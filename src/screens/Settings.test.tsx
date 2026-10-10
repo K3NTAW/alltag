@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import type { GemmaStatus } from "../offline/gemma";
 import Settings from "./Settings";
 
@@ -28,6 +28,66 @@ vi.mock("../offline/gemma", () => ({
   MODEL_FILE: "gemma3-1b-it-int4-web.task",
   gemma: fake,
 }));
+
+type InstallState = {
+  canInstall: boolean;
+  install: () => Promise<void>;
+  platform: "android" | "ios" | "other";
+  installed: boolean;
+};
+
+const pwa = vi.hoisted(() => {
+  const base = () => ({
+    canInstall: false,
+    install: vi.fn(async () => undefined),
+    platform: "other" as const,
+    installed: false,
+  });
+  return { base, state: base() as InstallState };
+});
+
+vi.mock("../pwa/install", () => ({ useInstallPrompt: () => pwa.state }));
+
+describe("Settings on your phone", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    fake.set({ state: "absent" });
+    pwa.state = pwa.base();
+  });
+
+  it("sits above the offline tutor", () => {
+    render(<Settings />);
+    const phone = screen.getByText("on your phone");
+    const tutor = screen.getByText("offline tutor");
+    expect(phone.compareDocumentPosition(tutor) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("installed", () => {
+    pwa.state = { ...pwa.base(), installed: true };
+    render(<Settings />);
+    expect(screen.getByText("installed. works offline.")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "add to home screen" })).not.toBeInTheDocument();
+  });
+
+  it("installable: the button calls install()", () => {
+    pwa.state = { ...pwa.base(), canInstall: true, platform: "android" };
+    render(<Settings />);
+    fireEvent.click(screen.getByRole("button", { name: "add to home screen" }));
+    expect(pwa.state.install).toHaveBeenCalledTimes(1);
+  });
+
+  it("ios: three-line instructions", () => {
+    pwa.state = { ...pwa.base(), platform: "ios" };
+    render(<Settings />);
+    const items = within(screen.getByTestId("on-your-phone")).getAllByRole("listitem");
+    expect(items.map((li) => li.textContent)).toEqual(["open in safari", "tap share", "add to home screen"]);
+  });
+
+  it("elsewhere: open it on your phone", () => {
+    render(<Settings />);
+    expect(screen.getByText("open this page on your phone to install it")).toBeInTheDocument();
+  });
+});
 
 describe("Settings offline tutor", () => {
   beforeEach(() => {

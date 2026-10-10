@@ -41,6 +41,10 @@ Where each state lives in code:
 - `src/voice/useLive.ts` (`LiveState = idle | connecting | listening | speaking | done | error`): Gemini Live for Noé. Live has no separate thinking phase; the server streams audio as soon as it has it. `done` fires when the model calls the `task_done` tool. `error` switches the Roleplay screen to the text fallback that calls `/api/turn`.
 - `correcting` is the `finish()` step in `src/screens/Roleplay.tsx`: it stops the live session, posts every learner line to `/api/correct` in parallel, dedupes the corrections, writes `session.lastExchange` and calls `go("corrections")`.
 
+## Service worker
+
+`vite-plugin-pwa` (workbox `generateSW`) builds `dist/sw.js` and `src/main.tsx` registers it with `registerType: "autoUpdate"`. It precaches the app shell (`**/*.{js,css,html,svg,woff2}`, files up to 5 MB) and answers navigations with `/index.html`, so the installed app loads with no network. `/api/*` is excluded from the navigate fallback and routed `NetworkOnly`: API responses are never cached, and offline the client falls back to the on-device model instead. The manifest stays `public/manifest.webmanifest` (`manifest: false` in the plugin).
+
 ## Data in localStorage
 
 | Key | Module | Content |

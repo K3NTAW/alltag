@@ -3,6 +3,7 @@ import { getSettings, setSettings, type Settings as SettingsShape } from "../lib
 import type { Level } from "../lib/types";
 import * as store from "../srs/store";
 import { gemma, MODEL_FILE, type GemmaStatus } from "../offline/gemma";
+import { useInstallPrompt } from "../pwa/install";
 
 const levels: Level[] = ["A1", "A2", "B1", "B2"];
 
@@ -96,6 +97,8 @@ export default function Settings() {
         />
       </label>
 
+      <OnYourPhone />
+
       <OfflineTutor />
 
       <div className={row}>
@@ -111,6 +114,42 @@ export default function Settings() {
         {cleared && <p className="text-[length:var(--text-small)] text-muted">cleared</p>}
       </div>
     </section>
+  );
+}
+
+function OnYourPhone() {
+  const { canInstall, install, platform, installed } = useInstallPrompt();
+
+  let body;
+  if (installed) {
+    body = <p>installed. works offline.</p>;
+  } else if (canInstall) {
+    body = (
+      <button
+        type="button"
+        onClick={() => void install()}
+        className="self-start rounded-[var(--radius-pill)] border border-line px-4 py-2"
+      >
+        add to home screen
+      </button>
+    );
+  } else if (platform === "ios") {
+    body = (
+      <ol className="flex flex-col gap-1 text-[length:var(--text-small)]">
+        <li>open in safari</li>
+        <li>tap share</li>
+        <li>add to home screen</li>
+      </ol>
+    );
+  } else {
+    body = <p className="text-[length:var(--text-small)] text-muted">open this page on your phone to install it</p>;
+  }
+
+  return (
+    <div className={row} data-testid="on-your-phone">
+      <span className="text-muted">on your phone</span>
+      {body}
+    </div>
   );
 }
 

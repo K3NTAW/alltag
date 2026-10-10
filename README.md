@@ -135,6 +135,15 @@ Setup, once per browser:
 
 Requirements and caveats: needs WebGPU (current Chrome or Edge on desktop or Android) and OPFS; elsewhere Settings says "not supported". The MediaPipe LLM Inference web API is in maintenance mode upstream; fine for a hackathon demo, not a long-term bet. A 1B model is much weaker than the cloud models: prompts are short and French, and its JSON is parsed leniently with safe defaults.
 
+#### Install on your phone
+
+The app ships a service worker, so once installed it opens with no network and the offline tutor is reachable.
+
+- Android Chrome: open the site, then Settings, "on your phone", "add to home screen" (or the browser menu, "Add to home screen").
+- iOS: open the site in Safari, tap Share, then "Add to Home Screen".
+- The model file is picked once in Settings and stays in the browser storage (OPFS) of that installed app.
+- WebGPU: Android Chrome is the tested path. iOS 26 Safari has WebGPU, but MediaPipe on it is untested.
+
 ## 5. API
 
 Types are in `src/lib/types.ts` (`CheckRequest`/`CheckResponse` in `src/lib/api.ts`). Full examples and error codes in [docs/API.md](docs/API.md).
