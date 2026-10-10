@@ -50,8 +50,8 @@ export default function Settings() {
   }
 
   return (
-    <section className="flex flex-col gap-3 p-[var(--gutter)]">
-      <h1 className="text-[length:var(--text-h1)] leading-[var(--lh-h1)]">settings</h1>
+    <section className="pt-safe pb-tabbar flex flex-col gap-3 px-[var(--gutter)]">
+      <h1 className="text-[length:var(--text-h1)] leading-[var(--lh-h1)] font-bold">settings</h1>
 
       <div className={row}>
         <span className="text-muted">language</span>

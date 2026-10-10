@@ -95,7 +95,7 @@ export default function Look() {
   const scanning = phase === "scanning";
 
   return (
-    <section className="relative flex min-h-screen flex-col bg-ink text-card">
+    <section className="bg-night relative flex min-h-dvh flex-col text-snow">
       <video
         ref={videoRef}
         playsInline
@@ -106,12 +106,15 @@ export default function Look() {
       {frame && (
         <img src={frame} alt="" className="absolute inset-0 h-full w-full object-cover opacity-50" />
       )}
+      {/* 35 % dim only where the clear glass floats. */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[120px] bg-gradient-to-b from-[var(--camera-dim)] to-transparent" />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[160px] bg-gradient-to-t from-[var(--camera-dim)] to-transparent" />
 
-      <div className="relative mt-auto flex flex-col items-center gap-3 p-6">
+      <div className="pb-tabbar relative mt-auto flex flex-col items-center gap-3 px-6 pt-6">
         {scanning ? (
           <p className="animate-pulse text-[length:var(--text-m)]">reading the room</p>
         ) : camera === "off" ? (
-          <label className="flex h-20 w-20 cursor-pointer items-center justify-center rounded-[var(--radius-pill)] bg-card text-ink">
+          <label className="glass-clear glass-specular flex h-[88px] w-[88px] items-center justify-center rounded-[var(--radius-pill)] border-2 border-snow/60 text-[length:var(--text-m)] font-semibold cursor-pointer">
             look
             <input
               type="file"
@@ -127,7 +130,7 @@ export default function Look() {
             type="button"
             onClick={look}
             disabled={camera !== "on"}
-            className="h-20 w-20 rounded-[var(--radius-pill)] bg-card text-ink disabled:opacity-50"
+            className="glass-clear glass-specular flex h-[88px] w-[88px] items-center justify-center rounded-[var(--radius-pill)] border-2 border-snow/60 text-[length:var(--text-m)] font-semibold disabled:opacity-50"
           >
             look
           </button>
@@ -140,7 +143,7 @@ export default function Look() {
             <button
               type="button"
               onClick={() => go("diary")}
-              className="rounded-[var(--radius-pill)] border border-card px-4 py-1 text-[length:var(--text-s)]"
+              className="glass-clear glass-specular flex h-9 items-center rounded-[18px] px-4 text-[15px] font-semibold"
             >
               open a saved scene
             </button>

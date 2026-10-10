@@ -6,6 +6,8 @@ import { getSettings } from "../lib/settings";
 import type { Card, Correction, SceneResult, TurnMessage } from "../lib/types";
 import * as store from "../srs/store";
 import { useLive } from "../voice/useLive";
+import GlassButton, { MicFace, type MicState } from "../components/GlassButton";
+import { useFullScreen } from "../components/TabBar";
 
 const MAX_LEARNER_TURNS = 4;
 
@@ -33,6 +35,11 @@ function openingLine(scene: SceneResult, card: Card | undefined): string {
 
 function learnerCount(messages: TurnMessage[]): number {
   return messages.filter((m) => m.role === "learner").length;
+}
+
+function micState(state: string): MicState {
+  if (state === "listening" || state === "speaking") return state;
+  return state === "done" ? "thinking" : "idle";
 }
 
 function Transcript({ messages }: { messages: Bubble[] }) {
@@ -71,6 +78,8 @@ export default function Roleplay() {
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
   const finishing = useRef(false);
+  // The voice conversation is full screen; idle and the typed fallback keep the tab bar.
+  useFullScreen(!!scene && !fallback);
 
   useEffect(() => {
     if (!scene) return;
@@ -122,12 +131,12 @@ export default function Roleplay() {
 
   if (!scene) {
     return (
-      <section className="flex min-h-screen flex-col items-center justify-center gap-4 p-6">
-        <p className="text-muted">nothing to talk about yet</p>
+      <section className="bg-night flex min-h-dvh flex-col items-center justify-center gap-4 p-6 pb-tabbar text-snow">
+        <p className="text-snow/72">nothing to talk about yet</p>
         <button
           type="button"
           onClick={() => go("look")}
-          className="rounded-[var(--radius-pill)] bg-accent px-5 py-2 text-card"
+          className="rounded-[26px] bg-accent px-6 py-3 text-[length:var(--text-m)] font-semibold text-card"
         >
           look
         </button>
@@ -168,22 +177,20 @@ export default function Roleplay() {
           : "connecting";
 
   return (
-    <section className="flex min-h-screen flex-col">
-      <header className="flex items-center justify-between gap-3 p-4">
+    <section className={`bg-night flex min-h-dvh flex-col text-snow ${fallback ? "pb-tabbar" : "pb-[env(safe-area-inset-bottom)]"}`}>
+      <header className="pt-safe sticky top-0 z-10 flex items-center justify-between gap-3 px-4 pb-2">
         <p
           data-testid="task-pill"
-          className="rounded-[var(--radius-pill)] bg-card px-4 py-1 text-[length:var(--text-s)] text-ink shadow"
+          className="glass-dark glass-specular flex h-9 items-center rounded-[18px] px-4 text-[15px] font-semibold"
         >
           {scene.task.fr}
         </p>
         {!fallback && (
-          <button
-            type="button"
-            onClick={() => void finish(live.transcript)}
-            className="shrink-0 rounded-[var(--radius-pill)] border border-line bg-card px-4 py-1 text-[length:var(--text-s)]"
-          >
-            end
-          </button>
+          <GlassButton variant="dark" aria-label="end" onClick={() => void finish(live.transcript)}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden>
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </GlassButton>
         )}
       </header>
 
@@ -192,7 +199,7 @@ export default function Roleplay() {
       {fallback && messages.some((m) => m.local) && (
         <p
           data-testid="offline-pill"
-          className="self-center rounded-[var(--radius-pill)] bg-card px-4 py-1 text-[length:var(--text-s)] text-muted shadow"
+          className="glass-dark glass-specular flex h-9 items-center self-center rounded-[18px] px-4 text-[length:var(--text-s)] text-snow/72"
         >
           offline, noé runs on this device
         </p>
@@ -206,14 +213,14 @@ export default function Roleplay() {
             void send();
           }}
         >
-          {failed && <p className="text-[length:var(--text-s)] text-muted">noé did not hear that, try again</p>}
-          {busy && <p className="text-[length:var(--text-s)] text-muted">noé is thinking</p>}
+          {failed && <p className="text-[length:var(--text-s)] text-snow/72">noé did not hear that, try again</p>}
+          {busy && <p className="text-[length:var(--text-s)] text-snow/72">noé is thinking</p>}
           <div className="flex gap-2">
             <input
               aria-label="your reply"
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
-              className="flex-1 rounded-[var(--radius-pill)] border border-line bg-card px-4 py-2"
+              className="flex-1 rounded-[var(--radius-pill)] border border-line bg-card px-4 py-2 text-ink"
             />
             <button
               type="submit"
@@ -227,16 +234,12 @@ export default function Roleplay() {
       ) : (
         <div className="flex flex-col items-center gap-3 p-6">
           {live.state === "listening" && live.partialUser && (
-            <p className="text-muted">{live.partialUser}</p>
+            <p className="text-snow/72">{live.partialUser}</p>
           )}
-          <div
-            data-state={live.state}
-            aria-hidden
-            className={`h-20 w-20 rounded-[var(--radius-pill)] ${
-              live.state === "listening" ? "animate-pulse bg-accent" : "bg-card shadow"
-            }`}
-          />
-          <p className="text-[length:var(--text-s)] text-muted">{status}</p>
+          <div data-state={live.state} aria-hidden>
+            <MicFace state={micState(live.state)} />
+          </div>
+          <p className="text-[length:var(--text-s)] text-snow/72">{status}</p>
         </div>
       )}
     </section>

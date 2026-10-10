@@ -99,8 +99,8 @@ export default function Diary() {
   const empty = store.all().length === 0 && conversations.all().length === 0;
 
   return (
-    <section className="flex flex-col gap-4 p-[var(--gutter)]">
-      <h1 className="text-[length:var(--text-h1)] leading-[var(--lh-h1)]">what you can say now</h1>
+    <section className="pt-safe pb-tabbar flex flex-col gap-4 px-[var(--gutter)]">
+      <h1 className="text-[length:var(--text-h1)] leading-[var(--lh-h1)] font-bold">what you can say now</h1>
       <div role="group" aria-label="filter" className="flex gap-2">
         {FILTERS.map((f) => (
           <button

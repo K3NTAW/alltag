@@ -21,7 +21,7 @@ function CorrectionCard({ c }: { c: Correction }) {
 
 function ExchangeDone({ phrases }: { phrases: string[] }) {
   return (
-    <section className="flex min-h-screen flex-col gap-4 p-4">
+    <section className="pt-safe pb-tabbar flex min-h-dvh flex-col gap-4 px-[var(--gutter)]">
       <div className="relative overflow-hidden rounded-[var(--radius-m)] bg-card">
         {session.frame && <img src={session.frame} alt={session.scene?.place ?? ""} className="block w-full opacity-60" />}
         <div className="flex flex-col gap-2 p-4">
@@ -39,14 +39,14 @@ function ExchangeDone({ phrases }: { phrases: string[] }) {
         <button
           type="button"
           onClick={() => go("look")}
-          className="flex-1 rounded-[var(--radius-pill)] border border-line px-4 py-2"
+          className="h-[52px] flex-1 rounded-[26px] border border-line bg-card px-4 text-[length:var(--text-m)] font-semibold"
         >
           look again
         </button>
         <button
           type="button"
           onClick={() => go("review")}
-          className="flex-1 rounded-[var(--radius-pill)] bg-accent px-4 py-2 text-card"
+          className="h-[52px] flex-1 rounded-[26px] bg-accent px-4 text-[length:var(--text-m)] font-semibold text-card"
         >
           review
         </button>
@@ -77,7 +77,8 @@ export default function Corrections() {
   }
 
   return (
-    <section className="flex min-h-screen flex-col gap-4 p-4">
+    <section className="pt-safe pb-tabbar flex min-h-dvh flex-col gap-4 px-[var(--gutter)]">
+      <h1 className="text-[length:var(--text-h1)] leading-[var(--lh-h1)] font-bold">corrections</h1>
       {corrections.length === 0 ? (
         <div className="flex flex-col gap-2 rounded-[var(--radius-m)] bg-card p-4 shadow">
           <p>nothing to fix, nice</p>
@@ -97,7 +98,7 @@ export default function Corrections() {
       <button
         type="button"
         onClick={keepAll}
-        className="rounded-[var(--radius-pill)] bg-accent px-5 py-2 text-card"
+        className="h-[52px] rounded-[26px] bg-accent px-5 text-[length:var(--text-m)] font-semibold text-card"
       >
         keep both and continue
       </button>

@@ -23,16 +23,19 @@
   --font-body: "Instrument Sans", sans-serif;
   --text-hero: 44px;
   --lh-hero: 48px;
-  --text-h1: 32px;
-  --lh-h1: 38px;
-  --text-h2: 24px;
-  --lh-h2: 30px;
-  --text-title: 18px;
-  --lh-title: 24px;
-  --text-body: 16px;
-  --lh-body: 24px;
-  --text-small: 14px;
-  --lh-small: 20px;
+  /* iOS scale from STYLE-GLASS.md: large title, title, headline, body, footnote, caption. */
+  --text-h1: 34px;
+  --lh-h1: 41px;
+  --text-h2: 28px;
+  --lh-h2: 34px;
+  --text-title: 17px;
+  --lh-title: 22px;
+  --text-body: 17px;
+  --lh-body: 22px;
+  --text-callout: 16px;
+  --lh-callout: 21px;
+  --text-small: 13px;
+  --lh-small: 18px;
   --text-micro: 12px;
   --lh-micro: 16px;
 
@@ -68,4 +71,124 @@
   --space-4: 16px;
   --space-5: 24px;
   --space-6: 32px;
+
+  /* Liquid Glass layer, from .orchestrator/design/STYLE-GLASS.md (v2). */
+  --glass-blur: 24px;
+  --glass-light-bg: rgba(255, 255, 255, 0.58);
+  --glass-light-border: rgba(255, 255, 255, 0.75);
+  --glass-light-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 8px 32px rgba(21, 24, 28, 0.12),
+    0 0 0 0.5px rgba(21, 24, 28, 0.08);
+  --glass-dark-bg: rgba(20, 22, 26, 0.55);
+  --glass-dark-border: rgba(255, 255, 255, 0.16);
+  --glass-dark-shadow: 0 1px 0 rgba(255, 255, 255, 0.18) inset, 0 12px 40px rgba(0, 0, 0, 0.45);
+  --glass-clear-bg: rgba(255, 255, 255, 0.14);
+  --glass-clear-border: rgba(255, 255, 255, 0.38);
+  --glass-clear-shadow: 0 1px 0 rgba(255, 255, 255, 0.45) inset, 0 8px 24px rgba(0, 0, 0, 0.35);
+  --glass-clear-blur: 16px;
+  --glass-specular: linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0) 42%);
+  --glass-specular-dark: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 42%);
+  --glass-tint-moss: rgba(15, 110, 86, 0.18);
+  --glass-tint-moss-dark: rgba(15, 110, 86, 0.28);
+  --moss-on-dark: #9BD7C3;
+  --camera-dim: rgba(0, 0, 0, 0.35);
+  --radius-capsule: 32px;
+  --tabbar-h: 64px;
+  --tabbar-gap: 16px;
+}
+
+/* Glass is for controls and navigation only, never cards, lists or text.
+   Components layer, so Tailwind utilities (position, size) still win. */
+@layer components {
+  .glass-light,
+  .glass-dark,
+  .glass-clear {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .glass-light {
+    background: var(--glass-light-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+    border: 1px solid var(--glass-light-border);
+    box-shadow: var(--glass-light-shadow);
+    color: var(--ink);
+  }
+
+  .glass-dark {
+    background: var(--glass-dark-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+    border: 1px solid var(--glass-dark-border);
+    box-shadow: var(--glass-dark-shadow);
+    color: var(--snow);
+  }
+
+  .glass-clear {
+    background: var(--glass-clear-bg);
+    backdrop-filter: blur(var(--glass-clear-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-clear-blur)) saturate(140%);
+    border: 1px solid var(--glass-clear-border);
+    box-shadow: var(--glass-clear-shadow);
+    color: var(--snow);
+  }
+
+  /* Top highlight, painted under the content of the element. */
+  .glass-specular {
+    isolation: isolate;
+  }
+
+  .glass-specular::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--glass-specular);
+    pointer-events: none;
+  }
+
+  .glass-dark.glass-specular::before {
+    background: var(--glass-specular-dark);
+  }
+
+  .tint-moss {
+    background: var(--glass-tint-moss);
+    color: var(--moss);
+  }
+
+  .glass-dark .tint-moss {
+    background: var(--glass-tint-moss-dark);
+    color: var(--moss-on-dark);
+  }
+
+  /* Soft glows so the glass has something to refract. */
+  .bg-paper {
+    background: radial-gradient(60% 40% at 10% 0%, rgba(15, 110, 86, 0.08), transparent), var(--paper);
+  }
+
+  .bg-night {
+    background: radial-gradient(60% 40% at 50% 100%, rgba(242, 201, 76, 0.06), transparent), var(--night);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-light {
+    background: var(--card);
+    border-color: var(--line);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .glass-dark {
+    background: #1A1D22;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .glass-clear {
+    background: rgba(20, 22, 26, 0.72);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }

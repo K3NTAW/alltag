@@ -5,6 +5,7 @@ import type { Card } from "../lib/types";
 import { gradeFromTranscript } from "../srs/recall";
 import * as store from "../srs/store";
 import { useVoice } from "../voice/useVoice";
+import { MicFace } from "../components/GlassButton";
 
 type Group = { key: string; cards: Card[] };
 
@@ -65,7 +66,7 @@ function ReviewCard({ card, position, total, onNext }: { card: Card; position: n
   }
 
   return (
-    <section className="flex flex-col gap-4 p-[var(--gutter)]">
+    <section className="pt-safe pb-tabbar flex flex-col gap-4 px-[var(--gutter)]">
       <p className="text-[length:var(--text-micro)] text-muted">
         {position} of {total}
       </p>
@@ -86,7 +87,7 @@ function ReviewCard({ card, position, total, onNext }: { card: Card; position: n
           <button
             type="button"
             onClick={onNext}
-            className="rounded-[var(--radius-button)] bg-accent px-5 py-3 text-card"
+            className="h-[52px] rounded-[26px] bg-accent px-5 text-[length:var(--text-m)] font-semibold text-card"
           >
             next
           </button>
@@ -99,8 +100,9 @@ function ReviewCard({ card, position, total, onNext }: { card: Card; position: n
             onPointerDown={() => void voice?.startListening()}
             onPointerUp={() => voice?.stopListening()}
             onPointerLeave={() => voice?.stopListening()}
-            className="self-center rounded-[var(--radius-pill)] bg-accent px-6 py-4 text-card"
+            className="flex flex-col items-center gap-1 self-center rounded-[var(--radius-pill)] text-[length:var(--text-micro)] font-medium tracking-[0.04em] text-muted"
           >
+            <MicFace state={voice?.state === "listening" ? "listening" : busy ? "thinking" : "idle"} surface="light" />
             {voice?.state === "listening" ? "listening" : "hold to talk"}
           </button>
           {voice?.partial && <p className="text-center text-muted">{voice.partial}</p>}
@@ -160,9 +162,9 @@ export default function Review() {
   }
 
   return (
-    <section className="flex flex-col gap-4 p-[var(--gutter)]">
+    <section className="pt-safe pb-tabbar flex flex-col gap-4 px-[var(--gutter)]">
       <header>
-        <h1 className="text-[length:var(--text-h1)] leading-[var(--lh-h1)]">review</h1>
+        <h1 className="text-[length:var(--text-h1)] leading-[var(--lh-h1)] font-bold">review</h1>
         <p className="text-[length:var(--text-small)] text-muted">
           due now <span data-testid="due-count">{due.length}</span>
         </p>
@@ -189,7 +191,7 @@ export default function Review() {
           <button
             type="button"
             onClick={() => start()}
-            className="rounded-[var(--radius-button)] bg-accent px-5 py-3 text-card"
+            className="h-[52px] rounded-[26px] bg-accent px-5 text-[length:var(--text-m)] font-semibold text-card"
           >
             start
           </button>

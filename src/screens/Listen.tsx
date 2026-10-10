@@ -10,6 +10,8 @@ import * as store from "../srs/store";
 import { defaultStartMic } from "../voice/live";
 import { SttSession } from "../voice/stt";
 import { useLive } from "../voice/useLive";
+import { MicFace } from "../components/GlassButton";
+import { useFullScreen } from "../components/TabBar";
 
 type Phase = "idle" | "live" | "learn";
 
@@ -70,7 +72,9 @@ function buildItems(
 // Same round control as the roleplay mic.
 function MicButton({ onClick, label }: { onClick: () => void; label: string }) {
   return (
-    <button type="button" onClick={onClick} aria-label={label} className="h-20 w-20 rounded-[var(--radius-pill)] bg-accent shadow" />
+    <button type="button" onClick={onClick} aria-label={label} className="rounded-[var(--radius-pill)]">
+      <MicFace state="idle" surface="light" />
+    </button>
   );
 }
 
@@ -99,6 +103,7 @@ export default function Listen() {
     n: number;
     gen: number;
   }>({ active: false, n: 0, gen: 0 });
+  useFullScreen(phase === "live");
 
   // Token or connect failure -> Gradium STT + /api/translate for the rest of this conversation.
   if (phase === "live" && !paused && !fallback && live.state === "error") setFallback(true);
@@ -277,9 +282,9 @@ export default function Listen() {
     const minutes = Math.max(1, Math.round(elapsed / 60));
     const k = learn.items.filter((it) => it.checked).length;
     return (
-      <section className="flex flex-col gap-5 p-[var(--gutter)]">
+      <section className="pt-safe pb-tabbar flex flex-col gap-5 px-[var(--gutter)]">
         <header>
-          <h1 className="font-display text-[length:var(--text-h1)] leading-[var(--lh-h1)]">from that conversation</h1>
+          <h1 className="font-display text-[length:var(--text-h1)] leading-[var(--lh-h1)] font-bold">from that conversation</h1>
           <p className="text-muted">
             {minutes} {minutes === 1 ? "minute" : "minutes"}, {learn.lines.length} {learn.lines.length === 1 ? "line" : "lines"}
           </p>
@@ -361,7 +366,7 @@ export default function Listen() {
             type="button"
             disabled={learn.loading}
             onClick={keepAndReview}
-            className="rounded-[var(--radius-button)] bg-accent px-5 py-3 text-card"
+            className="h-[52px] rounded-[26px] bg-accent px-5 text-[length:var(--text-m)] font-semibold text-card"
           >
             keep {k} and add to review
           </button>
@@ -369,7 +374,7 @@ export default function Listen() {
             type="button"
             disabled={learn.loading}
             onClick={saveTranscript}
-            className="rounded-[var(--radius-button)] border border-line bg-card px-5 py-3"
+            className="h-[52px] rounded-[26px] border border-line bg-card px-5 text-[length:var(--text-m)] font-semibold"
           >
             save transcript to diary
           </button>
@@ -380,8 +385,8 @@ export default function Listen() {
 
   if (phase === "live") {
     return (
-      <section className="flex min-h-dvh flex-col bg-night text-snow">
-        <header className="flex items-center gap-3 p-4">
+      <section className="flex min-h-dvh flex-col bg-night pb-[env(safe-area-inset-bottom)] text-snow">
+        <header className="pt-safe flex items-center gap-3 px-4 pb-2">
           <span aria-hidden className={`h-2.5 w-2.5 rounded-[var(--radius-pill)] bg-moss ${paused ? "" : "animate-pulse"}`} />
           <span data-testid="elapsed" className="tabular-nums">
             {clock(elapsed)}
@@ -389,7 +394,7 @@ export default function Listen() {
           <button
             type="button"
             onClick={() => void stopAndLearn()}
-            className="ml-auto rounded-[var(--radius-pill)] border border-[var(--glass-border)] px-4 py-1 text-[length:var(--text-small)]"
+            className="glass-dark glass-specular ml-auto flex h-11 items-center rounded-[22px] px-4 text-[15px] font-semibold"
           >
             stop
           </button>
@@ -426,18 +431,18 @@ export default function Listen() {
             </li>
           ))}
         </ol>
-        <div className="sticky bottom-0 m-4 flex gap-3 rounded-[var(--radius-card)] border border-[var(--glass-border)] bg-[var(--glass)] p-3 backdrop-blur">
+        <div className="glass-dark glass-specular sticky bottom-4 m-4 flex gap-3 rounded-[var(--radius-capsule)] p-2">
           <button
             type="button"
             onClick={paused ? resume : pause}
-            className="flex-1 rounded-[var(--radius-button)] border border-[var(--glass-border)] py-3"
+            className="h-12 flex-1 rounded-[24px] text-[length:var(--text-m)] font-semibold"
           >
             {paused ? "resume" : "pause"}
           </button>
           <button
             type="button"
             onClick={() => void stopAndLearn()}
-            className="flex-1 rounded-[var(--radius-button)] bg-moss py-3 text-snow"
+            className="h-12 flex-1 rounded-[24px] bg-moss text-[length:var(--text-m)] font-semibold text-snow"
           >
             stop and learn
           </button>
@@ -447,9 +452,9 @@ export default function Listen() {
   }
 
   return (
-    <section className="flex flex-col gap-5 p-[var(--gutter)]">
+    <section className="pt-safe pb-tabbar flex flex-col gap-5 px-[var(--gutter)]">
       <header className="flex flex-col gap-2">
-        <h1 className="font-display text-[length:var(--text-h1)] leading-[var(--lh-h1)]">listen</h1>
+        <h1 className="font-display text-[length:var(--text-h1)] leading-[var(--lh-h1)] font-bold">listen</h1>
         <p className="text-muted">hear a real conversation around you, see it in both languages, keep what you want to learn.</p>
       </header>
       <p className="rounded-[var(--radius-card)] border border-line bg-card p-4 text-[length:var(--text-small)] text-muted">
