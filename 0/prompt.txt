@@ -1,0 +1,96 @@
+Implement this single task in the current worktree. Commit the completed changes on the current branch with a message that starts with the task id before testing. Never leave uncommitted changes and never touch files outside scope.
+The packet above is the task contract: implement the ## objective, satisfy every line of ## acceptance, and edit only paths listed in ## write_scope.
+Run only the acceptance-named tests in the foreground; never background a command. Each command must finish in under 10 minutes. The daemon runs the full gate externally.
+No new dependencies without stating why. Finish with: summary, files changed, failures-only test output.
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read.
+
+packet vdf5b64176145 base 5ef24be4726f sources pool.toml@19c37ec8af44 gotchas@4cea4f31e183 memory@notes specialist: execute+implement-spec over cap by 189 chars: acceptance kept whole routed=shadow
+## skills
+### executor/implement-spec (v6ba2f814dd6f)
+## Trigger
+Any execute task from the orchestrator.
+
+## Objective
+Implement one atomic task within its Scope and leave tests green.
+
+## Procedure
+Read Spec, Acceptance, Scope. Run `scripts/tests_green.sh` first. Make the smallest accepted change. Run it again; iterate on failure. Commit on the task branch.
+
+## Tools
+Read, Edit, Bash; `scripts/failures_only.sh`.
+
+## Evidence requirements
+Acceptance checks and tests-green result.
+
+## Output contract
+Finish with: 3-line summary, `git diff --stat`, failures-only output (empty when green).
+
+## Stop conditions
+Stop when Acceptance passes or budget ends.
+
+## Failure/recovery
+Report only `scripts/failures_only.sh` output. Edit only paths in Scope. No new dependencies unless the spec names them.
+## objective
+fix: Listen shows the agent answering instead of the English translation; translate final French lines via /api/translate, ignore Live replies
+- discovery: Bug from the human's phone (goal/T-0001 5cbeeeb): in Listen mode the French utterances are transcribed correctly, but the English line under each one shows the Gemini Live model ANSWERING the speaker instead of translating. Cause: src/voice/live.ts listen mode (responseModalities TEXT, systemInstruction buildListenPrompt) treats modelTurn text as the translation, and src/listen/pairs.ts pairLines fills pair.en from those "tutor" events. The live model does not reliably follow the translate-only instruction.
+
+Fix: translation must never come from the Live model.
+1. Listen keeps using the Live session ONLY for input transcription (the French "user" events: partials update fr, final closes it). Ignore all modelTurn/"tutor" text in listen mode (live.ts may stop emitting tutor events when this.listen is true; keep roleplay mode untouched).
+2. When a French utterance becomes final, call the existing postTranslate (src/lib/api-listen.ts, POST /api/translate {text, from: "fr", to: "en"}) once for that utterance and set its en when it resolves; mark the pair final then. Use the same translate-and-fill code path the Gradium fallback already uses in Listen.tsx (reuse it, do not duplicate). Ignore results that arrive after the session was stopped/restarted (existing generation counter pattern). On translate failure leave en empty and final true (no retry loop), same as the fallback.
+3. pairLines: user events only build pairs; remove or bypass the tutor-fills-en logic for listen (adjust its doc comment and tests accordingly).
+4. Keep everything else (Gradium fallback, pause, keep/bookmark, learn/extract step, styling) unchanged. The "live translation unavailable, using fallback" note should only show when the Live session itself failed.
+Tests: Listen.test.tsx: with the live mock emitting a final French user event and a model text event, the English shown is the postTranslate result, never the model text; postTranslate called once per final utterance (not for partials); late translate result after stop is ignored. pairs.test.ts updated. live.test.ts (if present): listen mode emits no tutor events. Existing tests pass otherwise.
+Rollback: git revert the commit.
+## acceptance
+- In listen mode the English line comes only from postTranslate of the final French utterance; Live model text is never shown
+- postTranslate called once per final utterance, not for partials; stale results after stop ignored
+- Listen.test.tsx and pairs tests cover the above; roleplay live behaviour unchanged; existing tests pass
+- Gate green: npm test -- --watch=false, npx tsc --noEmit, npm run lint
+## base
+- branch: main
+- merge-base goal/T-0001: 5ef24be4726f745612785cfba5e120dfd068ed32
+- goal: T-0001
+## write_scope
+- src/screens/Listen.tsx
+- src/screens/Listen.test.tsx
+- src/listen/pairs.ts
+- src/listen/pairs.test.ts
+- src/voice/live.ts
+- src/voice/live.test.ts
+## read_scope
+- src/listen/
+- src/screens/
+- src/voice/
+- tests/
+## constraints
+- allowed_dependencies: "none new"
+- budget_turns: 50
+- dedupe: "listen-translate-fix"
+- interface_contract: "Roleplay live mode and the Gradium fallback keep their behaviour; Listen keeps props, aria labels and test ids."
+- priority: "high"
+- read_only: false
+- read_scope: ["**"]
+- route: "straightforward"
+- task_class: "bugfix"
+- timeout_s: 1500
+## relevant_tests
+- (none found)
+## symbols
+- (none)
+## gotchas
+- mem:gotchas.md:3 Gradium WebSocket shapes verified 2026-10-10
+- mem:gotchas.md:10 Vercel functions need .js on relative imports (type=module)
+- mem:gotchas.md:17 Worktree prune during a running executor left a stale index.lock
+## decisions
+- 2026-10-10 Alltag build order A..H as 8 execute tasks with shared contracts owned by the scaffold
+## verify
+- .claude/hooks/tests-green.sh .
+- On failure, report only scripts/failures_only.sh output.
+## evidence
+
+
+## conditional instructions
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read; run the test script at most twice.
+
+You are a Claude fallback executor (Codex is unavailable); a human reviews merges. Commit on the task branch when green.
+If you need a tool outside your allowlist, post bus_post_result with status held and result reason needs_tool:<tool id>.
