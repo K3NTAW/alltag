@@ -1,0 +1,47 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4KCFGB6ABT7SFXZCA7HMZDF",
+  "session_id": "78d0d296-5bcf-4101-a5d2-ccfbbbe3bd72",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T17:06:32.180207Z",
+  "branch": "task/T-0098",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".env.production",
+    "README.md",
+    "ios/App/App.xcodeproj/project.pbxproj",
+    "ios/App/App/Info.plist"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-sonnet-5-5",
+  "turn_id": "1b1b486c2b23",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 8,
+    "cache_creation_tokens": 31282,
+    "cache_read_tokens": 84764,
+    "output_tokens": 1771,
+    "api_call_count": 4
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-10T17:06:32.04647Z",
+    "agent_lines": 7,
+    "agent_removed": 3,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 7,
+    "total_lines_changed": 10,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+Implement this single task in the current worktree. Commit the completed changes on the current branch with a message that starts with the task id before testing. Never leave uncommitted changes and never touch files outside scope.
+The packet above is the task contract: implement the ## objective, satisfy every line of ## acceptance, and edit only paths listed in ## write_scope.
+Run only the acceptance-named tests in the foreground; never background a command. Each command must finish in under 10 minutes. The daemon runs the full gate externally.
+No new dependencies without stating why. Finish with: summary, files changed, failures-only test output.
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read.
+
+packet v4d16700b21e2 base 5ef24be4726f sources pool.toml@19c37ec8af44 gotchas@4cea4f31e183 memory@notes specialist: execute+implement-spec over cap by 156 chars: acceptance kept whole routed=shadow
+## skills
+### executor/implement-spec (v6ba2f814dd6f)
+## Trigger
+Any execute task from the orchestrator.
+
+## Objective
+Implement one atomic task within its Scope and leave tests green.
+
+## Procedure
+Read Spec, Acceptance, Scope. Run `scripts/tests_green.sh` first. Make the smallest accepted change. Run it again; iterate on failure. Commit on the task branch.
+
+## Tools
+Read, Edit, Bash; `scripts/failures_only.sh`.
+
+## Evidence requirements
+Acceptance checks and tests-green result.
+
+## Output contract
+Finish with: 3-line summary, `git diff --stat`, failures-only output (empty when green).
+
+## Stop conditions
+Stop when Acceptance passes or budget ends.
+
+## Failure/recovery
+Report only `scripts/failures_only.sh` output. Edit only paths in Scope. No new dependencies unless the spec names them.
+## objective
+TestFlight prep: production API base for native builds, Info.plist encryption flag, build number 2, icon alpha check, cap sync
+- discovery: Prepare the Capacitor iOS app (ios/App, bundle id ch.alltag.app) for a TestFlight upload. No signing, no archive, no upload, no Apple account access, no keychain access: the human does those in Xcode.
+1. Production API base: the native app is served from https://localhost, so relative /api calls fail. Add `.env.production` with `VITE_API_BASE=https://alltag-xi.vercel.app` (a public URL, not a secret) unless the app already resolves the API base another way for native builds; check src for how VITE_API_BASE is read and make sure Capacitor builds use it. Keep docs/readme.test.ts green (every .env.example var appears in README).
+2. Info.plist (ios/App/App/Info.plist): add `ITSAppUsesNonExemptEncryption` = false (only standard HTTPS); keep NSCameraUsageDescription and NSMicrophoneUsageDescription; if the app uses speech recognition (grep for SpeechRecognition / webkitSpeechRecognition), add NSSpeechRecognitionUsageDescription "alltag checks what you say in review".
+3. project.pbxproj: CURRENT_PROJECT_VERSION 1 -> 2 for both configurations; MARKETING_VERSION stays 1.0. Do NOT set DEVELOPMENT_TEAM.
+4. App icon: confirm ios/App/App/Assets.xcassets/AppIcon.appiconset has a 1024x1024 PNG without alpha (App Store rejects alpha). If it has alpha, flatten it onto the linen #F4F2EE background with macOS `sips` and replace it.
+5. Run `pnpm install`, `pnpm build`, `npx cap sync ios`. Commit the resulting changes to ios/ that cap sync produces (public assets are usually gitignored; follow the repo's .gitignore).
+6. Gate: `npm test -- --watch=false`, `npx tsc --noEmit`, `npm run lint` green.
+7. Result: list what changed, and confirm `xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build` succeeds (simulator build, no signing) so the human's Archive will compile.
+Rollback: git revert the commit.
+## acceptance
+- Native build calls https://alltag-xi.vercel.app/api (VITE_API_BASE set for production builds)
+- Info.plist has ITSAppUsesNonExemptEncryption false and all needed usage descriptions; CURRENT_PROJECT_VERSION 2; no DEVELOPMENT_TEAM set
+- AppIcon 1024 has no alpha; cap sync ios done; unsigned Release simulator xcodebuild succeeds
+- Gate green: npm test -- --watch=false, npx tsc --noEmit, npm run lint
+## base
+- branch: main
+- merge-base goal/T-0001: 5ef24be4726f745612785cfba5e120dfd068ed32
+- goal: T-0001
+## write_scope
+- .env.production
+- .env.example
+- README.md
+- ios/**
+- src/lib/api.ts
+- src/lib/**
+- capacitor.config.ts
+## read_scope
+- .
+- ios/
+- src/lib/
+- tests/
+## constraints
+- allowed_dependencies: "none new"
+- budget_turns: 60
+- dedupe: "testflight-prep"
+- interface_contract: "No signing, no team id, no Apple account or keychain access."
+- priority: "high"
+- read_only: false
+- read_scope: ["**"]
+- route: "straightforward"
+- task_class: "mechanical"
+- timeout_s: 2400
+## relevant_tests
+- (none found)
+## symbols
+- (none)
+## gotchas
+- mem:gotchas.md:3 Gradium WebSocket shapes verified 2026-10-10
+- mem:gotchas.md:10 Vercel functions need .js on relative imports (type=module)
+- mem:gotchas.md:17 Worktree prune during a running executor left a stale index.lock
+## decisions
+- 2026-10-10 Alltag build order A..H as 8 execute tasks with shared contracts owned by the scaffold
+- 2026-10-10 T-0001 closable: pushed goal/T-0001 19e9771..a0b9ef8 (T-0029 merge was local only), updated PR 1 body with O and S, posted PR url as goal result
+- 2026-10-10 T-0041 gate_red was load noise: external gate green, hold released for re-gate instead of respec or split
+## verify
+- .claude/hooks/tests-green.sh .
+- On failure, report only scripts/failures_only.sh output.
+## evidence
+- 00851d98701a task:T-0017:gotcha:1: - mem:gotchas.md:3 Gradium WebSocket shapes verified 2026-10-10
+
+## conditional instructions
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read; run the test script at most twice.
+
+You are a Claude fallback executor (Codex is unavailable); a human reviews merges. Commit on the task branch when green.
+If you need a tool outside your allowlist, post bus_post_result with status held and result reason needs_tool:<tool id>.
