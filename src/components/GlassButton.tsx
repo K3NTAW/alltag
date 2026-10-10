@@ -6,13 +6,13 @@ interface Props extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "aria-labe
   children: ReactNode;
 }
 
-/** 44px floating circle for back, close and settings at the top corners. */
+/** 44px floating circle for back, close and settings at the top corners (SNIPPETS D). */
 export default function GlassButton({ variant = "light", className = "", children, type = "button", ...rest }: Props) {
   return (
     <button
       type={type}
       {...rest}
-      className={`glass-${variant} glass-specular flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-pill)] ${className}`}
+      className={`glass-${variant} glass-specular press flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-[22px] p-0 ${className}`}
     >
       {children}
     </button>

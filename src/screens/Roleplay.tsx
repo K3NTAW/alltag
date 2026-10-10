@@ -6,7 +6,8 @@ import { getSettings } from "../lib/settings";
 import type { Card, Correction, SceneResult, TurnMessage } from "../lib/types";
 import * as store from "../srs/store";
 import { useLive } from "../voice/useLive";
-import GlassButton, { MicFace, type MicState } from "../components/GlassButton";
+import GlassButton, { type MicState } from "../components/GlassButton";
+import Orb from "../components/Orb";
 import { useFullScreen } from "../components/TabBar";
 
 const MAX_LEARNER_TURNS = 4;
@@ -237,7 +238,7 @@ export default function Roleplay() {
             <p className="text-snow/72">{live.partialUser}</p>
           )}
           <div data-state={live.state} aria-hidden>
-            <MicFace state={micState(live.state)} />
+            <Orb size={96} state={micState(live.state)} />
           </div>
           <p className="text-[length:var(--text-s)] text-snow/72">{status}</p>
         </div>

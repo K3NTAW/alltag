@@ -98,13 +98,13 @@ export default function TabBar({ screen, go, hidden = false }: Props) {
   const current = tabFor(screen);
   return (
     <div
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 mx-auto max-w-md px-4"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 mx-auto max-w-md px-[var(--gutter)]"
       style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + var(--tabbar-gap))" }}
     >
       <nav
         aria-label="main"
         data-variant={dark ? "dark" : "light"}
-        className={`${dark ? "glass-dark" : "glass-light"} glass-specular pointer-events-auto flex h-[var(--tabbar-h)] items-center justify-around rounded-[var(--radius-capsule)] px-1`}
+        className={`${dark ? "glass-dark" : "glass-light"} glass-specular pointer-events-auto grid h-[var(--tabbar-h)] grid-cols-5 items-center rounded-[var(--radius-capsule)] px-2`}
       >
         {TABS.map((t) => {
           const selected = t === current;
@@ -114,13 +114,13 @@ export default function TabBar({ screen, go, hidden = false }: Props) {
               type="button"
               onClick={() => go(t)}
               aria-current={selected ? "page" : undefined}
-              className={`flex h-12 w-14 flex-col items-center justify-center gap-0.5 rounded-[24px] ${
-                selected ? "tint-moss" : dark ? "text-snow/72" : "text-ink2"
+              className={`press mx-1 flex h-12 min-w-0 flex-col items-center justify-center gap-0.5 rounded-[24px] ${
+                selected ? "tint-moss" : dark ? "text-[color:var(--night-text2)]" : "text-ink2"
               }`}
             >
               <svg
-                width="24"
-                height="24"
+                width="22"
+                height="22"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -131,7 +131,7 @@ export default function TabBar({ screen, go, hidden = false }: Props) {
               >
                 {icons[t]}
               </svg>
-              <span className="text-[11px] leading-[13px] font-semibold">{t}</span>
+              <span className="font-body text-[11px] leading-[13px] font-semibold">{t}</span>
             </button>
           );
         })}
