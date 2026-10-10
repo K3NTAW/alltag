@@ -17,6 +17,41 @@ export function resampleLinear(input: Float32Array, inputRate: number, outputRat
   return out;
 }
 
+/** Streaming linear resampler that keeps fractional phase and the last sample across blocks. */
+export class StreamResampler {
+  private pos = 0;
+  private last: number | null = null;
+  private rate = 0;
+
+  process(input: Float32Array, inputRate: number, outputRate: number): Float32Array {
+    if (inputRate === outputRate) return input;
+    if (inputRate !== this.rate) {
+      this.rate = inputRate;
+      this.pos = 0;
+      this.last = null;
+    }
+    if (input.length === 0) return input;
+    const src = this.last === null ? input : new Float32Array(input.length + 1);
+    if (src !== input) {
+      src[0] = this.last as number;
+      src.set(input, 1);
+    }
+    const ratio = inputRate / outputRate;
+    const end = src.length - 1;
+    const out: number[] = [];
+    let pos = this.pos;
+    while (pos < end) {
+      const i0 = Math.floor(pos);
+      const t = pos - i0;
+      out.push(src[i0] * (1 - t) + src[i0 + 1] * t);
+      pos += ratio;
+    }
+    this.pos = pos - end;
+    this.last = src[end];
+    return Float32Array.from(out);
+  }
+}
+
 export function floatTo16BitPCM(input: Float32Array): Int16Array {
   const out = new Int16Array(input.length);
   for (let i = 0; i < input.length; i++) {
@@ -42,6 +77,8 @@ interface SttOptions {
   onPartial?: (text: string) => void;
   onFinal: (text: string) => void;
   onVad?: (prob3s: number) => void;
+  /** Called when a flush completes with no recognised text. */
+  onEmpty?: () => void;
 }
 
 interface ServerMessage {
@@ -57,6 +94,7 @@ export class SttSession {
   private queue: string[] = [];
   private turn: string[] = [];
   private flushId = 0;
+  private resampler = new StreamResampler();
 
   constructor(opts: SttOptions) {
     this.opts = opts;
@@ -88,7 +126,7 @@ export class SttSession {
   }
 
   pushSamples(samples: Float32Array, inputRate: number): void {
-    const pcm = floatTo16BitPCM(resampleLinear(samples, inputRate, STT_RATE));
+    const pcm = floatTo16BitPCM(this.resampler.process(samples, inputRate, STT_RATE));
     const merged = new Int16Array(this.buffer.length + pcm.length);
     merged.set(this.buffer);
     merged.set(pcm, this.buffer.length);
@@ -138,7 +176,8 @@ export class SttSession {
       this.opts.onVad?.(h3.inactivity_prob);
       if (h3.inactivity_prob > 0.5) this.endTurn();
     } else if (msg.type === "flushed") {
-      this.endTurn();
+      if (!this.turnText()) this.opts.onEmpty?.();
+      else this.endTurn();
     }
   }
 
