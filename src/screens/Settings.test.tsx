@@ -25,7 +25,9 @@ const fake = vi.hoisted(() => {
 });
 
 vi.mock("../offline/gemma", () => ({
-  MODEL_FILE: "gemma3-1b-it-int4-web.task",
+  MODEL_FILE: "gemma-4-E2B-it-web.task",
+  MODEL_LABEL: "Gemma 4 E2B",
+  MODEL_LICENCE: { name: "Apache 2.0", url: "https://www.apache.org/licenses/LICENSE-2.0" },
   gemma: fake,
 }));
 
@@ -120,15 +122,15 @@ describe("Settings offline tutor", () => {
   it("hides the file input when unsupported", () => {
     fake.set({ state: "unavailable" });
     render(<Settings />);
-    expect(screen.queryByLabelText("choose gemma3-1b-it-int4-web.task")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("choose gemma-4-E2B-it-web.task")).not.toBeInTheDocument();
   });
 
   it("file input triggers importFile", () => {
     render(<Settings />);
     expect(fake.refresh).toHaveBeenCalled();
-    const input = screen.getByLabelText("choose gemma3-1b-it-int4-web.task");
+    const input = screen.getByLabelText("choose gemma-4-E2B-it-web.task");
     expect(input).toHaveAttribute("accept", ".task");
-    const file = new File(["w"], "gemma3-1b-it-int4-web.task");
+    const file = new File(["w"], "gemma-4-E2B-it-web.task");
     fireEvent.change(input, { target: { files: [file] } });
     expect(fake.importFile).toHaveBeenCalledWith(file);
   });
@@ -148,7 +150,7 @@ describe("Settings offline tutor", () => {
     render(<Settings />);
     expect(screen.getByRole("link", { name: "hugging face" })).toHaveAttribute(
       "href",
-      "https://huggingface.co/litert-community/Gemma3-1B-IT",
+      "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm",
     );
   });
 
@@ -156,23 +158,25 @@ describe("Settings offline tutor", () => {
     fake.set({ state: "ready", source: "bundled" });
     render(<Settings />);
     expect(screen.getByTestId("offline-status")).toHaveTextContent("ready, built into the app");
-    expect(screen.queryByLabelText("choose gemma3-1b-it-int4-web.task")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("choose gemma-4-E2B-it-web.task")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "remove" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "hugging face" })).not.toBeInTheDocument();
   });
 
   it("licence line when bundled or installed, not when absent", () => {
     const { unmount } = render(<Settings />);
-    expect(screen.queryByRole("link", { name: "Gemma Terms of Use" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Apache 2.0" })).not.toBeInTheDocument();
     unmount();
     for (const s of [{ state: "ready", source: "bundled" }, { state: "ready", source: "opfs" }] as GemmaStatus[]) {
       fake.set(s);
       const view = render(<Settings />);
-      expect(screen.getByText(/on-device model: Gemma 3 1B/)).toBeInTheDocument();
-      expect(screen.getByRole("link", { name: "Gemma Terms of Use" })).toHaveAttribute(
+      expect(screen.getByText(/on-device model: Gemma 4 E2B, Apache 2.0/)).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Apache 2.0" })).toHaveAttribute(
         "href",
-        "https://ai.google.dev/gemma/terms",
+        "https://www.apache.org/licenses/LICENSE-2.0",
       );
+      expect(screen.queryByRole("link", { name: /Gemma Terms/ })).not.toBeInTheDocument();
+      expect(screen.queryByRole("link", { name: /prohibited use/ })).not.toBeInTheDocument();
       view.unmount();
     }
   });

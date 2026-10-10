@@ -47,7 +47,7 @@ Where each state lives in code:
 
 ## Offline model sources
 
-`src/offline/gemma.ts` reports where the Gemma model came from in `status().source`. `bundled`: the native app serves `public/models/gemma3-1b-it-int4-web.task` from its own origin; one HEAD to `/models/...` per session decides it, and MediaPipe loads that URL directly (no OPFS). `opfs`: the human picked the file in Settings and it was copied into the Origin Private File System. `url`: same OPFS copy, downloaded from `VITE_GEMMA_MODEL_URL`. A 404, a network error or a non-http origin skips the bundled source, so the web deployment (which never gets the file) behaves as before. The precache ignores `*.task` and `*.litertlm`.
+`src/offline/gemma.ts` reports where the Gemma 4 E2B model (Apache 2.0, about 2 GB, text only on web) came from in `status().source`. `bundled`: the native app serves `public/models/gemma-4-E2B-it-web.task` from its own origin; one HEAD to `/models/...` per session decides it, and MediaPipe loads that URL directly (no OPFS). `opfs`: the human picked the file in Settings and it was copied into the Origin Private File System. `url`: same OPFS copy, downloaded from `VITE_GEMMA_MODEL_URL`. A 404, a network error or a non-http origin skips the bundled source, so the web deployment (which never gets the file) behaves as before. The precache ignores `*.task` and `*.litertlm`.
 
 ## Origins
 

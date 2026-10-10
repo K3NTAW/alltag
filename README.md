@@ -122,15 +122,15 @@ Partner split: Noé live = Gemini Live, native speaker playback and review = Gra
 | Listen translation | api/translate.ts | `GEMINI_MODEL_TRANSLATE` | gemini-3.5-flash-lite | One short line per utterance, must feel instant |
 | Listen extract | api/extract.ts | `GEMINI_MODEL_EXTRACT` | gemini-3.8-flash | Once per conversation, structured JSON |
 | CEFR level estimate | not wired yet (reserved) | `GEMINI_MODEL_LEVEL` | gemini-3.8-flash | JSON classification at moderate volume |
-| Offline: Gemma 3 1B on device | src/offline/gemma.ts | none (file in OPFS) | gemma3-1b-it-int4-web.task | Text roleplay and corrections when the network is gone; runs in the browser on WebGPU |
+| Offline: Gemma 4 E2B on device | src/offline/gemma.ts | none (file in OPFS or bundled) | gemma-4-E2B-it-web.task | Text roleplay and corrections when the network is gone; runs in the browser on WebGPU |
 
-More detail in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+More detail in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Which languages the stack can support, and what adding one takes: [docs/LANGUAGES.md](docs/LANGUAGES.md).
 
 Listen: live fr/en transcript of a real conversation through Gemini Live in text mode, Gradium STT plus /api/translate as fallback, learn step through /api/extract, see [docs/LISTEN.md](docs/LISTEN.md).
 
-### Offline mode (Gemma 3 1B on device)
+### Offline mode (Gemma 4 E2B on device)
 
-The cloud path stays the default. When the browser is offline, or a POST to `/api/turn` or `/api/correct` fails with a network error (fetch rejects, not a 4xx/5xx), the client answers with Gemma 3 1B instruct running in the browser through the MediaPipe LLM Inference API (`@mediapipe/tasks-genai`). Replies from the device carry `source: "local"` and Roleplay shows "offline, noé runs on this device".
+The cloud path stays the default. When the browser is offline, or a POST to `/api/turn` or `/api/correct` fails with a network error (fetch rejects, not a 4xx/5xx), the client answers with Gemma 4 E2B instruct running in the browser through the MediaPipe LLM Inference API (`@mediapipe/tasks-genai`). Replies from the device carry `source: "local"` and Roleplay shows "offline, noé runs on this device".
 
 What works offline:
 
@@ -142,25 +142,25 @@ What works offline:
 
 Setup, once per browser:
 
-1. On Hugging Face, open `litert-community/Gemma3-1B-IT`, accept the Gemma licence (the repo is gated) and download `gemma3-1b-it-int4-web.task` (about 700 MB).
+1. On Hugging Face, open `litert-community/gemma-4-E2B-it-litert-lm` (not gated, Apache 2.0) and download `gemma-4-E2B-it-web.task` (about 2 GB). Not the `.litertlm` file; that one is for the LiteRT-LM runtime.
 2. In alltag, open Settings, section "offline tutor", and choose that file. It is copied into the Origin Private File System and loaded from there; the app never downloads it on its own.
 3. Optional: set `VITE_GEMMA_MODEL_URL` to a URL you host the file at; Settings then shows a "download" button instead of the file picker.
 
-Requirements and caveats: needs WebGPU (current Chrome or Edge on desktop or Android) and OPFS; elsewhere Settings says "not supported". The MediaPipe LLM Inference web API is in maintenance mode upstream; fine for a hackathon demo, not a long-term bet. A 1B model is much weaker than the cloud models: prompts are short and French, and its JSON is parsed leniently with safe defaults.
+Requirements and caveats: needs WebGPU (current Chrome or Edge on desktop or Android) and OPFS; elsewhere Settings says "not supported". The MediaPipe LLM Inference web API is in maintenance mode upstream; fine for a hackathon demo, not a long-term bet. Gemma 4 E2B is text only on the web and runs in under 1.5 GB of memory; it is much weaker than the cloud models: prompts are short and French, and its JSON is parsed leniently with safe defaults.
 
 #### Bundled in the iOS app
 
 The native app ships the model in its bundle, so a TestFlight or App Store install has the offline tutor ready with no file picking.
 
 ```sh
-pnpm model:fetch      # scripts/fetch-model.sh: hf CLI, or curl with HF_TOKEN; into public/models/
+pnpm model:fetch      # scripts/fetch-model.sh: hf CLI, or curl (HF_TOKEN optional); into public/models/
 pnpm ios:build        # warns (does not fail) when public/models has no .task file
 ```
 
-- `public/models/gemma3-1b-it-int4-web.task` lands in `dist/` and is served at `https://localhost/models/...` inside the app. On start `src/offline/gemma.ts` sends a HEAD there; a 200 loads the model straight from that URL and Settings shows "ready, built into the app".
-- The file ships inside the IPA (about 700 MB), so the App Store marks the app as a large download.
+- `public/models/gemma-4-E2B-it-web.task` lands in `dist/` and is served at `https://localhost/models/...` inside the app. On start `src/offline/gemma.ts` sends a HEAD there; a 200 loads the model straight from that URL and Settings shows "ready, built into the app".
+- The file ships inside the IPA (about 2 GB), so the App Store marks the app as a large download. No gated download: the repo is open, so `pnpm model:fetch` needs no token.
 - It is not in git, not deployed to Vercel and never precached by the service worker; the web app keeps the file picker.
-- Licence: Gemma is distributed under the [Gemma Terms of Use](https://ai.google.dev/gemma/terms). The app must show that notice and link the [prohibited use policy](https://ai.google.dev/gemma/prohibited_use_policy); Settings shows "on-device model: Gemma 3 1B, Gemma Terms of Use" whenever a model is bundled or installed.
+- Licence: Gemma 4 is released under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0). Settings shows "on-device model: Gemma 4 E2B, Apache 2.0" whenever a model is bundled or installed.
 - Later: Apple Background Assets essential downloads fetch the model from our own host during App Store installation, so the IPA stays small and the model is still there on first launch.
 
 #### Install on your phone

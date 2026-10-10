@@ -1,10 +1,12 @@
-// On-device Gemma 3 1B through the MediaPipe LLM Inference API (WebGPU).
-// The model file is gated and ~700 MB, so the app never fetches it on its own:
+// On-device Gemma 4 E2B through the MediaPipe LLM Inference API (WebGPU, text only on web).
+// The model file is about 2 GB (Apache 2.0, not gated), so the app never fetches it on its own:
 // the human picks it in Settings (or downloads from VITE_GEMMA_MODEL_URL) and it
 // lives in the Origin Private File System. The native app can ship it in its
 // bundle at BUNDLED_PATH instead; then it loads straight from the app origin.
 
-export const MODEL_FILE = "gemma3-1b-it-int4-web.task";
+export const MODEL_FILE = "gemma-4-E2B-it-web.task";
+export const MODEL_LABEL = "Gemma 4 E2B";
+export const MODEL_LICENCE = { name: "Apache 2.0", url: "https://www.apache.org/licenses/LICENSE-2.0" } as const;
 export const BUNDLED_PATH = `/models/${MODEL_FILE}`;
 const WASM_BASE = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai@latest/wasm";
 const CHUNK = 8 * 1024 * 1024;

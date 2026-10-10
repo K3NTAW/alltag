@@ -1,4 +1,12 @@
-import { BUNDLED_PATH, createGemma, MODEL_FILE, type GemmaDeps, type StorageDir } from "./gemma";
+import {
+  BUNDLED_PATH,
+  createGemma,
+  MODEL_FILE,
+  MODEL_LABEL,
+  MODEL_LICENCE,
+  type GemmaDeps,
+  type StorageDir,
+} from "./gemma";
 
 function fakeDir() {
   const files = new Map<string, Blob>();
@@ -49,6 +57,13 @@ function deps(over: Partial<GemmaDeps> = {}) {
 }
 
 describe("gemma", () => {
+  it("names the Gemma 4 E2B web model and its Apache 2.0 licence", () => {
+    expect(MODEL_FILE).toBe("gemma-4-E2B-it-web.task");
+    expect(BUNDLED_PATH).toBe("/models/gemma-4-E2B-it-web.task");
+    expect(MODEL_LABEL).toBe("Gemma 4 E2B");
+    expect(MODEL_LICENCE).toEqual({ name: "Apache 2.0", url: "https://www.apache.org/licenses/LICENSE-2.0" });
+  });
+
   it("is unavailable without navigator.gpu", async () => {
     const g = createGemma(deps({ hasGpu: () => false }).d);
     expect(g.status().state).toBe("unavailable");

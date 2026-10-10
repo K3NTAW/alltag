@@ -2,7 +2,7 @@ import { useEffect, useState, useSyncExternalStore, type ChangeEvent } from "rea
 import { getSettings, setSettings, type Settings as SettingsShape } from "../lib/settings";
 import type { Level } from "../lib/types";
 import * as store from "../srs/store";
-import { gemma, MODEL_FILE, type GemmaStatus } from "../offline/gemma";
+import { gemma, MODEL_FILE, MODEL_LABEL, MODEL_LICENCE, type GemmaStatus } from "../offline/gemma";
 import { useInstallPrompt } from "../pwa/install";
 
 const levels: Level[] = ["A1", "A2", "B1", "B2"];
@@ -221,33 +221,24 @@ function OfflineTutor() {
       {failed && <p className="text-[length:var(--text-small)] text-muted">{failed}</p>}
       {installed && (
         <p className="text-[length:var(--text-small)] text-muted">
-          on-device model: Gemma 3 1B,{" "}
-          <a href="https://ai.google.dev/gemma/terms" target="_blank" rel="noreferrer" className="underline">
-            Gemma Terms of Use
-          </a>
-          ,{" "}
-          <a
-            href="https://ai.google.dev/gemma/prohibited_use_policy"
-            target="_blank"
-            rel="noreferrer"
-            className="underline"
-          >
-            prohibited use policy
+          on-device model: {MODEL_LABEL},{" "}
+          <a href={MODEL_LICENCE.url} target="_blank" rel="noreferrer" className="underline">
+            {MODEL_LICENCE.name}
           </a>
         </p>
       )}
       {!builtIn && (
         <p className="text-[length:var(--text-small)] text-muted">
-          when the network is gone, noé runs on gemma 3 1b in this browser. get {MODEL_FILE} (about 700 mb) from{" "}
+          when the network is gone, noé runs on gemma 4 e2b in this browser. get {MODEL_FILE} (about 2 gb) from{" "}
           <a
-            href="https://huggingface.co/litert-community/Gemma3-1B-IT"
+            href="https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm"
             target="_blank"
             rel="noreferrer"
             className="underline"
           >
             hugging face
           </a>
-          . you accept the gemma licence there first. the file stays in this browser.
+          . the file stays in this browser.
         </p>
       )}
     </div>
