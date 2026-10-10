@@ -8,46 +8,32 @@ describe("pairLines", () => {
     expect(pairLines([])).toEqual([]);
   });
 
-  it("opens a pair on French and closes it with the translation", () => {
-    expect(pairLines([user("On y va ?"), tutor("Shall we go?")])).toEqual([
-      { id: "p0", fr: "On y va ?", en: "Shall we go?", final: true, kept: false },
-    ]);
+  it("opens a pair on French and closes it when the French is final", () => {
+    expect(pairLines([user("On y va ?")])).toEqual([{ id: "p0", fr: "On y va ?", en: "", final: true, kept: false }]);
   });
 
-  it("updates the open pair with partial French and partial English", () => {
+  it("updates the open pair with partial French", () => {
     const pairs = pairLines([user("On se", false), user("On se voit", false)]);
     expect(pairs).toEqual([{ id: "p0", fr: "On se voit", en: "", final: false, kept: false }]);
-    const more = pairLines([user("On se voit", false), user("On se voit demain"), tutor("See you", false)]);
-    expect(more).toEqual([{ id: "p0", fr: "On se voit demain", en: "See you", final: false, kept: false }]);
-  });
-
-  it("keeps turns apart and handles a translation that lags behind the next utterance", () => {
-    const pairs = pairLines([
-      user("Bonjour"),
-      tutor("Hello"),
-      user("Ça va ?"),
-      user("Oui", false),
-      tutor("How are you?"),
-      user("Oui, merci"),
-    ]);
-    expect(pairs.map((p) => [p.id, p.fr, p.en, p.final])).toEqual([
-      ["p0", "Bonjour", "Hello", true],
-      ["p1", "Ça va ?", "How are you?", true],
-      ["p2", "Oui, merci", "", false],
+    expect(pairLines([user("On se voit", false), user("On se voit demain")])).toEqual([
+      { id: "p0", fr: "On se voit demain", en: "", final: true, kept: false },
     ]);
   });
 
-  it("closes an untranslated pair empty when a later one closes", () => {
-    const pairs = pairLines([user("hm"), user("Merci beaucoup"), tutor("Thank you very much")]);
-    expect(pairs.map((p) => [p.fr, p.en, p.final])).toEqual([
-      ["hm", "", true],
-      ["Merci beaucoup", "Thank you very much", true],
+  it("keeps turns apart", () => {
+    const pairs = pairLines([user("Bonjour"), user("Ça va ?"), user("Oui", false), user("Oui, merci", false)]);
+    expect(pairs.map((p) => [p.id, p.fr, p.final])).toEqual([
+      ["p0", "Bonjour", true],
+      ["p1", "Ça va ?", true],
+      ["p2", "Oui, merci", false],
     ]);
   });
 
-  it("ignores translations with no French to attach to and uses the id prefix", () => {
-    expect(pairLines([tutor("stray"), user("Salut"), tutor("Hi")], "s1-")).toEqual([
-      { id: "s1-0", fr: "Salut", en: "Hi", final: true, kept: false },
+  it("never takes English from tutor text and uses the id prefix", () => {
+    const pairs = pairLines([tutor("stray"), user("Salut"), tutor("Hi, how can I help?"), user("Ciao", false), tutor("Bye", false)], "s1-");
+    expect(pairs).toEqual([
+      { id: "s1-0", fr: "Salut", en: "", final: true, kept: false },
+      { id: "s1-1", fr: "Ciao", en: "", final: false, kept: false },
     ]);
   });
 });

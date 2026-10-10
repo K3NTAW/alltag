@@ -112,6 +112,9 @@ export default function Listen() {
   const [elapsed, setElapsed] = useState(0);
   const [learn, setLearn] = useState<LearnState | null>(null);
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  // /api/translate results by pair id ("" when it failed); a present id means the pair is final.
+  const [translations, setTranslations] = useState<Record<string, string>>({});
+  const tr = useRef<{ requested: Set<string>; gen: number }>({ requested: new Set(), gen: 0 });
   const startedAt = useRef("");
   const convId = useRef<string | undefined>(undefined);
   const fb = useRef<{
@@ -127,8 +130,30 @@ export default function Listen() {
   // Token or connect failure -> Gradium STT + /api/translate for the rest of this conversation.
   if (phase === "live" && !paused && !fallback && live.state === "error") setFallback(true);
 
-  const livePairs = fallback || paused || phase !== "live" ? [] : pairLines(live.events, `s${segment}-`);
-  const pairs = [...committed, ...livePairs].map((p) => ({ ...p, kept: keptIds.has(p.id) }));
+  // Live gives only the French; its final flag here means "French done", not translated yet.
+  const frPairs = fallback || paused || phase !== "live" ? [] : pairLines(live.events, `s${segment}-`);
+  const withTranslation = (p: Pair): Pair => (p.id in translations ? { ...p, en: translations[p.id], final: true } : p);
+  const livePairs = frPairs.map((p) => withTranslation({ ...p, final: false }));
+  const pairs = [...committed, ...livePairs].map((p) => ({ ...withTranslation(p), kept: keptIds.has(p.id) }));
+
+  // Translate a final French utterance once and fill its en. Shared by Live and the Gradium fallback.
+  // Results after stop or a new start are dropped; a failure closes the pair with no English.
+  const translate = useCallback((id: string, text: string) => {
+    const t = tr.current;
+    if (t.requested.has(id)) return;
+    t.requested.add(id);
+    const gen = t.gen;
+    const fill = (en: string) => {
+      if (gen === t.gen) setTranslations((m) => ({ ...m, [id]: en }));
+    };
+    postTranslate({ text, from: "fr", to: "en" })
+      .then((r) => fill(r.text))
+      .catch(() => fill(""));
+  }, []);
+
+  useEffect(() => {
+    for (const p of frPairs) if (p.final) translate(p.id, p.fr);
+  });
 
   const closeFallback = useCallback(() => {
     const f = fb.current;
@@ -170,9 +195,7 @@ export default function Listen() {
           if (gen !== f.gen) return;
           const id = upsert(text);
           f.openId = undefined;
-          postTranslate({ text, from: "fr", to: "en" })
-            .then((r) => setPair(id, { en: r.text, final: true }))
-            .catch(() => setPair(id, { final: true }));
+          translate(id, text);
         },
       });
       // One socket for the whole conversation; turns end on VAD.
@@ -184,7 +207,7 @@ export default function Listen() {
     } catch {
       if (gen === f.gen) setFallbackError(true);
     }
-  }, []);
+  }, [translate]);
 
   useEffect(() => {
     if (fallback && phase === "live" && !paused && !fb.current.active) void startFallback();
@@ -207,6 +230,8 @@ export default function Listen() {
   function begin() {
     startedAt.current = new Date().toISOString();
     convId.current = undefined;
+    tr.current = { requested: new Set(), gen: tr.current.gen + 1 };
+    setTranslations({});
     setCommitted([]);
     setKeptIds(new Set());
     setElapsed(0);
@@ -248,6 +273,7 @@ export default function Listen() {
 
   async function stopAndLearn() {
     if (!paused) closeSession();
+    tr.current.gen += 1;
     setPaused(false);
     const lines = pairs.filter((p) => p.final || p.kept);
     const bookmarked = lines.filter((p) => p.kept);

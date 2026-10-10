@@ -6,6 +6,7 @@ import { gemma, MODEL_FILE, MODEL_LABEL, MODEL_LICENCE, type GemmaStatus } from 
 import { useInstallPrompt } from "../pwa/install";
 import { useAuth } from "../auth/auth";
 import { useBackupStatus, type BackupStatus } from "../sync/backup";
+import Orb from "../components/Orb";
 
 const levels: Level[] = ["A1", "A2", "B1", "B2"];
 
@@ -57,8 +58,21 @@ function backupText(s: BackupStatus): string {
   }
 }
 
-const row = "flex flex-col gap-2 rounded-[var(--radius-card)] border border-line bg-card p-4";
-const control = "rounded-[var(--radius-button)] border border-line bg-card px-3 py-2";
+const eyebrow =
+  "mx-5 mb-2 font-mono text-[11px] leading-[14px] font-medium tracking-[0.08em] text-ink2 uppercase";
+const card = "overflow-hidden rounded-[var(--radius-card)] bg-card shadow-[var(--e1)]";
+const panel = `${card} flex flex-col gap-3 p-5`;
+// Grouped list row: 56 tall, hairline inset 20 from the left, none under the last row.
+const row = "flex min-h-14 items-stretch pl-5 [&:last-child>*]:border-b-0";
+const rowInner = "flex flex-1 items-center justify-between gap-3 border-b border-line py-2 pr-4";
+const rowLabel = "text-[16px] leading-[21px]";
+const control =
+  "rounded-[var(--radius-chip)] bg-[var(--sunken)] px-3 py-1.5 text-[15px] leading-[20px] text-ink2";
+const footnote = "text-[13px] leading-[18px] text-ink2";
+const secondary =
+  "press inline-flex h-10 items-center self-start rounded-[var(--radius-pill)] bg-[var(--sunken)] px-[18px] text-[15px] leading-[20px] font-semibold";
+const primary =
+  "press inline-flex h-10 items-center self-start rounded-[var(--radius-pill)] bg-ink px-[18px] text-[15px] leading-[20px] font-semibold text-snow shadow-[0_6px_16px_rgba(18,19,22,0.16)]";
 
 export default function Settings() {
   const [settings, setLocal] = useState(getSettings);
@@ -75,70 +89,97 @@ export default function Settings() {
   }
 
   return (
-    <section className="pt-safe pb-tabbar flex flex-col gap-3 px-[var(--gutter)]">
-      <h1 className="text-[length:var(--text-h1)] leading-[var(--lh-h1)] font-bold">settings</h1>
-
-      <div className={row}>
-        <span className="text-muted">language</span>
-        <span>french</span>
-      </div>
-
-      <label className={row}>
-        <span className="text-muted">level</span>
-        <select
-          value={settings.level}
-          onChange={(e) => update({ level: e.target.value as Level })}
-          className={control}
-        >
-          {levels.map((l) => (
-            <option key={l} value={l}>
-              {l}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <label className={row}>
-        <span className="text-muted">voice</span>
-        <select value={settings.voiceId} onChange={(e) => update({ voiceId: e.target.value })} className={control}>
-          {voices.map((v) => (
-            <option key={v.id} value={v.id}>
-              {v.name}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <label className={row}>
-        <span className="text-muted">speed {settings.speed.toFixed(1)}</span>
-        <input
-          type="range"
-          min={0.8}
-          max={1.2}
-          step={0.1}
-          value={settings.speed}
-          onChange={(e) => update({ speed: Number(e.target.value) })}
-          className="accent-[var(--moss)]"
-        />
-      </label>
-
-      <OnYourPhone />
+    <section className="screen-enter pt-safe pb-tabbar flex flex-col gap-6 px-[var(--gutter)]">
+      <h1 className="mt-2 text-[40px] leading-[44px] tracking-[-0.01em] text-ink">Settings</h1>
 
       <AccountSection />
 
+      <div>
+        <div className={eyebrow}>learning</div>
+        <div className={card}>
+          <div className={row}>
+            <div className={rowInner}>
+              <span className={rowLabel}>language</span>
+              <span lang="fr" className="font-display text-[18px] leading-[22px] text-ink2">
+                Français
+              </span>
+            </div>
+          </div>
+
+          <label className={row}>
+            <span className={rowInner}>
+              <span className={rowLabel}>level</span>
+              <select
+                value={settings.level}
+                onChange={(e) => update({ level: e.target.value as Level })}
+                className={control}
+              >
+                {levels.map((l) => (
+                  <option key={l} value={l}>
+                    {l}
+                  </option>
+                ))}
+              </select>
+            </span>
+          </label>
+
+          <label className={row}>
+            <span className={rowInner}>
+              <span className={rowLabel}>voice</span>
+              <select
+                value={settings.voiceId}
+                onChange={(e) => update({ voiceId: e.target.value })}
+                className={control}
+              >
+                {voices.map((v) => (
+                  <option key={v.id} value={v.id}>
+                    {v.name}
+                  </option>
+                ))}
+              </select>
+            </span>
+          </label>
+
+          <label className={row}>
+            <span className={rowInner}>
+              <span className={rowLabel}>speed {settings.speed.toFixed(1)}</span>
+              <input
+                type="range"
+                min={0.8}
+                max={1.2}
+                step={0.1}
+                value={settings.speed}
+                onChange={(e) => update({ speed: Number(e.target.value) })}
+                className="w-[148px] accent-[var(--moss)]"
+              />
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <OnYourPhone />
+
       <OfflineTutor />
 
-      <div className={row}>
-        <span className="text-muted">data</span>
-        <p className="text-[length:var(--text-small)] text-muted">everything stays in this browser</p>
-        <button
-          type="button"
-          onClick={clearAll}
-          className="self-start rounded-[var(--radius-pill)] border border-line px-4 py-2 text-[var(--clay)]"
-        >
-          clear everything
-        </button>
-        {cleared && <p className="text-[length:var(--text-small)] text-muted">cleared</p>}
+      <div>
+        <div className={eyebrow}>data</div>
+        <div className={card}>
+          <div className={row}>
+            <p className={`${rowInner} ${footnote}`}>everything stays in this browser</p>
+          </div>
+          <div className={row}>
+            <div className={rowInner}>
+              <button
+                type="button"
+                onClick={clearAll}
+                className="press min-h-11 flex-1 text-left text-[16px] leading-[21px] text-clay"
+              >
+                clear everything
+              </button>
+              {cleared && <p className={footnote}>cleared</p>}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -147,24 +188,19 @@ export default function Settings() {
 function AccountSection() {
   const { status, address, openAccount, signOut } = useAuth();
   const backup = useBackupStatus();
-  const muted = "text-[length:var(--text-small)] text-muted";
 
   let body;
   if (status === "disabled") {
-    body = <p className={muted}>sync is off in this build</p>;
+    body = <p className={footnote}>sync is off in this build</p>;
   } else if (status === "loading") {
-    body = <p className={muted}>checking your account…</p>;
+    body = <p className={footnote}>checking your account…</p>;
   } else if (status === "signed_out") {
     body = (
       <>
-        <p className="text-[length:var(--text-small)]">
+        <p className={footnote}>
           sign in to sync your words, scenes and conversations across devices. everything also works without an account.
         </p>
-        <button
-          type="button"
-          onClick={openAccount}
-          className="self-start rounded-[var(--radius-pill)] bg-moss px-5 py-2 font-semibold text-snow"
-        >
+        <button type="button" onClick={openAccount} className={`${primary} mt-1`}>
           sign in
         </button>
       </>
@@ -172,17 +208,20 @@ function AccountSection() {
   } else {
     body = (
       <>
-        <p data-testid="account-address">{address}</p>
-        <p className={muted}>signed in</p>
-        <div className="flex items-center justify-between">
-          <span className="text-muted">sync</span>
-          <span data-testid="sync-state">{backupText(backup)}</span>
+        <p data-testid="account-address" className="truncate text-[16px] leading-[21px]">
+          {address}
+        </p>
+        <p className={footnote}>signed in</p>
+        <div className="flex items-center justify-between gap-3">
+          <span className={footnote}>sync</span>
+          <span
+            data-testid="sync-state"
+            className="inline-flex h-6 items-center rounded-[12px] bg-moss-soft px-[9px] font-mono text-[10px] leading-[14px] font-medium tracking-[0.08em] text-moss uppercase"
+          >
+            {backupText(backup)}
+          </span>
         </div>
-        <button
-          type="button"
-          onClick={() => void signOut()}
-          className="self-start rounded-[var(--radius-pill)] border border-line px-4 py-2"
-        >
+        <button type="button" onClick={() => void signOut()} className={`${secondary} mt-1`}>
           sign out
         </button>
       </>
@@ -190,9 +229,12 @@ function AccountSection() {
   }
 
   return (
-    <div className={row} data-testid="account">
-      <span className="text-muted">account</span>
-      {body}
+    <div className={`${card} flex items-start gap-3.5 py-4 pr-4 pl-5`} data-testid="account">
+      <Orb size={44} />
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <span className="text-[17px] leading-[22px] font-semibold">account</span>
+        {body}
+      </div>
     </div>
   );
 }
@@ -202,33 +244,29 @@ function OnYourPhone() {
 
   let body;
   if (installed) {
-    body = <p>installed. works offline.</p>;
+    body = <p className="text-[16px] leading-[21px]">installed. works offline.</p>;
   } else if (canInstall) {
     body = (
-      <button
-        type="button"
-        onClick={() => void install()}
-        className="self-start rounded-[var(--radius-pill)] border border-line px-4 py-2"
-      >
+      <button type="button" onClick={() => void install()} className={secondary}>
         add to home screen
       </button>
     );
   } else if (platform === "ios") {
     body = (
-      <ol className="flex flex-col gap-1 text-[length:var(--text-small)]">
+      <ol className="flex list-inside list-decimal flex-col gap-1 text-[15px] leading-[21px]">
         <li>open in safari</li>
         <li>tap share</li>
         <li>add to home screen</li>
       </ol>
     );
   } else {
-    body = <p className="text-[length:var(--text-small)] text-muted">open this page on your phone to install it</p>;
+    body = <p className={footnote}>open this page on your phone to install it</p>;
   }
 
   return (
-    <div className={row} data-testid="on-your-phone">
-      <span className="text-muted">on your phone</span>
-      {body}
+    <div data-testid="on-your-phone">
+      <div className={eyebrow}>on your phone</div>
+      <div className={panel}>{body}</div>
     </div>
   );
 }
@@ -263,64 +301,67 @@ function OfflineTutor() {
   const installed = builtIn || status.state === "ready";
 
   return (
-    <div className={row}>
-      <span className="text-muted">offline tutor</span>
-      <p data-testid="offline-status">{statusText(status)}</p>
-      {usable &&
-        (modelUrl ? (
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => run(gemma.importUrl(modelUrl))}
-            className="self-start rounded-[var(--radius-pill)] border border-line px-4 py-2 disabled:opacity-50"
-          >
-            download
-          </button>
-        ) : (
-          <label className="flex flex-col gap-1">
-            <span className="text-[length:var(--text-small)]">choose {MODEL_FILE}</span>
-            <input
-              type="file"
-              accept=".task"
-              aria-label={`choose ${MODEL_FILE}`}
-              disabled={busy}
-              onChange={onFile}
-              className={control}
-            />
-          </label>
-        ))}
-      {usable && (status.state === "ready" || status.state === "error") && (
-        <button
-          type="button"
-          onClick={remove}
-          className="self-start rounded-[var(--radius-pill)] border border-line px-4 py-2 text-[var(--clay)]"
+    <div>
+      <div className={eyebrow}>offline tutor</div>
+      <div className={panel}>
+        <p
+          data-testid="offline-status"
+          className={`text-[16px] leading-[21px] ${installed ? "text-moss" : "text-ink"}`}
         >
-          remove
-        </button>
-      )}
-      {failed && <p className="text-[length:var(--text-small)] text-muted">{failed}</p>}
-      {installed && (
-        <p className="text-[length:var(--text-small)] text-muted">
-          on-device model: {MODEL_LABEL},{" "}
-          <a href={MODEL_LICENCE.url} target="_blank" rel="noreferrer" className="underline">
-            {MODEL_LICENCE.name}
-          </a>
+          {statusText(status)}
         </p>
-      )}
-      {!builtIn && (
-        <p className="text-[length:var(--text-small)] text-muted">
-          when the network is gone, noé runs on gemma 4 e2b in this browser. get {MODEL_FILE} (about 2 gb) from{" "}
-          <a
-            href="https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm"
-            target="_blank"
-            rel="noreferrer"
-            className="underline"
-          >
-            hugging face
-          </a>
-          . the file stays in this browser.
-        </p>
-      )}
+        {usable &&
+          (modelUrl ? (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => run(gemma.importUrl(modelUrl))}
+              className={`${secondary} disabled:opacity-50`}
+            >
+              download
+            </button>
+          ) : (
+            <label className="flex flex-col gap-1">
+              <span className={footnote}>choose {MODEL_FILE}</span>
+              <input
+                type="file"
+                accept=".task"
+                aria-label={`choose ${MODEL_FILE}`}
+                disabled={busy}
+                onChange={onFile}
+                className={control}
+              />
+            </label>
+          ))}
+        {usable && (status.state === "ready" || status.state === "error") && (
+          <button type="button" onClick={remove} className={`${secondary} text-clay`}>
+            remove
+          </button>
+        )}
+        {failed && <p className={footnote}>{failed}</p>}
+        {installed && (
+          <p className={footnote}>
+            on-device model: {MODEL_LABEL},{" "}
+            <a href={MODEL_LICENCE.url} target="_blank" rel="noreferrer" className="underline">
+              {MODEL_LICENCE.name}
+            </a>
+          </p>
+        )}
+        {!builtIn && (
+          <p className={footnote}>
+            when the network is gone, noé runs on gemma 4 e2b in this browser. get {MODEL_FILE} (about 2 gb) from{" "}
+            <a
+              href="https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm"
+              target="_blank"
+              rel="noreferrer"
+              className="underline"
+            >
+              hugging face
+            </a>
+            . the file stays in this browser.
+          </p>
+        )}
+      </div>
     </div>
   );
 }

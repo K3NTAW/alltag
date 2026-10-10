@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { coverPoint } from "../lib/cover";
 import { go } from "../lib/screen";
 import { session } from "../lib/session";
 import type { SceneObject } from "../lib/types";
@@ -6,6 +7,7 @@ import { findRecall } from "../srs/recall";
 import * as store from "../srs/store";
 import GlassButton from "../components/GlassButton";
 import Orb from "../components/Orb";
+import { useIsFullScreen } from "../components/TabBar";
 
 type DotState = "known" | "due" | "new";
 
@@ -47,6 +49,25 @@ export default function Scene() {
   const [open, setOpen] = useState<SceneObject | null>(null);
   const [, setVersion] = useState(0);
   const [now] = useState(() => Date.now());
+  const [nat, setNat] = useState<{ w: number; h: number } | null>(null);
+  const [box, setBox] = useState<{ w: number; h: number } | null>(null);
+  const boxRef = useRef<HTMLDivElement>(null);
+  // Same condition App uses to show the tab bar.
+  const tabbar = !useIsFullScreen();
+
+  useEffect(() => {
+    const el = boxRef.current;
+    if (!el) return;
+    const measure = () => setBox({ w: el.clientWidth, h: el.clientHeight });
+    measure();
+    if (typeof ResizeObserver !== "undefined") {
+      const ro = new ResizeObserver(measure);
+      ro.observe(el);
+      return () => ro.disconnect();
+    }
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [scene]);
 
   if (!scene) {
     return (
@@ -62,8 +83,20 @@ export default function Scene() {
       </section>
     );
   }
-  const placed = scene.objects.filter((o) => o.bbox);
-  const stacked = scene.objects.filter((o) => !o.bbox);
+  // Pills sit on their objects only once the photo is measured and the point is visible.
+  const placed: { obj: SceneObject; x: number; y: number }[] = [];
+  const stacked: SceneObject[] = [];
+  for (const obj of scene.objects) {
+    if (obj.bbox && nat && box && box.w > 0 && box.h > 0) {
+      const [x, y, w, h] = obj.bbox;
+      const p = coverPoint(x + w / 2, y + h / 2, nat.w, nat.h, box.w, box.h);
+      if (p.x >= 0 && p.x <= box.w && p.y >= 0 && p.y <= box.h) {
+        placed.push({ obj, x: p.x, y: p.y });
+        continue;
+      }
+    }
+    stacked.push(obj);
+  }
 
   function keep(obj: SceneObject) {
     store.keep({
@@ -77,44 +110,64 @@ export default function Scene() {
     setVersion((v) => v + 1);
   }
 
+  function talk() {
+    session.recallCardId = findRecall(scene!, store.all())?.id ?? null;
+    go("roleplay");
+  }
+
   return (
-    <section className="bg-night pb-tabbar flex min-h-dvh flex-col text-[var(--night-text)]">
-      <div className="relative min-h-[300px]">
-        {session.frame && <img src={session.frame} alt={scene.place} className="fade-in block w-full" />}
+    <section className="relative h-dvh overflow-hidden bg-night text-[var(--night-text)]">
+      <div ref={boxRef} className="absolute inset-0">
+        {session.frame && (
+          <img
+            src={session.frame}
+            alt={scene.place}
+            onLoad={(e) =>
+              setNat({
+                w: e.currentTarget.naturalWidth,
+                h: e.currentTarget.naturalHeight,
+              })
+            }
+            className="fade-in absolute inset-0 block h-full w-full object-cover"
+          />
+        )}
         <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[140px] bg-gradient-to-b from-[var(--camera-dim)] to-transparent" />
         <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[220px] bg-gradient-to-t from-[var(--camera-dim)] to-transparent" />
-        <header className="pt-safe absolute inset-x-0 top-0 z-10 flex items-center gap-3 px-5">
-          <GlassButton variant="dark" aria-label="look again" onClick={() => go("look")}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <path d="M15 5l-7 7 7 7" />
-            </svg>
-          </GlassButton>
-          <p className="glass-dark glass-specular mx-auto flex h-9 min-w-0 items-center rounded-full px-4 text-[13px] font-semibold">
-            <span className="block truncate first-letter:uppercase">
-              {scene.place} · {scene.objects.length} {scene.objects.length === 1 ? "thing" : "things"}
-            </span>
-          </p>
-          <span aria-hidden className="w-11 shrink-0" />
-        </header>
-        {placed.map((obj, i) => {
-          const [x, y, w, h] = obj.bbox!;
-          return (
-            <div
-              key={obj.id}
-              className="absolute -translate-x-[15px] translate-y-[calc(-100%+4px)]"
-              style={{ left: `${(x + w / 2) * 100}%`, top: `${(y + h / 2) * 100}%` }}
-            >
-              <div className="pop-in flex flex-col items-start" style={{ animationDelay: `${i * 70}ms` }}>
-                <Pill obj={obj} now={now} active={open?.id === obj.id} onOpen={() => setOpen(obj)} />
-                <span aria-hidden className="ml-3.5 h-[18px] w-0.5 bg-snow/70" />
-                <span aria-hidden className="ml-[11px] h-2 w-2 rounded-full bg-snow shadow-[0_0_0_4px_var(--glass-clear-bg)]" />
-              </div>
+        {placed.map(({ obj, x, y }, i) => (
+          <div key={obj.id} className="absolute -translate-x-[15px] translate-y-[calc(-100%+4px)]" style={{ left: x, top: y }}>
+            <div className="pop-in flex flex-col items-start" style={{ animationDelay: `${i * 70}ms` }}>
+              <Pill obj={obj} now={now} active={open?.id === obj.id} onOpen={() => setOpen(obj)} />
+              <span aria-hidden className="ml-3.5 h-[18px] w-0.5 bg-snow/70" />
+              <span aria-hidden className="ml-[11px] h-2 w-2 rounded-full bg-snow shadow-[0_0_0_4px_var(--glass-clear-bg)]" />
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
+      <header className="pt-safe absolute inset-x-0 top-0 z-10 flex items-center gap-3 px-5">
+        <GlassButton variant="dark" aria-label="look again" onClick={() => go("look")}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M15 5l-7 7 7 7" />
+          </svg>
+        </GlassButton>
+        <p className="glass-dark glass-specular mx-auto flex h-9 min-w-0 items-center rounded-full px-4 text-[13px] font-semibold">
+          <span className="block truncate first-letter:uppercase">
+            {scene.place} · {scene.objects.length} {scene.objects.length === 1 ? "thing" : "things"}
+          </span>
+        </p>
+        <span aria-hidden className="w-11 shrink-0" />
+      </header>
 
-      <div className="sheet-up relative z-10 -mt-8 flex flex-col gap-1.5 rounded-t-[var(--radius-sheet)] border-t border-[var(--glass-dark-border)] bg-[var(--raised)] px-5 pt-6 pb-5 [animation-delay:400ms]">
+      <div
+        className="sheet-up absolute inset-x-0 bottom-0 z-10 flex max-h-[45dvh] flex-col gap-1.5 overflow-y-auto rounded-t-[var(--radius-sheet)] border-t border-[var(--glass-dark-border)] bg-[var(--raised)] px-5 pt-6 [animation-delay:400ms]"
+        style={
+          tabbar
+            ? {
+                bottom: "calc(var(--tabbar-h) + var(--tabbar-gap) + env(safe-area-inset-bottom))",
+                paddingBottom: 20,
+              }
+            : { paddingBottom: "calc(20px + env(safe-area-inset-bottom))" }
+        }
+      >
         <div className="flex items-center gap-2">
           <Orb size={28} />
           <p className={`${eyebrow} text-[var(--moss-on-dark)]`}>Noé</p>
@@ -133,6 +186,18 @@ export default function Scene() {
             ))}
           </div>
         )}
+
+        <button
+          type="button"
+          onClick={talk}
+          className="press mt-4 flex h-14 w-full shrink-0 items-center justify-center gap-2.5 rounded-[28px] bg-[var(--night-text)] text-[17px] leading-[22px] font-semibold text-ink shadow-[var(--glass-dark-shadow)]"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <rect x="9" y="3" width="6" height="11" rx="3" />
+            <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
+          </svg>
+          talk
+        </button>
       </div>
 
       {open && <div aria-hidden className="fade-in pointer-events-none fixed inset-0 z-40 bg-[var(--camera-dim)]" />}
@@ -170,10 +235,7 @@ export default function Scene() {
           <div className="mt-6 flex gap-3">
             <button
               type="button"
-              onClick={() => {
-                session.recallCardId = findRecall(scene, store.all())?.id ?? null;
-                go("roleplay");
-              }}
+              onClick={talk}
               className="press flex h-14 flex-1 items-center justify-center gap-2.5 rounded-[28px] bg-card text-[17px] leading-[22px] font-semibold shadow-[var(--e1)]"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden>

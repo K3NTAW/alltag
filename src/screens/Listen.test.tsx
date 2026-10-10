@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { getGradiumToken } from "../lib/api";
-import { postExtract } from "../lib/api-listen";
+import { postExtract, postTranslate } from "../lib/api-listen";
 import { go, useScreen } from "../lib/screen";
 import * as conversations from "../srs/conversations";
 import * as store from "../srs/store";
@@ -48,17 +48,25 @@ function ScreenProbe() {
   return <output data-testid="screen">{useScreen().screen}</output>;
 }
 
+// The tutor lines are the Live model answering; they must never show up as the English.
 const conversation = [
   { kind: "user" as const, text: "On se voit demain ?", final: true },
-  { kind: "tutor" as const, text: "See you tomorrow?", final: true },
+  { kind: "tutor" as const, text: "Bien sûr, à quelle heure ?", final: true },
   { kind: "user" as const, text: "Ça marche, à midi.", final: true },
-  { kind: "tutor" as const, text: "Works for me, at noon.", final: true },
+  { kind: "tutor" as const, text: "Parfait, bonne journée !", final: true },
   { kind: "user" as const, text: "Super", final: false },
 ];
 
-function startListening() {
+const english: Record<string, string> = {
+  "On se voit demain ?": "See you tomorrow?",
+  "Ça marche, à midi.": "Works for me, at noon.",
+};
+
+async function startListening() {
   fireEvent.click(screen.getByRole("button", { name: "start listening" }));
   act(() => live.set({ state: "listening", events: conversation }));
+  await screen.findByText("Works for me, at noon.");
+  await screen.findByText("See you tomorrow?");
 }
 
 describe("Listen", () => {
@@ -70,6 +78,8 @@ describe("Listen", () => {
     live.start.mockClear();
     live.stop.mockClear();
     vi.mocked(postExtract).mockReset();
+    vi.mocked(postTranslate).mockReset();
+    vi.mocked(postTranslate).mockImplementation(async ({ text }) => ({ text: english[text] ?? `EN ${text}` }));
     vi.mocked(getGradiumToken).mockReset();
     vi.mocked(getGradiumToken).mockRejectedValue(new Error("no token"));
     act(() => go("listen"));
@@ -85,15 +95,16 @@ describe("Listen", () => {
     expect(screen.getByText(/Stop and learn picks/)).toBeInTheDocument();
   });
 
-  it("live renders pairs from events, the newest French still partial, and bookmarks toggle", () => {
+  it("live renders pairs from events, the newest French still partial, and bookmarks toggle", async () => {
     render(<Listen />);
-    startListening();
+    await startListening();
     expect(live.start).toHaveBeenCalledWith({ mode: "listen", from: "fr", to: "en" });
     const pairs = screen.getAllByTestId("pair");
     expect(pairs).toHaveLength(3);
     expect(pairs[0].textContent).toContain("On se voit demain ?");
     expect(pairs[0].textContent).toContain("See you tomorrow?");
     expect(pairs[2].textContent).toBe("Super");
+    expect(screen.queryByText(/Bien sûr|Parfait/)).not.toBeInTheDocument();
     expect(screen.getByTestId("elapsed").textContent).toBe("00:00");
 
     const mark = within(pairs[0]).getByRole("button", { name: /bookmark/ });
@@ -104,9 +115,9 @@ describe("Listen", () => {
     expect(mark).toHaveAttribute("aria-pressed", "false");
   });
 
-  it("pause closes the session and keeps the lines, resume reopens", () => {
+  it("pause closes the session and keeps the lines, resume reopens", async () => {
     render(<Listen />);
-    startListening();
+    await startListening();
     fireEvent.click(screen.getByRole("button", { name: "pause" }));
     expect(live.stop).toHaveBeenCalled();
     expect(screen.getAllByTestId("pair")).toHaveLength(3);
@@ -133,7 +144,7 @@ describe("Listen", () => {
         <ScreenProbe />
       </>,
     );
-    startListening();
+    await startListening();
     fireEvent.click(within(screen.getAllByTestId("pair")[0]).getByRole("button", { name: /bookmark/ }));
     fireEvent.click(screen.getByRole("button", { name: "Stop and learn" }));
     expect(live.stop).toHaveBeenCalled();
@@ -178,7 +189,7 @@ describe("Listen", () => {
   it("shows only the bookmarked lines when extract fails, and save transcript keeps nothing", async () => {
     vi.mocked(postExtract).mockRejectedValue(new Error("extract 502"));
     render(<Listen />);
-    startListening();
+    await startListening();
     fireEvent.click(within(screen.getAllByTestId("pair")[1]).getByRole("button", { name: /bookmark/ }));
     fireEvent.click(screen.getByRole("button", { name: "Stop and learn" }));
     await waitFor(() => expect(screen.getAllByTestId("keep-card")).toHaveLength(1));
@@ -188,6 +199,62 @@ describe("Listen", () => {
     expect(keepSpy).not.toHaveBeenCalled();
     keepSpy.mockRestore();
     expect(conversations.all()).toHaveLength(1);
+  });
+
+  it("translates each final French line once via /api/translate and never shows the model text", async () => {
+    render(<Listen />);
+    fireEvent.click(screen.getByRole("button", { name: "start listening" }));
+    act(() => live.set({ state: "listening", events: [{ kind: "user", text: "On se", final: false }] }));
+    act(() =>
+      live.set({
+        events: [
+          { kind: "user", text: "On se voit demain ?", final: true },
+          { kind: "tutor", text: "Bien sûr, à quelle heure ?", final: false },
+        ],
+      }),
+    );
+    act(() =>
+      live.set({
+        events: [
+          { kind: "user", text: "On se voit demain ?", final: true },
+          { kind: "tutor", text: "Bien sûr, à quelle heure ?", final: true },
+        ],
+      }),
+    );
+    await screen.findByText("See you tomorrow?");
+    expect(postTranslate).toHaveBeenCalledTimes(1);
+    expect(postTranslate).toHaveBeenCalledWith({ text: "On se voit demain ?", from: "fr", to: "en" });
+    expect(screen.queryByText(/Bien sûr/)).not.toBeInTheDocument();
+    expect(screen.queryByText("live translation unavailable, using fallback")).not.toBeInTheDocument();
+  });
+
+  it("closes the pair with no English when translate fails", async () => {
+    vi.mocked(postTranslate).mockRejectedValue(new Error("translate 502"));
+    vi.mocked(postExtract).mockResolvedValue({ keep: [], known: [], advanced: [] });
+    render(<Listen />);
+    fireEvent.click(screen.getByRole("button", { name: "start listening" }));
+    act(() => live.set({ state: "listening", events: [{ kind: "user", text: "Salut", final: true }, { kind: "tutor", text: "Hi there!", final: true }] }));
+    await waitFor(() => expect(postTranslate).toHaveBeenCalledTimes(1));
+    fireEvent.click(screen.getByRole("button", { name: "Stop and learn" }));
+    await screen.findByText("From that conversation");
+    expect(postExtract).toHaveBeenCalledWith(expect.objectContaining({ lines: [{ fr: "Salut", en: "" }] }));
+  });
+
+  it("ignores a translation that arrives after stop", async () => {
+    let resolve: (r: { text: string }) => void = () => {};
+    vi.mocked(postTranslate).mockImplementationOnce(() => new Promise((r) => (resolve = r)));
+    vi.mocked(postExtract).mockRejectedValue(new Error("extract 502"));
+    render(<Listen />);
+    fireEvent.click(screen.getByRole("button", { name: "start listening" }));
+    act(() => live.set({ state: "listening", events: [{ kind: "user", text: "Salut", final: false }] }));
+    act(() => live.set({ events: [{ kind: "user", text: "Salut", final: true }] }));
+    expect(postTranslate).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole("button", { name: "Stop and learn" }));
+    await screen.findByText("From that conversation");
+    await act(async () => resolve({ text: "Hello (late)" }));
+    expect(screen.queryByText("Hello (late)")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Save transcript to diary" }));
+    expect(conversations.all()[0].lines.map((l) => l.en)).not.toContain("Hello (late)");
   });
 
   it("shows the fallback notice when the live token fails", async () => {

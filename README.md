@@ -2,6 +2,10 @@
 
 Learn a language from the room you are in.
 
+## Team
+
+Kenta
+
 ## 1. What it is
 
 Point your phone at anything around you and alltag names what it sees in French, at your level, then drops you into a short spoken roleplay with Noé, the tutor, set in that exact scene. After the exchange you get typed corrections, and every phrase you fumbled goes into a review queue that you clear by speaking, not tapping. When the camera sees the same object again, Noé opens with it. There are no lessons, no streaks, no owl. Everything in the app is this loop:
@@ -223,7 +227,8 @@ Errors are `{ error: "<code>" }` with 400 (bad input), 403 (cross-site, token ro
 **Entire** (session capture behind commits)
 - The `entire` CLI records the agent session (prompts, tool calls, transcript) behind each commit, so the jury can audit how the thing was built.
 - Enable: install the Entire CLI, then run `entire enable` in the repo root.
-- checkpoints branch: <the human fills this in>
+- Sessions: https://entire.io/gh/K3NTAW/alltag
+- Checkpoints: stored as `refs/entire/checkpoints/*` in https://github.com/K3NTAW/alltag. Fetch them with `git fetch origin 'refs/entire/*:refs/entire/*'`.
 
 ## 7. Latency
 
