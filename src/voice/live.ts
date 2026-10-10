@@ -12,7 +12,8 @@ export const LIVE_OUTPUT_RATE = 24000;
 const MIC_CHUNK = 1600;
 const TASK_DONE = "mark_task_done";
 
-export interface LiveConnectOptions {
+export interface LiveRoleplayOptions {
+  mode?: "roleplay";
   token: string;
   scene: SceneResult;
   level: Level;
@@ -20,6 +21,17 @@ export interface LiveConnectOptions {
   recallPhrase?: string;
   model?: string;
 }
+
+/** Listen mode: Gemini hears a real conversation and answers each utterance with its translation as text. */
+export interface LiveListenOptions {
+  mode: "listen";
+  token: string;
+  from?: "fr";
+  to?: "en";
+  model?: string;
+}
+
+export type LiveConnectOptions = LiveRoleplayOptions | LiveListenOptions;
 
 export interface LiveEvents {
   open: void;
@@ -54,7 +66,16 @@ export interface LiveDeps {
   startMic?: (onSamples: (samples: Float32Array, rate: number) => void) => Promise<() => void>;
 }
 
-export function buildLivePrompt(opts: Pick<LiveConnectOptions, "scene" | "level" | "knownWords" | "recallPhrase">): string {
+export function buildListenPrompt({ from, to }: { from: "fr"; to: "en" }): string {
+  const name = (code: string) => (code === "fr" ? "French" : "English");
+  return [
+    `You hear a live conversation in ${name(from)}.`,
+    `For every utterance you hear, reply with ONLY its ${name(to)} translation, one line, no commentary, no quotes, keep names, keep it short;`,
+    `if it is not ${name(from)} or not speech, reply with an empty line.`,
+  ].join(" ");
+}
+
+export function buildLivePrompt(opts: Pick<LiveRoleplayOptions, "scene" | "level" | "knownWords" | "recallPhrase">): string {
   const { scene, level, knownWords, recallPhrase } = opts;
   const objects = scene.objects.map((o) => `${o.article} ${o.fr}`).join(", ");
   const known = knownWords.length ? knownWords.join(", ") : "(none yet)";
@@ -100,7 +121,7 @@ function defaultAudioContext(): AudioContext | undefined {
   return Ctx ? new Ctx() : undefined;
 }
 
-async function defaultStartMic(onSamples: (samples: Float32Array, rate: number) => void): Promise<() => void> {
+export async function defaultStartMic(onSamples: (samples: Float32Array, rate: number) => void): Promise<() => void> {
   const Ctx = audioContextCtor();
   const media = typeof navigator !== "undefined" ? navigator.mediaDevices : undefined;
   if (!Ctx || !media?.getUserMedia || typeof AudioWorkletNode === "undefined") {
@@ -146,6 +167,7 @@ export class LiveSession {
   private resampler = new StreamResampler();
   private micBuf = new Int16Array(0);
   private ended = false;
+  private listen = false;
 
   constructor(deps: LiveDeps = {}) {
     this.deps = deps;
@@ -173,30 +195,42 @@ export class LiveSession {
   async connect(opts: LiveConnectOptions): Promise<void> {
     const Ctor = this.deps.GoogleGenAI ?? (GoogleGenAI as unknown as NonNullable<LiveDeps["GoogleGenAI"]>);
     const ai = new Ctor({ apiKey: opts.token, httpOptions: { apiVersion: "v1beta" } });
-    // Create the playback context before any await so it can start inside the user gesture.
-    this.playCtx = (this.deps.createAudioContext ?? defaultAudioContext)();
-    if (this.playCtx?.state === "suspended") void this.playCtx.resume().catch(() => undefined);
+    this.listen = opts.mode === "listen";
+    if (!this.listen) {
+      // Create the playback context before any await so it can start inside the user gesture.
+      this.playCtx = (this.deps.createAudioContext ?? defaultAudioContext)();
+      if (this.playCtx?.state === "suspended") void this.playCtx.resume().catch(() => undefined);
+    }
+    const config: LiveConnectParameters["config"] =
+      opts.mode === "listen"
+        ? {
+            // Text only: no voice, no tools, no playback.
+            responseModalities: [Modality.TEXT],
+            systemInstruction: buildListenPrompt({ from: opts.from ?? "fr", to: opts.to ?? "en" }),
+            inputAudioTranscription: {},
+          }
+        : {
+            responseModalities: [Modality.AUDIO],
+            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } } },
+            systemInstruction: buildLivePrompt(opts),
+            inputAudioTranscription: {},
+            outputAudioTranscription: {},
+            tools: [
+              {
+                functionDeclarations: [
+                  {
+                    name: TASK_DONE,
+                    description: "call when the learner has completed the task",
+                    parameters: { type: Type.OBJECT, properties: {} },
+                  },
+                ],
+              },
+            ],
+          };
     try {
       this.session = await ai.live.connect({
         model: opts.model ?? LIVE_MODEL,
-        config: {
-          responseModalities: [Modality.AUDIO],
-          speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } } },
-          systemInstruction: buildLivePrompt(opts),
-          inputAudioTranscription: {},
-          outputAudioTranscription: {},
-          tools: [
-            {
-              functionDeclarations: [
-                {
-                  name: TASK_DONE,
-                  description: "call when the learner has completed the task",
-                  parameters: { type: Type.OBJECT, properties: {} },
-                },
-              ],
-            },
-          ],
-        },
+        config,
         callbacks: {
           onmessage: (msg) => this.handleMessage(msg),
           onerror: (e) => this.emit("error", e?.message || "live connection error"),
@@ -270,6 +304,15 @@ export class LiveSession {
         this.flushTutor();
       }
       for (const part of content.modelTurn?.parts ?? []) {
+        if (this.listen) {
+          // The translation of the utterance just heard.
+          if (part.text && !part.thought) {
+            this.flushUser();
+            this.tutorBuf += part.text;
+            this.emit("tutorText", { text: this.tutorBuf, final: false });
+          }
+          continue;
+        }
         const data = part.inlineData;
         if (data?.data && (data.mimeType ?? "audio/pcm").startsWith("audio/pcm")) {
           this.enqueue(pcm16ToFloat32(base64ToBytes(data.data)), rateOf(data.mimeType));

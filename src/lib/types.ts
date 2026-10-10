@@ -91,7 +91,8 @@ export interface Card {
   /** JPEG data URL */
   crop?: string;
   place?: string;
-  errorType?: CorrectionType;
+  /** "phrase" for phrases kept from a listened conversation */
+  errorType?: CorrectionType | "phrase";
   ease: number;
   /** days */
   interval: number;
@@ -105,4 +106,52 @@ export interface Card {
 export interface GradiumToken {
   token: string;
   expires_at: string;
+}
+
+export interface TranslateRequest {
+  text: string;
+  from: "fr";
+  to: "en";
+}
+
+export interface TranslateResponse {
+  text: string;
+}
+
+export type ExtractType = "phrase" | "expression" | "word";
+
+export interface ExtractRequest {
+  lines: { fr: string; en: string }[];
+  level: Level;
+  knownWords: string[];
+}
+
+export interface ExtractItem {
+  fr: string;
+  en: string;
+  why: string;
+  type: ExtractType;
+  noun_fr?: string;
+}
+
+export interface ExtractResponse {
+  keep: ExtractItem[];
+  known: string[];
+  advanced: { fr: string; en: string }[];
+}
+
+export interface ConversationLine {
+  fr: string;
+  en: string;
+  kept: boolean;
+}
+
+export interface Conversation {
+  id: string;
+  /** ISO timestamp */
+  startedAt: string;
+  durationS: number;
+  lines: ConversationLine[];
+  keptCount: number;
+  place?: string;
 }

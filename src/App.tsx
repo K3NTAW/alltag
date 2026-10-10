@@ -6,9 +6,18 @@ import Roleplay from "./screens/Roleplay";
 import Corrections from "./screens/Corrections";
 import Review from "./screens/Review";
 import Diary from "./screens/Diary";
+import Listen from "./screens/Listen";
 import Settings from "./screens/Settings";
 
-const nav: Screen[] = ["look", "review", "diary", "settings"];
+const nav: Screen[] = ["look", "listen", "review", "diary", "settings"];
+
+function WaveIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden>
+      <path d="M3 12h2M7 8v8M11 5v14M15 9v6M19 11v2" />
+    </svg>
+  );
+}
 
 function subscribeOnline(cb: () => void): () => void {
   window.addEventListener("online", cb);
@@ -35,6 +44,8 @@ function Current({ screen }: { screen: Screen }) {
       return <Diary />;
     case "settings":
       return <Settings />;
+    case "listen":
+      return <Listen />;
   }
 }
 
@@ -59,8 +70,9 @@ export default function App() {
             type="button"
             onClick={() => go(s)}
             aria-current={screen === s ? "page" : undefined}
-            className={`flex-1 py-3 text-sm ${screen === s ? "text-accent" : "text-muted"}`}
+            className={`flex flex-1 items-center justify-center gap-1 py-3 text-sm ${screen === s ? "text-accent" : "text-muted"}`}
           >
+            {s === "listen" && <WaveIcon />}
             {s}
           </button>
         ))}

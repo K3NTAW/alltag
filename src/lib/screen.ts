@@ -7,6 +7,7 @@ export type Screen =
   | "corrections"
   | "review"
   | "diary"
+  | "listen"
   | "settings";
 
 let current: Screen = "look";

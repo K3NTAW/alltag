@@ -1,6 +1,6 @@
 import type { LiveConnectParameters, LiveServerMessage } from "@google/genai";
 import type { SceneResult } from "../lib/types";
-import { buildLivePrompt, LiveSession } from "./live";
+import { buildListenPrompt, buildLivePrompt, LiveSession } from "./live";
 import type { LiveDeps, LiveSessionHandle } from "./live";
 
 const scene: SceneResult = {
@@ -296,5 +296,64 @@ describe("LiveSession", () => {
     s.on("error", err);
     await expect(s.connect(base)).rejects.toThrow("connect refused");
     expect(err).toHaveBeenCalledWith("connect refused");
+  });
+});
+
+describe("LiveSession listen mode", () => {
+  const listen = { mode: "listen" as const, token: "auth_tokens/t" };
+
+  it("builds the listen prompt", () => {
+    const p = buildListenPrompt({ from: "fr", to: "en" });
+    expect(p).toContain("live conversation in French");
+    expect(p).toContain("ONLY its English translation");
+    expect(p).toContain("empty line");
+  });
+
+  it("connects with TEXT modality, no tools, no speech config and input transcription", async () => {
+    const { deps, ai } = makeDeps();
+    await new LiveSession(deps).connect(listen);
+    const config = ai.state.params!.config!;
+    expect(ai.state.params!.model).toBe("gemini-3.8-live");
+    expect(config.responseModalities).toEqual(["TEXT"]);
+    expect(config.tools).toBeUndefined();
+    expect(config.speechConfig).toBeUndefined();
+    expect(config.outputAudioTranscription).toBeUndefined();
+    expect(config.inputAudioTranscription).toEqual({});
+    expect(config.systemInstruction).toBe(buildListenPrompt({ from: "fr", to: "en" }));
+  });
+
+  it("emits modelTurn text parts as tutorText, final on turnComplete, and never plays audio", async () => {
+    const { deps, ai, ctx } = makeDeps();
+    const createAudioContext = vi.fn(deps.createAudioContext);
+    const s = new LiveSession({ ...deps, createAudioContext });
+    const user: { text: string; final: boolean }[] = [];
+    const tutor: { text: string; final: boolean }[] = [];
+    s.on("userText", (e) => user.push(e));
+    s.on("tutorText", (e) => tutor.push(e));
+    await s.connect(listen);
+    ai.state.send({ serverContent: { inputTranscription: { text: "On se voit demain" } } });
+    ai.state.send({ serverContent: { modelTurn: { parts: [{ text: "See you" }] } } });
+    ai.state.send({ serverContent: { modelTurn: { parts: [{ text: " tomorrow" }] } } });
+    ai.state.send(audioMessage());
+    ai.state.send({ serverContent: { turnComplete: true } });
+    expect(user).toEqual([
+      { text: "On se voit demain", final: false },
+      { text: "On se voit demain", final: true },
+    ]);
+    expect(tutor).toEqual([
+      { text: "See you", final: false },
+      { text: "See you tomorrow", final: false },
+      { text: "See you tomorrow", final: true },
+    ]);
+    expect(createAudioContext).not.toHaveBeenCalled();
+    expect(ctx.sources).toHaveLength(0);
+    expect(s.queued).toBe(0);
+  });
+
+  it("captures the mic at 16 kHz like roleplay", async () => {
+    const { deps, ai, pushMic } = makeDeps();
+    await new LiveSession(deps).connect(listen);
+    pushMic(new Float32Array(1600), 16000);
+    expect(ai.state.session.realtime[0].audio.mimeType).toBe("audio/pcm;rate=16000");
   });
 });
