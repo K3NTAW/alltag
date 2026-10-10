@@ -2,6 +2,7 @@ import { useState } from "react";
 import { go } from "../lib/screen";
 import { session } from "../lib/session";
 import type { SceneObject } from "../lib/types";
+import { findRecall } from "../srs/recall";
 import * as store from "../srs/store";
 
 type DotState = "known" | "due" | "new";
@@ -135,7 +136,10 @@ export default function Scene() {
             </button>
             <button
               type="button"
-              onClick={() => go("roleplay")}
+              onClick={() => {
+                session.recallCardId = findRecall(scene, store.all())?.id ?? null;
+                go("roleplay");
+              }}
               className="flex-1 rounded-[var(--radius-pill)] bg-accent px-4 py-2 text-card"
             >
               talk
