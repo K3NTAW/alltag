@@ -170,7 +170,9 @@ describe("Settings offline tutor", () => {
     for (const s of [{ state: "ready", source: "bundled" }, { state: "ready", source: "opfs" }] as GemmaStatus[]) {
       fake.set(s);
       const view = render(<Settings />);
-      expect(screen.getByText(/on-device model: Gemma 4 E2B, Apache 2.0/)).toBeInTheDocument();
+      expect(
+        screen.getByText((_, el) => el?.tagName === "P" && el.textContent === "on-device model: Gemma 4 E2B, Apache 2.0"),
+      ).toBeInTheDocument();
       expect(screen.getByRole("link", { name: "Apache 2.0" })).toHaveAttribute(
         "href",
         "https://www.apache.org/licenses/LICENSE-2.0",

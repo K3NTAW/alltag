@@ -5,6 +5,7 @@ import {
   MODEL_LABEL,
   MODEL_LICENCE,
   type GemmaDeps,
+  type GenAi,
   type StorageDir,
 } from "./gemma";
 
@@ -38,7 +39,7 @@ function fakeDir() {
 function deps(over: Partial<GemmaDeps> = {}) {
   const { files, dir } = fakeDir();
   const generateResponse = vi.fn(async (p: string) => `echo:${p}`);
-  const createFromOptions = vi.fn(async () => ({ generateResponse, close: vi.fn() }));
+  const createFromOptions = vi.fn<GenAi["LlmInference"]["createFromOptions"]>(async () => ({ generateResponse, close: vi.fn() }));
   const d: GemmaDeps = {
     hasGpu: () => true,
     hasStorage: () => true,
