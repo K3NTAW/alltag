@@ -1,0 +1,79 @@
+Implement this single task in the current worktree. Commit the completed changes on the current branch with a message that starts with the task id before testing. Never leave uncommitted changes and never touch files outside scope.
+The packet above is the task contract: implement the ## objective, satisfy every line of ## acceptance, and edit only paths listed in ## write_scope.
+Run only the acceptance-named tests in the foreground; never background a command. Each command must finish in under 10 minutes. The daemon runs the full gate externally.
+No new dependencies without stating why. Finish with: summary, files changed, failures-only test output.
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read.
+
+packet v8ffaf781abe0 base 5ef24be4726f sources pool.toml@19c37ec8af44 gotchas@374d2195ba90 memory@notes over cap by 1330 chars: acceptance kept whole routed=shadow
+## objective
+N: bundled Gemma model in the native app (served from the app bundle, no user download), fetch script, licence notice
+- discovery: Run `pnpm install --frozen-lockfile` first. No new dependencies. Read src/offline/gemma.ts (task O: OPFS import + lazy MediaPipe load), src/screens/Settings.tsx (offline tutor section), capacitor.config.ts and package.json scripts (task Q), vite.config.ts (PWA precache, task P), .gitignore and .vercelignore.
+
+Human ask (2026-10-10 13:20): "when you download the app from TestFlight or the App Store the model should come with it so the user does not touch any of that." Approach for today: ship the model file inside the native app bundle. Capacitor serves everything in dist/ from the app's local origin, so a file at public/models/gemma3-1b-it-int4-web.task ends up at https://localhost/models/gemma3-1b-it-int4-web.task inside the iOS app and MediaPipe can load it straight from that URL (modelAssetPath), no OPFS copy, no download. The web deployment never gets the file (it is ignored for git and Vercel), so the web app keeps the existing file picker / VITE_GEMMA_MODEL_URL paths.
+
+1. src/offline/gemma.ts: add a "bundled" source. On first status()/ensureLoaded(): `fetch(BUNDLED_URL, {method: "HEAD"})` where BUNDLED_URL = "/models/gemma3-1b-it-int4-web.task" (resolved against location.origin); if it answers 200 (or 206), the state becomes "ready" with `source: "bundled"` once ensureLoaded has created the LlmInference with modelAssetPath = that URL; if it fails (404, network error, non-http origin), fall through to the existing OPFS / URL logic unchanged. Cache the probe result for the session. Expose `source: "bundled" | "opfs" | "url" | null` in status(). Tests: bundled HEAD 200 -> ready after ensureLoaded without touching OPFS; HEAD 404 -> existing behaviour; HEAD rejects -> existing behaviour.
+2. src/screens/Settings.tsx: when source is "bundled", the offline tutor section shows "ready, built into the app" and hides the file input and the remove button. Keep the other states exactly as they are. Extend Settings.test.tsx for the bundled state.
+3. public/models/README.md (committed): what goes here, the exact file name, the licence line (Gemma is distributed under the Gemma Terms of Use; the app must show the notice and the prohibited-use policy link), and the fetch command. .gitignore: `public/models/*.task` and `public/models/*.litertlm`. .vercelignore: `public/models/`. vite.config.ts: make sure the PWA precache glob never includes .task/.litertlm (globIgnores) so the service worker does not try to cache 700 MB.
+4. scripts/fetch-model.sh (committed, executable): downloads the file from Hugging Face into public/models/ using the `hf` CLI if present (`hf download litert-community/Gemma3-1B-IT gemma3-1b-it-int4-web.task --local-dir public/models`) else curl with an HF_TOKEN env (`https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/main/gemma3-1b-it-int4-web.task`), prints the licence reminder first, verifies the size is above 600 MB, never prints the token. package.json: `"model:fetch": "sh scripts/fetch-model.sh"`; `ios:build` stays as is but prints a one-line warning when public/models has no .task file (`node -e` check before vite build; do not fail the build).
+5. Settings "about" area or the offline section: a one-line "on-device model: Gemma 3 1B, Gemma Terms of Use" with a link to https://ai.google.dev/gemma/terms (only when source is bundled or a model is installed).
+6. README: in the Offline mode section add "Bundled in the iOS app": the fetch command, that the file ships inside the IPA (about 700 MB, so the App Store marks it as a large download), the licence notice requirement, and the later upgrade path (Apple Background Assets essential downloads, which fetch the model from your own host during App Store installation so the IPA stays small). docs/ARCHITECTURE.md: one paragraph on the three model sources.
+Gate: all existing tests green, tsc, lint; `pnpm build` exits 0 with and without a dummy file in public/models/ (create a 1 KB dummy for the check, then delete it; do not commit it).
+## acceptance
+- src/offline/gemma.test.ts covers the bundled source: HEAD 200 -> ready with source bundled and no OPFS access; HEAD 404 and HEAD rejection -> unchanged existing behaviour
+- src/screens/Settings.test.tsx covers the bundled state (no file input, no remove button, the built-in text) and the licence line
+- .gitignore ignores public/models/*.task and *.litertlm; .vercelignore lists public/models/; vite PWA config ignores .task and .litertlm in the precache; scripts/fetch-model.sh exists and is executable; package.json has model:fetch
+- README Offline mode section has the 'Bundled in the iOS app' subsection with the fetch command and the Gemma Terms of Use notice
+- Gate green: npm test -- --watch=false, npx tsc --noEmit, npm run lint; pnpm build exits 0
+## base
+- branch: main
+- merge-base goal/T-0001: 5ef24be4726f745612785cfba5e120dfd068ed32
+- goal: T-0001
+## write_scope
+- src/offline/gemma.ts
+- src/offline/gemma.test.ts
+- src/screens/Settings.tsx
+- src/screens/Settings.test.tsx
+- public/models/README.md
+- scripts/fetch-model.sh
+- package.json
+- .gitignore
+- .vercelignore
+- vite.config.ts
+- README.md
+- docs/ARCHITECTURE.md
+## read_scope
+- .
+- docs/
+- public/models/
+- scripts/
+- src/offline/
+- src/screens/
+- tests/
+## constraints
+- allowed_dependencies: "none new"
+- budget_turns: 40
+- interface_contract: "gemma.status() gains source; no API change; web behaviour unchanged when no bundled file is served."
+- read_only: false
+- read_scope: ["src/**", "public/**", "vite.config.ts", "capacitor.config.ts", "package.json", ".gitignore", ".vercelignore", "README.md", "docs/*.md"]
+- route: "straightforward"
+- task_class: "mechanical"
+- timeout_s: 1800
+## relevant_tests
+
+## symbols
+
+## gotchas
+
+## decisions
+
+## verify
+- .claude/hooks/tests-green.sh .
+- On failure, report only scripts/failures_only.sh output.
+## evidence
+
+
+## conditional instructions
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read; run the test script at most twice.
+
+You are a Claude fallback executor (Codex is unavailable); a human reviews merges. Commit on the task branch when green.
+If you need a tool outside your allowlist, post bus_post_result with status held and result reason needs_tool:<tool id>.
