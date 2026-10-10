@@ -1,0 +1,84 @@
+Implement this single task in the current worktree. Commit the completed changes on the current branch with a message that starts with the task id before testing. Never leave uncommitted changes and never touch files outside scope.
+The packet above is the task contract: implement the ## objective, satisfy every line of ## acceptance, and edit only paths listed in ## write_scope.
+Run only the acceptance-named tests in the foreground; never background a command. Each command must finish in under 10 minutes. The daemon runs the full gate externally.
+No new dependencies without stating why. Finish with: summary, files changed, failures-only test output.
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read.
+
+packet v31f2377b2e40 base 5ef24be4726f sources pool.toml@19c37ec8af44 gotchas@374d2195ba90 memory@notes,bus over cap by 1562 chars: acceptance kept whole routed=shadow
+## objective
+G2: iOS 26 Liquid Glass restyle: glass tokens, floating glass tab bar, floating top buttons, mic control, camera pills, large titles
+- discovery: Run `pnpm install --frozen-lockfile` first. No new dependencies. The design contract is .orchestrator/design/STYLE-GLASS.md (read it fully; it overrides STYLE.md where they differ) and the G-*.dc.html boards in .orchestrator/design/canvas/ if present (open G-Foundations and two screens; they are static HTML with inline styles that you can lift values from). Keep the colour tokens and fonts from src/styles/tokens.css; this task adds a glass layer and restyles the shell, it does not change any behaviour or test semantics.
+
+1. src/styles/tokens.css: add the glass tokens from STYLE-GLASS.md as CSS variables (--glass-light-bg, --glass-light-border, --glass-light-shadow, --glass-dark-*, --glass-clear-*, --glass-blur: 24px, --glass-tint-moss, --radius-capsule, --tabbar-h: 64px, --tabbar-gap: 16px) and utility classes: .glass-light, .glass-dark, .glass-clear (background + backdrop-filter + -webkit-backdrop-filter + border + box-shadow + position relative + overflow hidden), .glass-specular::before (the top highlight gradient, pointer-events none), .tint-moss. Add `@media (prefers-reduced-transparency: reduce)` fallbacks exactly as the sheet lists them. Add the paper and night radial glows as .bg-paper and .bg-night.
+2. src/components/TabBar.tsx (new) replacing the nav markup in src/App.tsx: floating capsule (height 64, radius 32, 16px side gutters, 16px above the bottom safe area, `padding-bottom: env(safe-area-inset-bottom)` handling), five tabs look/listen/review/diary/settings (if the Screen union does not yet contain "listen" because task R has not merged, render the four existing tabs and leave a one-line TODO; do not add the screen yourself), stroke icons 24px 1.75, labels 11/600, the selected tab in a moss-tinted capsule 56x48. Dark variant on look (camera), roleplay and listen screens, light elsewhere. Hidden on roleplay live and listen live states (full-screen), still rendered on idle states. Every screen's scroll container gets 96px bottom padding.
+3. src/components/GlassButton.tsx (new): a 44px circular glass button (light/dark variant, aria-label required) used for back/close/settings actions at the top corners; replace any solid top bars in Look, Scene, Roleplay, Corrections, Review, Diary, Settings with large titles in content (34/41 Bricolage) plus floating buttons where the screen had a bar action.
+4. Mic control (Roleplay, ReviewCard, Listen if present): 88px circle, glass-clear ring with specular and the four state dots from the sheet (idle white 60 %, listening moss with rings, speaking sun, thinking white 30 %). Keep the existing pointer handlers, labels and test ids so src/screens/*.test.tsx stay green.
+5. Camera (Look/Scene): object label pills become glass-clear pills with a moss dot; a 35 % dim gradient at top 120px and bottom 160px behind the floating controls; the task pill is glass-regular-dark.
+6. Sheets (ObjectSheet, Settings groups): paper at 96 % with blur 20px, radius 28, grab handle 36x5; content stays paper cards. Never put glass on cards, lists or text (HIG rule quoted in the sheet).
+7. Type: adopt the scale from the sheet (large title 34/41, title 28/34, headline 17/22, body 17/22, footnote 13/18) via the existing --text-* variables; adjust only variables and the few places that hard-code sizes.
+8. index.html: `<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">` so safe-area insets work in the installed app and the iOS shell.
+Tests: src/components/TabBar.test.tsx (renders the tabs, marks the current screen selected, calls go on tap, hidden in live states, dark variant on night screens), src/components/GlassButton.test.tsx (aria-label required, variant class), src/styles/tokens.test.ts (`// @vitest-environment node`: tokens.css contains the glass variables, the reduced-transparency media query and the three glass classes). All existing tests must stay green; where a test asserts old nav markup, update the assertion to the new TabBar, nothing else.
+## acceptance
+- src/components/TabBar.test.tsx, src/components/GlassButton.test.tsx and src/styles/tokens.test.ts pass: five (or four, if listen is absent) tabs with selected state and navigation, hidden in live states, dark variant on night screens; glass variables, classes and the prefers-reduced-transparency fallback present
+- All previously passing screen tests still pass; the only test edits are nav-markup assertions updated to the TabBar
+- No behaviour change: src/lib/**, src/voice/**, src/srs/**, api/** are untouched (git diff --name-only against the base must not list them)
+- index.html viewport has viewport-fit=cover; tokens.css keeps every existing variable name
+- Gate green: npm test -- --watch=false, npx tsc --noEmit, npm run lint; pnpm build exits 0
+## base
+- branch: main
+- merge-base goal/T-0001: 5ef24be4726f745612785cfba5e120dfd068ed32
+- goal: T-0001
+## write_scope
+- src/styles/tokens.css
+- src/styles/tokens.test.ts
+- src/components/TabBar.tsx
+- src/components/TabBar.test.tsx
+- src/components/GlassButton.tsx
+- src/components/GlassButton.test.tsx
+- src/App.tsx
+- src/index.css
+- index.html
+- src/screens/Look.tsx
+- src/screens/Scene.tsx
+- src/screens/Roleplay.tsx
+- src/screens/Corrections.tsx
+- src/screens/Review.tsx
+- src/screens/Diary.tsx
+- src/screens/Settings.tsx
+- src/screens/Listen.tsx
+- src/screens/*.test.tsx
+## read_scope
+- .
+- src/
+- src/components/
+- src/screens/
+- src/styles/
+- tests/
+## constraints
+- allowed_dependencies: "none new"
+- budget_turns: 60
+- interface_contract: "Visual layer only: new TabBar and GlassButton components, token additions; no change to lib, voice, srs, api."
+- read_only: false
+- read_scope: ["src/**", "index.html", ".orchestrator/design/STYLE-GLASS.md", ".orchestrator/design/STYLE.md", ".orchestrator/design/canvas/G-*.dc.html"]
+- route: "straightforward"
+- task_class: "unfamiliar"
+- timeout_s: 3000
+## relevant_tests
+
+## symbols
+
+## gotchas
+
+## decisions
+
+## verify
+- .claude/hooks/tests-green.sh .
+- On failure, report only scripts/failures_only.sh output.
+## evidence
+
+
+## conditional instructions
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read; run the test script at most twice.
+
+You are a Claude fallback executor (Codex is unavailable); a human reviews merges. Commit on the task branch when green.
+If you need a tool outside your allowlist, post bus_post_result with status held and result reason needs_tool:<tool id>.

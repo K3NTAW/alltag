@@ -1,0 +1,41 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4JXNWHH9NFV4FKT1APNQYC9",
+  "strategy": "manual-commit",
+  "branch": "task/T-0034",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "src/App.tsx",
+    "src/components/GlassButton.test.tsx",
+    "src/components/GlassButton.tsx",
+    "src/components/TabBar.test.tsx",
+    "src/components/TabBar.tsx",
+    "src/index.css",
+    "src/screens/Corrections.tsx",
+    "src/screens/Diary.tsx",
+    "src/screens/Listen.tsx",
+    "src/screens/Look.tsx",
+    "src/screens/Review.tsx",
+    "src/screens/Roleplay.tsx",
+    "src/screens/Scene.tsx",
+    "src/screens/Settings.tsx",
+    "src/styles/tokens.css",
+    "src/styles/tokens.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 54,
+    "cache_creation_tokens": 87143,
+    "cache_read_tokens": 1661787,
+    "output_tokens": 31464,
+    "api_call_count": 27
+  }
+}

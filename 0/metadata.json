@@ -1,0 +1,59 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4JXNWHH9NFV4FKT1APNQYC9",
+  "session_id": "0357f295-9553-474d-981c-6f1c20f05cf5",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T12:47:51.163641Z",
+  "branch": "task/T-0034",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "src/App.tsx",
+    "src/components/GlassButton.test.tsx",
+    "src/components/GlassButton.tsx",
+    "src/components/TabBar.test.tsx",
+    "src/components/TabBar.tsx",
+    "src/index.css",
+    "src/screens/Corrections.tsx",
+    "src/screens/Diary.tsx",
+    "src/screens/Listen.tsx",
+    "src/screens/Look.tsx",
+    "src/screens/Review.tsx",
+    "src/screens/Roleplay.tsx",
+    "src/screens/Scene.tsx",
+    "src/screens/Settings.tsx",
+    "src/styles/tokens.css",
+    "src/styles/tokens.test.ts"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "99376a816354",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 54,
+    "cache_creation_tokens": 87143,
+    "cache_read_tokens": 1661787,
+    "output_tokens": 31464,
+    "api_call_count": 27
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-10T12:47:51.114826Z",
+    "agent_lines": 618,
+    "agent_removed": 131,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 618,
+    "total_lines_changed": 749,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}
