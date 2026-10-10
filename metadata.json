@@ -1,0 +1,26 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4K5PG0MNB02ZCEMY43V1QEJ",
+  "strategy": "manual-commit",
+  "branch": "task/T-0083",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "src/components/Orb.tsx"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 10,
+    "cache_creation_tokens": 4955,
+    "cache_read_tokens": 314571,
+    "output_tokens": 1303,
+    "api_call_count": 5
+  }
+}
