@@ -1,0 +1,118 @@
+Implement this single task in the current worktree. Commit the completed changes on the current branch with a message that starts with the task id before testing. Never leave uncommitted changes and never touch files outside scope.
+The packet above is the task contract: implement the ## objective, satisfy every line of ## acceptance, and edit only paths listed in ## write_scope.
+Run only the acceptance-named tests in the foreground; never background a command. Each command must finish in under 10 minutes. The daemon runs the full gate externally.
+No new dependencies without stating why. Finish with: summary, files changed, failures-only test output.
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read.
+
+packet v53de89c3caf1 base 5ef24be4726f sources pool.toml@19c37ec8af44 gotchas@374d2195ba90 memory@notes specialist: execute+implement-spec over cap by 1192 chars: acceptance kept whole routed=shadow
+## skills
+### executor/implement-spec (v6ba2f814dd6f)
+## Trigger
+Any execute task from the orchestrator.
+
+## Objective
+Implement one atomic task within its Scope and leave tests green.
+
+## Procedure
+Read Spec, Acceptance, Scope. Run `scripts/tests_green.sh` first. Make the smallest accepted change. Run it again; iterate on failure. Commit on the task branch.
+
+## Tools
+Read, Edit, Bash; `scripts/failures_only.sh`.
+
+## Evidence requirements
+Acceptance checks and tests-green result.
+
+## Output contract
+Finish with: 3-line summary, `git diff --stat`, failures-only output (empty when green).
+
+## Stop conditions
+Stop when Acceptance passes or budget ends.
+
+## Failure/recovery
+Report only `scripts/failures_only.sh` output. Edit only paths in Scope. No new dependencies unless the spec names them.
+## objective
+fix round 1 (human decision) for held T-0037: switch the bundled offline model to Gemma 4 E2B, docs/LANGUAGES.md
+- discovery: Fix round 1 for held T-0037 (branch task/T-0037, worktree wt/T-0037, head eec2b04: bundled Gemma 3 1B, fetch script, licence notice). Work in wt/T-0037 on task/T-0037. node_modules exists there; if not, run `pnpm install --frozen-lockfile` first. No new dependencies (@mediapipe/tasks-genai 0.10.29 is the latest and loads Gemma 4 .task files).
+
+Human decision 2026-10-10 15:00: "use gemma 4 E2B" and "make a list of all languages we can actually support now".
+
+Facts (Planner research, verified on Hugging Face and the model card today):
+- Repo litert-community/gemma-4-E2B-it-litert-lm, NOT gated, licence Apache 2.0. Web file for MediaPipe: gemma-4-E2B-it-web.task (about 2 GB; a gemma-4-E2B-it-web.litertlm also exists for the LiteRT-LM runtime, do not use it). Text-only on web, WebGPU required. Runs in under 1.5 GB memory per Google.
+- Gemma 4 is pretrained on 140+ languages with out-of-the-box support for 35+.
+
+Do exactly this:
+1. src/offline/gemma.ts: MODEL_FILE = "gemma-4-E2B-it-web.task"; header comment says Gemma 4 E2B; export MODEL_LABEL = "Gemma 4 E2B" and MODEL_LICENCE = {name: "Apache 2.0", url: "https://www.apache.org/licenses/LICENSE-2.0"}; keep every other behaviour (bundled probe, OPFS, URL). Raise any size check or copy that assumes 700 MB to about 2 GB. If the LlmInference options set maxTokens, keep them; set it to 1024 if unset.
+2. src/screens/Settings.tsx: the licence line becomes "on-device model: Gemma 4 E2B, Apache 2.0" linking MODEL_LICENCE.url (use the constants); remove the Gemma Terms of Use and prohibited-use links; the manual-download copy says gemma 4 e2b, about 2 gb, from https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm, and drops "you accept the gemma licence there first". Keep the glass styling from T-0034 untouched.
+3. scripts/fetch-model.sh: REPO litert-community/gemma-4-E2B-it-litert-lm, FILE gemma-4-E2B-it-web.task, no token needed (keep HF_TOKEN optional), size check above 1500 MB, licence line "Gemma 4 is released under Apache 2.0".
+4. public/models/README.md, README.md (offline section, bundled subsection: about 2 GB IPA, Apache 2.0, no gated download), docs/ARCHITECTURE.md: replace Gemma 3 1B facts with the above.
+5. docs/LANGUAGES.md (new): from .orchestrator/languages-reference.md (read it; it is research data). Sections: "Today" (the app teaches French only; language is fixed in settings and prompts), "What the stack supports" with three tiers: A full experience with Gradium voice (en, fr, de, es, pt, plus the Swiss French and Swiss German accents of the voice library), B Gemini only voice and transcription (the full 99-language table), C offline Gemma 4 E2B (35+ out of the box, text only on web). "What it takes to add a language" (settings field, prompt parameter, Gradium routing for tier A, Gemini Live voice and Gemini TTS for tier B, onboarding picker). Link it from README.
+6. Tests: update src/offline/gemma.test.ts and src/screens/Settings.test.tsx expectations for the new file name, label and licence; add a docs test only if README.test.ts style requires every docs file to be linked (it may; check).
+7. Run `npm test -- --watch=false`, `npx tsc --noEmit`, `npm run lint`. Commit as "T-0037 fix 1: Gemma 4 E2B (Apache 2.0) instead of Gemma 3 1B; docs/LANGUAGES.md" and report git diff --name-only HEAD~1.
+## acceptance
+- src/offline/gemma.ts MODEL_FILE is gemma-4-E2B-it-web.task and exports MODEL_LABEL and MODEL_LICENCE; gemma.test.ts asserts them
+- Settings shows 'Gemma 4 E2B, Apache 2.0' and no Gemma Terms link (Settings.test.tsx asserts it); fetch-model.sh targets litert-community/gemma-4-E2B-it-litert-lm
+- docs/LANGUAGES.md exists with the three tiers and the 99-language table, linked from README.md
+- Gate green: npm test -- --watch=false, npx tsc --noEmit, npm run lint
+## base
+- branch: main
+- merge-base goal/T-0001: 5ef24be4726f745612785cfba5e120dfd068ed32
+- goal: T-0001
+## write_scope
+- src/offline/gemma.ts
+- src/offline/gemma.test.ts
+- src/screens/Settings.tsx
+- src/screens/Settings.test.tsx
+- scripts/fetch-model.sh
+- public/models/README.md
+- README.md
+- docs/ARCHITECTURE.md
+- docs/LANGUAGES.md
+- docs/readme.test.ts
+## read_scope
+- .
+- docs/
+- public/models/
+- scripts/
+- src/offline/
+- src/screens/
+- tests/
+## constraints
+- allowed_dependencies: "none new"
+- auto_round: 1
+- budget_turns: 30
+- fix_round_for: "T-0037"
+- interface_contract: "gemma.ts public API unchanged apart from the new MODEL_LABEL and MODEL_LICENCE exports."
+- read_only: false
+- read_scope: ["src/**", "scripts/**", "public/models/**", "README.md", "docs/**", ".orchestrator/languages-reference.md"]
+- route: "straightforward"
+- task_class: "mechanical"
+- timeout_s: 1800
+## relevant_tests
+
+## symbols
+
+## gotchas
+
+## decisions
+
+## verify
+- .claude/hooks/tests-green.sh .
+- On failure, report only scripts/failures_only.sh output.
+## evidence
+
+
+## conditional instructions
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read; run the test script at most twice.
+
+You are a Claude fallback executor (Codex is unavailable); a human reviews merges. Commit on the task branch when green.
+If you need a tool outside your allowlist, post bus_post_result with status held and result reason needs_tool:<tool id>.
+
+---
+
+<task-notification>
+<task-id>b1yxfyiak</task-id>
+<tool-use-id>toolu_01RrYjyDkENfmQDBugqfnstM</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-k3ntaw-code-alltag-wt-T-0048/25a758e4-c0b9-43c1-b6a4-80e34d38d788/tasks/b1yxfyiak.output</output-file>
+<status>failed</status>
+<summary>Background command "find / -name languages-reference.md -path "*alltag*" 2&gt;/dev/null | head; sed -n 150,260p src/screens/Settings.tsx; sed -n 140,185p src/screens/Settings.test.tsx; sed -n 1,30p src/offline/gemma.test.ts; cat scripts/fetch-model.sh public/models/README.md docs/readme.test.ts; grep -n -i "gemma\|offline\|700\|docs/" README.md docs/ARCHITECTURE.md" failed with exit code 144</summary>
+</task-notification>
