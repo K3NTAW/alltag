@@ -1,9 +1,9 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { applyCors } from "./_lib/cors";
+import { applyCors } from "./_lib/cors.js";
 import { GoogleGenAI } from "@google/genai";
 import type { CheckRequest, CheckResponse } from "../src/lib/api";
 import type { Level } from "../src/lib/types";
-import { CHECK_SCHEMA, buildCheckPrompt } from "./_prompts/check";
+import { CHECK_SCHEMA, buildCheckPrompt } from "./_prompts/check.js";
 
 const LEVELS: Level[] = ["A1", "A2", "B1", "B2"];
 export const DEFAULT_CHECK_MODEL = "gemini-3.5-flash-lite";

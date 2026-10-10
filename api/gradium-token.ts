@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { applyCors, originAllowed } from "./_lib/cors";
+import { applyCors, originAllowed } from "./_lib/cors.js";
 import type { GradiumToken } from "../src/lib/types";
 
 const TOKEN_URL = "https://api.gradium.ai/api/api-keys/token";

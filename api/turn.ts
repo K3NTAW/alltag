@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { applyCors } from "./_lib/cors";
+import { applyCors } from "./_lib/cors.js";
 import { GoogleGenAI } from "@google/genai";
 import type { TurnRequest, TurnResponse } from "../src/lib/types";
-import { TURN_SCHEMA, buildTurnPrompt } from "./_prompts/turn";
+import { TURN_SCHEMA, buildTurnPrompt } from "./_prompts/turn.js";
 
 export const DEFAULT_TURN_MODEL = "gemini-3.8-flash";
 

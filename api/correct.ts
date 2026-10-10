@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { applyCors } from "./_lib/cors";
+import { applyCors } from "./_lib/cors.js";
 import { GoogleGenAI } from "@google/genai";
 import type {
   CorrectRequest,
@@ -11,7 +11,7 @@ import {
   CORRECTION_TYPES,
   CORRECT_SCHEMA,
   buildCorrectPrompt,
-} from "./_prompts/correct";
+} from "./_prompts/correct.js";
 
 export const DEFAULT_GRADER_MODEL = "gemini-3.1-pro-preview";
 export const FALLBACK_GRADER_MODEL = "gemini-3.8-flash";

@@ -6,8 +6,8 @@ import type {
   SceneRequest,
   SceneResult,
 } from "../src/lib/types";
-import { applyCors } from "./_lib/cors";
-import { SCENE_SCHEMA, buildScenePrompt } from "./_prompts/scene";
+import { applyCors } from "./_lib/cors.js";
+import { SCENE_SCHEMA, buildScenePrompt } from "./_prompts/scene.js";
 
 const LEVELS: Level[] = ["A1", "A2", "B1", "B2"];
 const DATA_PREFIX = "data:image/jpeg;base64,";

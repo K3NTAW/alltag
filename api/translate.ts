@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { applyCors } from "./_lib/cors";
+import { applyCors } from "./_lib/cors.js";
 import { GoogleGenAI } from "@google/genai";
 import type { TranslateRequest } from "../src/lib/types";
-import { buildTranslatePrompt } from "./_prompts/translate";
+import { buildTranslatePrompt } from "./_prompts/translate.js";
 
 export const DEFAULT_TRANSLATE_MODEL = "gemini-3.5-flash-lite";
 

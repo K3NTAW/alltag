@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { applyCors } from "./_lib/cors";
+import { applyCors } from "./_lib/cors.js";
 import { GoogleGenAI } from "@google/genai";
 import type { ExtractItem, ExtractRequest, ExtractResponse, ExtractType, Level } from "../src/lib/types";
-import { EXTRACT_SCHEMA, EXTRACT_TYPES, MAX_KEEP, buildExtractPrompt } from "./_prompts/extract";
+import { EXTRACT_SCHEMA, EXTRACT_TYPES, MAX_KEEP, buildExtractPrompt } from "./_prompts/extract.js";
 
 const LEVELS: Level[] = ["A1", "A2", "B1", "B2"];
 export const DEFAULT_EXTRACT_MODEL = "gemini-3.8-flash";

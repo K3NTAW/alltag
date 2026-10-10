@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { applyCors, originAllowed } from "./_lib/cors";
+import { applyCors, originAllowed } from "./_lib/cors.js";
 import { GoogleGenAI } from "@google/genai";
 
 export const DEFAULT_LIVE_MODEL = "gemini-3.8-live";
