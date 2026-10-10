@@ -34,3 +34,6 @@ Spec review from complexity 6 would cost an hour per task: keep complexity <= 5 
 
 ## Escalate to the human when
 A partner API shape contradicts this file (then prefer the live docs and say so in plan.md), the gate is red twice on the same task, or anything needs a paid account.
+
+## Design tokens in the repo (added 11:30)
+The canvas is behind login for executors. The design language (colors, type, radii, every component spec) is at .orchestrator/design/STYLE.md and the per-screen content at .orchestrator/design/BOARDS.md. Task A writes src/styles/tokens.css from STYLE.md; E, F, G follow BOARDS.md.
