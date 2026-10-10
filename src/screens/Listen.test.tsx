@@ -77,12 +77,12 @@ describe("Listen", () => {
 
   it("idle shows the consent card and toggles how it works", () => {
     render(<Listen />);
-    expect(screen.getByRole("heading", { name: "listen" })).toBeInTheDocument();
-    expect(screen.getByText(/only listen where people know/)).toBeInTheDocument();
-    expect(screen.getByText("fr -> en")).toBeInTheDocument();
-    expect(screen.queryByText(/stop and learn picks/)).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "how it works" }));
-    expect(screen.getByText(/stop and learn picks/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Listen" })).toBeInTheDocument();
+    expect(screen.getByText(/Only listen where people know/)).toBeInTheDocument();
+    expect(screen.getByText("FR · they speak")).toBeInTheDocument();
+    expect(screen.queryByText(/Stop and learn picks/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "How it works" }));
+    expect(screen.getByText(/Stop and learn picks/)).toBeInTheDocument();
   });
 
   it("live renders pairs from events, the newest French still partial, and bookmarks toggle", () => {
@@ -135,10 +135,10 @@ describe("Listen", () => {
     );
     startListening();
     fireEvent.click(within(screen.getAllByTestId("pair")[0]).getByRole("button", { name: /bookmark/ }));
-    fireEvent.click(screen.getByRole("button", { name: "stop and learn" }));
+    fireEvent.click(screen.getByRole("button", { name: "Stop and learn" }));
     expect(live.stop).toHaveBeenCalled();
 
-    await screen.findByText("from that conversation");
+    await screen.findByText("From that conversation");
     expect(postExtract).toHaveBeenCalledWith({
       lines: [
         { fr: "On se voit demain ?", en: "See you tomorrow?" },
@@ -147,18 +147,18 @@ describe("Listen", () => {
       level: "A1",
       knownWords: ["bonjour"],
     });
-    expect(screen.getByText("1 minute, 2 lines")).toBeInTheDocument();
+    expect(screen.getByText("1 minute · 2 lines")).toBeInTheDocument();
     await screen.findAllByTestId("keep-card");
     expect(screen.getByRole("checkbox", { name: "keep On se voit demain ?" })).toBeChecked();
     expect(screen.getByRole("checkbox", { name: "keep ça marche" })).not.toBeChecked();
     expect(screen.getByText("demain")).toBeInTheDocument();
     expect(screen.queryByText("Il eût fallu")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /too advanced for now/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Too advanced for now/ }));
     expect(screen.getByText("Il eût fallu")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("checkbox", { name: "keep le midi" }));
     const keepSpy = vi.spyOn(store, "keep");
-    fireEvent.click(screen.getByRole("button", { name: "keep 2 and add to review" }));
+    fireEvent.click(screen.getByRole("button", { name: "Keep 2 for review" }));
     expect(keepSpy).toHaveBeenCalledTimes(2);
     expect(keepSpy).toHaveBeenCalledWith({
       phrase_fr: "On se voit demain ?",
@@ -180,11 +180,11 @@ describe("Listen", () => {
     render(<Listen />);
     startListening();
     fireEvent.click(within(screen.getAllByTestId("pair")[1]).getByRole("button", { name: /bookmark/ }));
-    fireEvent.click(screen.getByRole("button", { name: "stop and learn" }));
+    fireEvent.click(screen.getByRole("button", { name: "Stop and learn" }));
     await waitFor(() => expect(screen.getAllByTestId("keep-card")).toHaveLength(1));
     expect(screen.getByRole("checkbox", { name: "keep Ça marche, à midi." })).toBeChecked();
     const keepSpy = vi.spyOn(store, "keep");
-    fireEvent.click(screen.getByRole("button", { name: "save transcript to diary" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save transcript to diary" }));
     expect(keepSpy).not.toHaveBeenCalled();
     keepSpy.mockRestore();
     expect(conversations.all()).toHaveLength(1);
