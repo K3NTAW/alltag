@@ -91,7 +91,17 @@ export default function Listen() {
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const startedAt = useRef("");
   const convId = useRef<string | undefined>(undefined);
-  const fb = useRef<{ stt?: SttSession; stopMic?: () => void; openId?: string; n: number; gen: number }>({ n: 0, gen: 0 });
+  const fb = useRef<{
+    stt?: SttSession;
+    stopMic?: () => void;
+    openId?: string;
+    active: boolean;
+    n: number;
+    gen: number;
+  }>({ active: false, n: 0, gen: 0 });
+
+  // Token or connect failure -> Gradium STT + /api/translate for the rest of this conversation.
+  if (phase === "live" && !paused && !fallback && live.state === "error") setFallback(true);
 
   const livePairs = fallback || paused || phase !== "live" ? [] : pairLines(live.events, `s${segment}-`);
   const pairs = [...committed, ...livePairs].map((p) => ({ ...p, kept: keptIds.has(p.id) }));
@@ -99,6 +109,7 @@ export default function Listen() {
   const closeFallback = useCallback(() => {
     const f = fb.current;
     f.gen += 1;
+    f.active = false;
     f.stopMic?.();
     f.stopMic = undefined;
     f.stt?.close();
@@ -109,7 +120,7 @@ export default function Listen() {
   const startFallback = useCallback(async () => {
     const f = fb.current;
     const gen = ++f.gen;
-    setFallbackError(false);
+    f.active = true;
     const setPair = (id: string, patch: Partial<Pair>) =>
       setCommitted((list) => list.map((p) => (p.id === id ? { ...p, ...patch } : p)));
     const upsert = (text: string): string => {
@@ -151,16 +162,9 @@ export default function Listen() {
     }
   }, []);
 
-  const goFallback = useCallback(() => {
-    if (fallback) return;
-    setFallback(true);
-    void startFallback();
-  }, [fallback, startFallback]);
-
-  // Token or connect failure -> Gradium STT + /api/translate.
   useEffect(() => {
-    if (phase === "live" && !paused && !fallback && live.state === "error") goFallback();
-  }, [phase, paused, fallback, live.state, goFallback]);
+    if (fallback && phase === "live" && !paused && !fb.current.active) void startFallback();
+  }, [fallback, phase, paused, startFallback]);
 
   useEffect(() => {
     if (phase !== "live" || paused) return;
@@ -171,11 +175,9 @@ export default function Listen() {
   useEffect(() => closeFallback, [closeFallback]);
 
   function openSession() {
-    if (fallback) {
-      void startFallback();
-      return;
-    }
-    start({ mode: "listen", from: "fr", to: "en" }).catch(() => goFallback());
+    // In fallback the effect above reopens the STT socket.
+    if (fallback) return;
+    start({ mode: "listen", from: "fr", to: "en" }).catch(() => setFallback(true));
   }
 
   function begin() {
@@ -185,6 +187,7 @@ export default function Listen() {
     setKeptIds(new Set());
     setElapsed(0);
     setPaused(false);
+    setFallbackError(false);
     setLearn(null);
     setPhase("live");
     openSession();

@@ -52,10 +52,10 @@ describe("Diary", () => {
     expect(row.textContent).toContain("conversation, sat 14:05");
     expect(row.textContent).toContain("2 lines, 1 kept");
     // newest first: the conversation comes before the older scene tile
-    const items = screen.getAllByRole("listitem");
-    expect(items[0]).toBe(row);
+    const tile = screen.getByTestId("diary-tile");
+    expect(row.compareDocumentPosition(tile) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.queryByText("Oui, à midi.")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /conversation, sat 14:05/ }));
+    fireEvent.click(row.querySelector("button")!);
     expect(screen.getByText("Oui, à midi.")).toBeInTheDocument();
     expect(screen.getByText("See you tomorrow?")).toBeInTheDocument();
   });
