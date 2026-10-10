@@ -3,9 +3,10 @@
   "checkpoint_id": "01M4JWF97WS4M66P20B2PAHZ59",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 5,
+  "checkpoints_count": 16,
   "files_touched": [
     ".orchestrator/memory/decisions.md",
+    ".orchestrator/plan-log.md",
     ".orchestrator/plan.md"
   ],
   "sessions": [
@@ -43,13 +44,20 @@
       "compact_transcript": "/4/transcript.jsonl",
       "content_hash": "/4/content_hash.txt",
       "prompt": "/4/prompt.txt"
+    },
+    {
+      "metadata": "/5/metadata.json",
+      "transcript": "/5/full.jsonl",
+      "compact_transcript": "/5/transcript.jsonl",
+      "content_hash": "/5/content_hash.txt",
+      "prompt": "/5/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 1226,
-    "cache_creation_tokens": 312347,
-    "cache_read_tokens": 2178251,
-    "output_tokens": 33038,
-    "api_call_count": 43
+    "input_tokens": 2450,
+    "cache_creation_tokens": 477104,
+    "cache_read_tokens": 8603471,
+    "output_tokens": 94157,
+    "api_call_count": 100
   }
 }

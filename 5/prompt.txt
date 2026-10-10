@@ -1,0 +1,263 @@
+<task-notification>
+<task-id>blnj7kqj7</task-id>
+<summary>Monitor event: "bus status/hold/gate/merge events for T-0001 children"</summary>
+<event>31 T-0002 update {"packet_meta": {"chars": 8834, "est_tokens": 2208, "presented_tokens": 2208, "sections": {"_preamble": {"chars": 168, "est_tokens": 42, "sha256": "3c31830b9a5e
+32 T-0002 update {"packet_meta": {"chars": 8834, "est_tokens": 2208, "presented_tokens": 2208, "sections": {"_preamble": {"chars": 168, "est_tokens": 42, "sha256": "3c31830b9a5e
+33 T-0002 update {"status": "done", "result": {"summary": "T-0002 is done and committed on `task/T-0002` in two commits: `3814b37` (scaffold) and `d1a3fe5` (removes a file that</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>blnj7kqj7</task-id>
+<summary>Monitor event: "bus status/hold/gate/merge events for T-0001 children"</summary>
+<event>34 T-0002 update {"pipeline": {"first_ready_at": 1791623804.554515, "dispatched_at_lease": 1791624825.286221, "dispatched_at_done": 1791623925.596528, "dispatched_at": 179162392</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>blnj7kqj7</task-id>
+<summary>Monitor event: "bus status/hold/gate/merge events for T-0001 children"</summary>
+<event>35 T-0002 update {"pipeline": {"first_ready_at": 1791623804.554515, "dispatched_at_lease": 1791624825.286221, "dispatched_at_done": 1791623925.596528, "dispatched_at": 179162392
+36 T-0002 update {"pipeline": {"first_ready_at": 1791623804.554515, "dispatched_at_lease": 1791624825.286221, "dispatched_at_done": 1791623925.596528, "dispatched_at": 179162392
+37 T-0002 update {"pipeline": {"first_ready_at": 1791623804.554515, "dispatched_at_lease": 1791624825.286221, "dispatched_at_done": 1791623925.596528, "dispatched_at": 179162392
+38 T-0002 update {"pipeline": {"first_ready_at": 1791623804.554515, "dispatched_at_lease": 1791624825.286221, "dispatched_at_done": 1791623925.596528, "dispatched_at": 179162392
+39 T-0010 created {}
+40 T-0010 update {"reviewed_sha": "d1a3fe52476eca1360e8113d62792b0aae507ff7"}
+41 T-0002 update {"pipeline": {"first_ready_at": 1791623804.554515, "dispatched_at_lease": 1791624825.286221, "dispatched_at_done": 1791623925.596528, "dispatched_at": 179162392
+42 T-0010 update {"packet_meta": {"prefix_sha": "a7fc6578794f", "prefix_chars": 710, "suffix_chars": 8896, "dynamic_sections": ["spec", "acceptance", "scope", "diff", "changed t
+43 T-0010 update {"packet_meta": {"chars": 8755, "est_tokens": 2188, "presented_tokens": 2188, "sections": {"_preamble": {"chars": 90, "est_tokens": 22, "sha256": "e37cddbd88414
+44 T-0010 update {"status": "running", "assigned_to": "claude:B", "worktree": "/Users/k3ntaw/code/alltag/wt/T-0010", "claimed_at": 1791624212.844008}</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>blnj7kqj7</task-id>
+<summary>Monitor event: "bus status/hold/gate/merge events for T-0001 children"</summary>
+<event>47 T-0010 update {"packet_meta": {"chars": 8755, "est_tokens": 2188, "presented_tokens": 2188, "sections": {"_preamble": {"chars": 90, "est_tokens": 22, "sha256": "e37cddbd88414
+48 T-0010 update {"packet_meta": {"chars": 8755, "est_tokens": 2188, "presented_tokens": 2188, "sections": {"_preamble": {"chars": 90, "est_tokens": 22, "sha256": "e37cddbd88414
+49 T-0010 update {"status": "done", "result": {"summary": "The packet's scoped diff was empty because the T-0002 scaffold is already in the base (HEAD is d1a3fe5), so I reviewed
+50 T-0010 update {"review_verdict": "approve"}
+51 T-0010 update {"review_facts": {"verdict": "approve", "findings_count": 2, "findings_by_severity": {"high": 0, "med": 0, "low": 2, "other": 0}, "reviewer_role": "general", "c
+52 T-0002 update {"review_verdict": "approve"}</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>blnj7kqj7</task-id>
+<summary>Monitor event: "bus status/hold/gate/merge events for T-0001 children"</summary>
+<event>53 T-0002 update {"pipeline": {"first_ready_at": 1791623804.554515, "dispatched_at_lease": 1791624825.286221, "dispatched_at_done": 1791623925.596528, "dispatched_at": 179162392</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>blnj7kqj7</task-id>
+<summary>Monitor event: "bus status/hold/gate/merge events for T-0001 children"</summary>
+<event>54 T-0002 update {"status": "done", "merged_into": "goal/T-0001", "sha": "d3fbe36b597ba9a6b149833b6588da6753787a79", "merged_at": 1791624326.3420641, "changed_files": [".env.exa</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>blnj7kqj7</task-id>
+<summary>Monitor event: "bus status/hold/gate/merge events for T-0001 children"</summary>
+<event>64 T-0003 update {"tier": "opus", "fallback": "claude", "review_rule": "same-family-review: other account, different model"}
+69 T-0001 update {"pipeline": {"last_merge": {"status": "merged", "target": "goal/T-0001", "sha": "d3fbe36b597ba9a6b149833b6588da6753787a79", "checkout_synced": false, "head_sha
+71 T-0002 update {"pipeline": {"first_ready_at": 1791623804.554515, "dispatched_at_lease": 1791624825.286221, "dispatched_at_done": 1791623925.596528, "dispatched_at": 179162392
+73 T-0004 update {"tier": "opus", "fallback": "claude", "review_rule": "same-family-review: other account, different model"}
+75 T-0002 update {"pipeline": {"first_ready_at": 1791623804.554515, "dispatched_at_lease": 1791624825.286221, "dispatched_at_done": 1791623925.596528, "dispatched_at": 179162392
+77 T-0003 update {"packet_meta": {"chars": 4724, "est_tokens": 1181, "presented_tokens": 1181, "sections": {"_preamble": {"chars": 122, "est_tokens": 30, "sha256": "58582912a427
+80 T-0004 update {"packet_meta": {"chars": 4892, "est_tokens": 1223, "presented_tokens": 1223, "sections": {"_preamble": {"chars": 166, "est_tokens": 41, "sha256": "f070dbfdf523
+81 T-0003 update {"status": "running", "assigned_to": "claude:A", "worktree": "/Users/k3ntaw/code/alltag/wt/T-0003", "claimed_at": 1791624342.863806}
+84 T-0004 update {"status": "running", "assigned_to": "claude:A", "worktree": "/Users/k3ntaw/code/alltag/wt/T-0004", "claimed_at": 1791624342.959625}
+87 T-0011 created {}</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>blnj7kqj7</task-id>
+<summary>Monitor event: "bus status/hold/gate/merge events for T-0001 children"</summary>
+<event>89 T-0003 update {"packet_meta": {"chars": 4724, "est_tokens": 1181, "presented_tokens": 1181, "sections": {"_preamble": {"chars": 122, "est_tokens": 30, "sha256": "58582912a427
+90 T-0003 update {"packet_meta": {"chars": 4724, "est_tokens": 1181, "presented_tokens": 1181, "sections": {"_preamble": {"chars": 122, "est_tokens": 30, "sha256": "58582912a427
+91 T-0003 update {"status": "done", "result": {"summary": "I added the scene route, its prompt and its tests, and committed them on `task/T-0003` as `T-0003: add api/scene Gemin
+92 T-0004 update {"packet_meta": {"chars": 4892, "est_tokens": 1223, "presented_tokens": 1223, "sections": {"_preamble": {"chars": 166, "est_tokens": 41, "sha256": "f070dbfdf523
+93 T-0004 update {"packet_meta": {"chars": 4892, "est_tokens": 1223, "presented_tokens": 1223, "sections": {"_preamble": {"chars": 166, "est_tokens": 41, "sha256": "f070dbfdf523
+94 T-0004 update {"status": "done", "result": {"summary": "I added `/api/turn` and `/api/correct` and committed them as `eb4803b` on `task/T-0004`. The two acceptance-named test</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>blnj7kqj7</task-id>
+<summary>Monitor event: "bus status/hold/gate/merge events for T-0001 children"</summary>
+<event>102 T-0005 update {"tier": "opus", "fallback": "claude", "review_rule": "same-family-review: other account, different model"}
+107 T-0003 update {"pipeline": {"first_ready_at": 1791624340.549025, "dispatched_at": 1791624340.554409, "dispatched_at_lease": 1791625240.554409, "dispatched_at_done": 179162434
+109 T-0011 update {"tier": "opus", "fallback": "claude", "review_rule": "same-family-review: other account, different model"}
+113 T-0005 update {"packet_meta": {"chars": 7408, "est_tokens": 1852, "presented_tokens": 1852, "sections": {"_preamble": {"chars": 168, "est_tokens": 42, "sha256": "b5be9f6ee691
+115 T-0011 update {"packet_meta": {"chars": 4896, "est_tokens": 1224, "presented_tokens": 1224, "sections": {"_preamble": {"chars": 166, "est_tokens": 41, "sha256": "2d8315ffd976
+116 T-0005 update {"status": "running", "assigned_to": "claude:A", "worktree": "/Users/k3ntaw/code/alltag/wt/T-0005", "claimed_at": 1791624513.330716}
+119 T-0011 update {"status": "running", "assigned_to": "claude:A", "worktree": "/Users/k3ntaw/code/alltag/wt/T-0011", "claimed_at": 1791624514.631021}</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>blnj7kqj7</task-id>
+<summary>Monitor event: "bus status/hold/gate/merge events for T-0001 children"</summary>
+<event>122 T-0003 update {"pipeline": {"first_ready_at": 1791624340.549025, "dispatched_at": 1791624340.554409, "dispatched_at_lease": 1791625240.554409, "dispatched_at_done": 179162434
+123 T-0003 update {"pipeline": {"first_ready_at": 1791624340.549025, "dispatched_at": 1791624340.554409, "dispatched_at_lease": 1791625240.554409, "dispatched_at_done": 179162434
+124 T-0003 update {"pipeline": {"first_ready_at": 1791624340.549025, "dispatched_at": 1791624340.554409, "dispatched_at_lease": 1791625240.554409, "dispatched_at_done": 179162434
+125 T-0004 update {"pipeline": {"first_ready_at": 1791624340.825514, "dispatched_at": 1791624340.827727, "dispatched_at_lease": 1791625240.827727, "dispatched_at_done": 179162434</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>blnj7kqj7</task-id>
+<summary>Monitor event: "bus status/hold/gate/merge events for T-0001 children"</summary>
+<event>[Monitor expired after 10m with 10 events delivered. Re-arm it if you still need the watch.]</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>b5c8dlsww</task-id>
+<summary>Monitor event: "bus done/merge/hold/review events for T-0001 children"</summary>
+<event>137 T-0003 update {"pipeline": {"first_ready_at": 1791624340.549025, "dispatched_at": 1791624340.554409, "dispatched_at_lease": 1791625240.554409, "dispatched
+140 T-0003 update {"pipeline": {"first_ready_at": 1791624340.549025, "dispatched_at": 1791624340.554409, "dispatched_at_lease": 1791625240.554409, "dispatched
+142 T-0004 update {"pipeline": {"first_ready_at": 1791624340.825514, "dispatched_at": 1791624340.827727, "dispatched_at_lease": 1791625240.827727, "dispatched
+143 T-0004 update {"pipeline": {"first_ready_at": 1791624340.825514, "dispatched_at": 1791624340.827727, "dispatched_at_lease": 1791625240.827727, "dispatched
+144 T-0006 update {"status": "running", "assigned_to": "claude:A", "worktree": "/Users/k3ntaw/code/alltag/wt/T-0006", "claimed_at": 1791624693.7315168}</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>b5c8dlsww</task-id>
+<summary>Monitor event: "bus done/merge/hold/review events for T-0001 children"</summary>
+<event>147 T-0004 update {"status": "done", "merged_into": "goal/T-0001", "sha": "013bfbfdddd91d3a9f4d50b92342265c868f1788", "merged_at": 1791624753.0449438, "change</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>b5c8dlsww</task-id>
+<summary>Monitor event: "bus done/merge/hold/review events for T-0001 children"</summary>
+<event>149 T-0004 update {"pipeline": {"first_ready_at": 1791624340.825514, "dispatched_at": 1791624340.827727, "dispatched_at_lease": 1791625240.827727, "dispatched
+150 T-0004 update {"pipeline": {"first_ready_at": 1791624340.825514, "dispatched_at": 1791624340.827727, "dispatched_at_lease": 1791625240.827727, "dispatched
+153 T-0011 update {"status": "done", "result": {"summary": "Both fixes are in and committed on `task/T-0011` with message \"T-0011: approve pnpm build scripts</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>b5c8dlsww</task-id>
+<summary>Monitor event: "bus done/merge/hold/review events for T-0001 children"</summary>
+<event>157 T-0005 update {"status": "done", "result": {"summary": "T-0005 is done and committed on `task/T-0005` as `5528368`. The commit went in before the test run</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>b5c8dlsww</task-id>
+<summary>Monitor event: "bus done/merge/hold/review events for T-0001 children"</summary>
+<event>159 T-0011 update {"pipeline": {"first_ready_at": 1791624372.3607502, "dispatched_at": 1791624509.500006, "dispatched_at_lease": 1791625409.500006, "dispatche
+160 T-0011 update {"pipeline": {"first_ready_at": 1791624372.3607502, "dispatched_at": 1791624509.500006, "dispatched_at_lease": 1791625409.500006, "dispatche
+161 T-0011 update {"pipeline": {"first_ready_at": 1791624372.3607502, "dispatched_at": 1791624509.500006, "dispatched_at_lease": 1791625409.500006, "dispatche
+162 T-0012 created {}
+164 T-0011 update {"pipeline": {"first_ready_at": 1791624372.3607502, "dispatched_at": 1791624509.500006, "dispatched_at_lease": 1791625409.500006, "dispatche
+168 T-0012 update {"status": "running", "assigned_to": "claude:B", "worktree": "/Users/k3ntaw/code/alltag/wt/T-0012", "claimed_at": 1791624857.254037}</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>b5c8dlsww</task-id>
+<summary>Monitor event: "bus done/merge/hold/review events for T-0001 children"</summary>
+<event>173 T-0012 update {"status": "done", "result": {"summary": "All spec tokens, aliases, @theme mappings and font links are present. The `--font-display: var(--f
+174 T-0012 update {"review_verdict": "approve"}
+176 T-0011 update {"review_verdict": "approve"}
+178 T-0005 update {"pipeline": {"first_ready_at": 1791624341.0682619, "dispatched_at": 1791624505.863133, "dispatched_at_lease": 1791625405.863133, "dispatche
+179 T-0005 update {"pipeline": {"first_ready_at": 1791624341.0682619, "dispatched_at": 1791624505.863133, "dispatched_at_lease": 1791625405.863133, "dispatche
+180 T-0005 update {"pipeline": {"first_ready_at": 1791624341.0682619, "dispatched_at": 1791624505.863133, "dispatched_at_lease": 1791625405.863133, "dispatche
+181 T-0013 created {}
+183 T-0005 update {"pipeline": {"first_ready_at": 1791624341.0682619, "dispatched_at": 1791624505.863133, "dispatched_at_lease": 1791625405.863133, "dispatche
+184 T-0011 update {"pipeline": {"first_ready_at": 1791624372.3607502, "dispatched_at": 1791624509.500006, "dispatched_at_lease": 1791625409.500006, "dispatche
+187 T-0013 update {"status": "running", "assigned_to": "claude:B", "worktree": "/Users/k3ntaw/code/alltag/wt/T-0013", "claimed_at": 1791624889.150743}</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>b5c8dlsww</task-id>
+<summary>Monitor event: "bus done/merge/hold/review events for T-0001 children"</summary>
+<event>190 T-0011 update {"status": "done", "merged_into": "goal/T-0001", "sha": "820c97351bd6d32f7f4aa0b62862af5436b26a0a", "merged_at": 1791624900.215452, "changed
+193 T-0006 update {"status": "done", "result": {"summary": "I've finished building and committing the Look and Scene screens, the camera helpers and the card
+195 T-0011 update {"pipeline": {"first_ready_at": 1791624372.3607502, "dispatched_at": 1791624509.500006, "dispatched_at_lease": 1791625409.500006, "dispatche
+196 T-0011 update {"pipeline": {"first_ready_at": 1791624372.3607502, "dispatched_at": 1791624509.500006, "dispatched_at_lease": 1791625409.500006, "dispatche</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>b5c8dlsww</task-id>
+<summary>Monitor event: "bus done/merge/hold/review events for T-0001 children"</summary>
+<event>200 T-0013 update {"status": "done", "result": {"summary": "I read all the source files and the token test. I did not read stt.test.ts or tts.test.ts and ran
+201 T-0013 update {"review_verdict": "request_changes"}
+203 T-0005 update {"review_verdict": "request_changes"}</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>b5c8dlsww</task-id>
+<summary>Monitor event: "bus done/merge/hold/review events for T-0001 children"</summary>
+<event>205 T-0006 update {"pipeline": {"first_ready_at": 1791624688.18024, "dispatched_at": 1791624688.188214, "dispatched_at_lease": 1791625588.188214, "dispatched_
+206 T-0006 update {"pipeline": {"first_ready_at": 1791624688.18024, "dispatched_at": 1791624688.188214, "dispatched_at_lease": 1791625588.188214, "dispatched_
+207 T-0006 update {"status": "failed", "reason": "rebase_conflict", "resume_hint": {"conflicts": [], "hunks": ""}}
+209 T-0006 update {"pipeline": {"first_ready_at": 1791624688.18024, "dispatched_at": 1791624688.188214, "dispatched_at_lease": 1791625588.188214, "dispatched_
+210 T-0005 update {"pipeline": {"first_ready_at": 1791624341.0682619, "dispatched_at": 1791624505.863133, "dispatched_at_lease": 1791625405.863133, "dispatche
+211 T-0005 update {"pipeline": {"first_ready_at": 1791624341.0682619, "dispatched_at": 1791624505.863133, "dispatched_at_lease": 1791625405.863133, "dispatche
+212 T-0014 created {}
+213 T-0005 update {"pipeline": {"first_ready_at": 1791624341.0682619, "dispatched_at": 1791624505.863133, "dispatched_at_lease": 1791625405.863133, "dispatche</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>b5c8dlsww</task-id>
+<summary>Monitor event: "bus done/merge/hold/review events for T-0001 children"</summary>
+<event>226 T-0014 update {"status": "running", "assigned_to": "claude:A", "worktree": "/Users/k3ntaw/code/alltag/wt/T-0014", "claimed_at": 1791624989.013164}
+229 T-0006 update {"status": "failed", "reason": "rebase_conflict", "resume_hint": {"conflicts": [], "hunks": ""}}
+230 T-0015 created {}
+231 T-0016 created {}</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>b5c8dlsww</task-id>
+<summary>Monitor event: "bus done/merge/hold/review events for T-0001 children"</summary>
+<event>243 T-0016 update {"status": "running", "assigned_to": "claude:A", "worktree": "/Users/k3ntaw/code/alltag/wt/T-0016", "claimed_at": 1791625020.851799}</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>b5c8dlsww</task-id>
+<summary>Monitor event: "bus done/merge/hold/review events for T-0001 children"</summary>
+<event>246 T-0017 created {}</event>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>b5c8dlsww</task-id>
+<summary>Monitor event: "bus done/merge/hold/review events for T-0001 children"</summary>
+<event>258 T-0017 update {"status": "running", "assigned_to": "claude:A", "worktree": "/Users/k3ntaw/code/alltag/wt/T-0017", "claimed_at": 1791625083.652426}</event>
+</task-notification>
