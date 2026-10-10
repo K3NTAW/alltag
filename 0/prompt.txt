@@ -1,0 +1,7 @@
+<task-notification>
+<task-id>bv9cb5ui4</task-id>
+<tool-use-id>toolu_018TaVp7eVWP9yzxWsavDMer</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-k3ntaw-code-alltag/9148a55b-f53d-41cf-9e1b-f1dff34cf386/tasks/bv9cb5ui4.output</output-file>
+<status>completed</status>
+<summary>Background command "Wait for the T-0087 gate to finish, then run the full gate on goal head cb07797 in wt/T-0086" completed (exit code 0)</summary>
+</task-notification>
