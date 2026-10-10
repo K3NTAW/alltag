@@ -50,6 +50,8 @@ vercel deploy
 | `GRADIUM_API_KEY` | Gradium key, only used to mint short-lived browser tokens |
 | `GEMINI_MODEL_VISION`, `GEMINI_MODEL_TURN`, `GEMINI_MODEL_GRADER`, `GEMINI_MODEL_LIVE`, `GEMINI_MODEL_CHECK`, `GEMINI_MODEL_LEVEL` | One model per job, see the model table in section 4 |
 | `GEMINI_MODEL` | Optional last-resort alias read by the routes when their own var is unset |
+| `ALLOWED_ORIGINS` | Extra origins allowed to call `/api`, comma-separated, exact match. Set to `https://localhost` for the iOS app; leave empty for the web only |
+| `VITE_API_BASE` | Client build only, native app only: `https://<your-vercel-host>`. Empty on the web (same origin) |
 
 On Vercel, add the same vars under Project Settings, Environment Variables (or `vercel env add GEMINI_API_KEY`) for Production and Preview. `vercel.json` sets the Vite framework and a 30 s `maxDuration` for `api/**/*.ts`.
 
@@ -143,6 +145,25 @@ The app ships a service worker, so once installed it opens with no network and t
 - iOS: open the site in Safari, tap Share, then "Add to Home Screen".
 - The model file is picked once in Settings and stays in the browser storage (OPFS) of that installed app.
 - WebGPU: Android Chrome is the tested path. iOS 26 Safari has WebGPU, but MediaPipe on it is untested.
+
+### iOS app (Capacitor)
+
+The same web build runs as a native iOS app (`ios/`, Swift Package Manager, no CocoaPods). The web app on Vercel stays the main deliverable.
+
+Prerequisites: a Mac with Xcode 26 and an Apple ID. A free personal team is enough to run on your own iPhone; the build then expires after 7 days and needs a fresh Run.
+
+```sh
+pnpm i
+VITE_API_BASE=https://<your-vercel-host> pnpm ios:build   # vite build && cap sync ios
+pnpm ios:open                                              # opens ios/App in Xcode
+```
+
+In Xcode pick your team under Signing & Capabilities, select your iPhone, press Run.
+
+- `VITE_API_BASE` must be set (in `.env` or inline as above) before `ios:build`. Without it the native app calls its own origin (`https://localhost/api/...`) and every request fails.
+- On that Vercel deployment set `ALLOWED_ORIGINS=https://localhost`, otherwise CORS blocks the app and the token routes answer 403.
+- Camera and microphone prompts appear on first use.
+- Limits: WebGPU inside WKWebView on iOS 26 is untested, so the on-device Gemma fallback may not work in the native shell. The PWA on Android Chrome is the tested offline path.
 
 ## 5. API
 

@@ -45,6 +45,10 @@ Where each state lives in code:
 
 `vite-plugin-pwa` (workbox `generateSW`) builds `dist/sw.js` with `registerType: "autoUpdate"` (the worker skips waiting and claims clients); `src/main.tsx` registers `/sw.js` itself in production builds, since the plugin's `virtual:pwa-register` would pull in `workbox-window`. It precaches the app shell (`**/*.{js,css,html,svg,woff2}`, files up to 5 MB) and answers navigations with `/index.html`, so the installed app loads with no network. `/api/*` is excluded from the navigate fallback and routed `NetworkOnly`: API responses are never cached, and offline the client falls back to the on-device model instead. The manifest stays `public/manifest.webmanifest` (`manifest: false` in the plugin).
 
+## Origins
+
+On the web the client and `api/` share one origin: `src/lib/api.ts` fetches `/api/<name>` and no CORS is involved. The iOS app (Capacitor, `server.iosScheme: "https"`) loads the bundled build from `https://localhost`, so it is built with `VITE_API_BASE` set to the Vercel host and calls `${VITE_API_BASE}/api/<name>` with `credentials: "omit"`. Every route starts with `applyCors` from `api/_lib/cors.ts`: an `Origin` listed in `ALLOWED_ORIGINS` (exact match, never a wildcard) gets `Access-Control-Allow-Origin` echoed back, preflights end with 204. The browser guard on `/api/gradium-token` and `/api/live-token` (`originAllowed`) accepts the same origin or an allowlisted one and still rejects any other cross-site caller with 403.
+
 ## Data in localStorage
 
 | Key | Module | Content |

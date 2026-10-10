@@ -38,6 +38,7 @@ describe("api/live-token", () => {
   const prevKey = process.env.GEMINI_API_KEY;
   const prevModel = process.env.GEMINI_MODEL_LIVE;
   afterEach(() => {
+    vi.unstubAllEnvs();
     if (prevKey === undefined) delete process.env.GEMINI_API_KEY;
     else process.env.GEMINI_API_KEY = prevKey;
     if (prevModel === undefined) delete process.env.GEMINI_MODEL_LIVE;
@@ -109,5 +110,37 @@ describe("api/live-token", () => {
     const { res, out } = mockRes();
     await createHandler({ createClient })({ method: "POST" } as VercelRequest, res);
     expect(out.code).toBe(502);
+  });
+  it("accepts a cross origin listed in ALLOWED_ORIGINS and echoes it", async () => {
+    vi.stubEnv("ALLOWED_ORIGINS", "https://localhost");
+    process.env.GEMINI_API_KEY = KEY;
+    const { createClient } = fakeClient(async () => ({ name: "auth_tokens/abc" }));
+    const { res, out } = mockRes();
+    await createHandler({ createClient, now: () => NOW })(
+      {
+        method: "POST",
+        headers: { origin: "https://localhost", "sec-fetch-site": "cross-site", host: "alltag.vercel.app" },
+      } as unknown as VercelRequest,
+      res,
+    );
+    expect(out.code).toBe(200);
+    expect(out.headers["access-control-allow-origin"]).toBe("https://localhost");
+  });
+
+  it("still rejects an unknown cross origin with 403", async () => {
+    vi.stubEnv("ALLOWED_ORIGINS", "https://localhost");
+    process.env.GEMINI_API_KEY = KEY;
+    const { createClient } = fakeClient(async () => ({ name: "auth_tokens/abc" }));
+    const { res, out } = mockRes();
+    await createHandler({ createClient, now: () => NOW })(
+      {
+        method: "POST",
+        headers: { origin: "https://evil.example", "sec-fetch-site": "cross-site", host: "alltag.vercel.app" },
+      } as unknown as VercelRequest,
+      res,
+    );
+    expect(out.code).toBe(403);
+    expect(out.body).toEqual({ error: "forbidden" });
+    expect(out.headers["access-control-allow-origin"]).toBeUndefined();
   });
 });

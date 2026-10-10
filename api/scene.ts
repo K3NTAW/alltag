@@ -6,6 +6,7 @@ import type {
   SceneRequest,
   SceneResult,
 } from "../src/lib/types";
+import { applyCors } from "./_lib/cors";
 import { SCENE_SCHEMA, buildScenePrompt } from "./_prompts/scene";
 
 const LEVELS: Level[] = ["A1", "A2", "B1", "B2"];
@@ -164,6 +165,7 @@ export function createHandler(deps: SceneDeps) {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (applyCors(req, res)) return;
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     res.status(500).json({ error: "missing_key" });

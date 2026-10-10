@@ -17,4 +17,14 @@ describe("vercel functions", () => {
     expect(routes.length).toBeGreaterThan(0);
     expect(routes.length).toBeLessThanOrEqual(12);
   });
+
+  it("every route calls applyCors first", () => {
+    const routes = readdirSync(join(root, "api")).filter(
+      (f) => f.endsWith(".ts") && !f.endsWith(".test.ts"),
+    );
+    for (const r of routes) {
+      const src = readFileSync(join(root, "api", r), "utf8");
+      expect(src, r).toContain("if (applyCors(req, res)) return;");
+    }
+  });
 });

@@ -1,6 +1,6 @@
 import type { CorrectRequest, SceneResult, TurnRequest } from "./types";
 import { localCorrect, localTurn } from "../offline/local-api";
-import { postCorrect, postTurn } from "./api";
+import { getGradiumToken, postCorrect, postTurn } from "./api";
 
 vi.mock("../offline/local-api", () => ({
   localTurn: vi.fn(),
@@ -70,5 +70,42 @@ describe("api offline fallback", () => {
     fetchMock.mockRejectedValue(new TypeError("Failed to fetch"));
     vi.mocked(localTurn).mockRejectedValue(new Error("offline tutor unavailable"));
     await expect(postTurn(turnReq)).rejects.toThrow("offline tutor unavailable");
+  });
+});
+
+describe("api base", () => {
+  beforeEach(() => {
+    fetchMock.mockReset();
+    vi.stubGlobal("fetch", fetchMock);
+    vi.resetModules();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  });
+
+  it("calls /api/<name> on the same origin when VITE_API_BASE is unset", async () => {
+    vi.stubEnv("VITE_API_BASE", undefined);
+    fetchMock.mockResolvedValue(new Response(JSON.stringify(cloudTurn), { status: 200 }));
+    const api = await import("./api");
+    await api.postTurn(turnReq);
+    expect(fetchMock.mock.calls[0][0]).toBe("/api/turn");
+    expect(fetchMock.mock.calls[0][1]).toMatchObject({ method: "POST", credentials: "omit" });
+  });
+
+  it("prefixes VITE_API_BASE without a double slash", async () => {
+    vi.stubEnv("VITE_API_BASE", "https://alltag.example/");
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ token: "t", expires_at: "x" }), { status: 200 }));
+    const api = await import("./api");
+    await api.getGradiumToken();
+    expect(fetchMock.mock.calls[0][0]).toBe("https://alltag.example/api/gradium-token");
+    expect(fetchMock.mock.calls[0][1]).toMatchObject({ credentials: "omit" });
+  });
+
+  it("the statically imported module uses the same origin", async () => {
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ token: "t", expires_at: "x" }), { status: 200 }));
+    await getGradiumToken();
+    expect(fetchMock.mock.calls[0][0]).toBe("/api/gradium-token");
   });
 });

@@ -13,3 +13,9 @@ dist
 .env
 .env.*.local
 .vercel
+# iOS (Capacitor) build products; ios/App/App/public is the synced web build
+ios/App/build/
+ios/App/DerivedData/
+ios/App/App/public/
+ios/App/Pods/
+ios/App/App.xcworkspace/xcuserdata/

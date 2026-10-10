@@ -34,6 +34,7 @@ function fakeFetch(status: number, body: unknown) {
 describe("api/gradium-token", () => {
   const prev = process.env.GRADIUM_API_KEY;
   afterEach(() => {
+    vi.unstubAllEnvs();
     if (prev === undefined) delete process.env.GRADIUM_API_KEY;
     else process.env.GRADIUM_API_KEY = prev;
   });
@@ -70,5 +71,37 @@ describe("api/gradium-token", () => {
     expect(out.code).toBe(502);
     expect(out.body).toEqual({ error: "token_failed" });
     expect(JSON.stringify(out.body)).not.toContain(KEY);
+  });
+  it("accepts a cross origin listed in ALLOWED_ORIGINS and echoes it", async () => {
+    vi.stubEnv("ALLOWED_ORIGINS", "https://localhost");
+    process.env.GRADIUM_API_KEY = KEY;
+    const fetchImpl = fakeFetch(200, { token: "t1", expires_at: "2026-10-10T20:00:00Z" });
+    const { res, out } = mockRes();
+    await createHandler({ fetchImpl })(
+      {
+        method: "GET",
+        headers: { origin: "https://localhost", "sec-fetch-site": "cross-site", host: "alltag.vercel.app" },
+      } as unknown as VercelRequest,
+      res,
+    );
+    expect(out.code).toBe(200);
+    expect(out.headers["access-control-allow-origin"]).toBe("https://localhost");
+  });
+
+  it("still rejects an unknown cross origin with 403", async () => {
+    vi.stubEnv("ALLOWED_ORIGINS", "https://localhost");
+    process.env.GRADIUM_API_KEY = KEY;
+    const fetchImpl = fakeFetch(200, { token: "t1", expires_at: "2026-10-10T20:00:00Z" });
+    const { res, out } = mockRes();
+    await createHandler({ fetchImpl })(
+      {
+        method: "GET",
+        headers: { origin: "https://evil.example", "sec-fetch-site": "cross-site", host: "alltag.vercel.app" },
+      } as unknown as VercelRequest,
+      res,
+    );
+    expect(out.code).toBe(403);
+    expect(out.body).toEqual({ error: "forbidden" });
+    expect(out.headers["access-control-allow-origin"]).toBeUndefined();
   });
 });

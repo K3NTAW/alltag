@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { applyCors } from "./_lib/cors";
 import { GoogleGenAI } from "@google/genai";
 import type {
   CorrectRequest,
@@ -113,6 +114,7 @@ function parseCorrect(text: string | undefined): CorrectResponse | null {
 export function createHandler(deps: { generate: Generate; timeoutMs?: number }) {
   const timeoutMs = deps.timeoutMs ?? GRADER_TIMEOUT_MS;
   return async function handler(req: VercelRequest, res: VercelResponse) {
+    if (applyCors(req, res)) return;
     if (req.method !== "POST") {
       res.status(405).json({ error: "method_not_allowed" });
       return;

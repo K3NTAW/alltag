@@ -10,8 +10,11 @@ import type {
 } from "./types";
 import { localCorrect, localTurn } from "../offline/local-api";
 
+// Empty on the web (same origin). The native app sets it to the Vercel host at build time.
+const BASE = (import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
+
 async function call<T>(name: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`/api/${name}`, init);
+  const res = await fetch(`${BASE}/api/${name}`, { ...init, credentials: "omit" });
   if (!res.ok) throw new Error(`${name} ${res.status}`);
   return (await res.json()) as T;
 }
