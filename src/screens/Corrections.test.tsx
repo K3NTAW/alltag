@@ -59,7 +59,7 @@ describe("Corrections", () => {
     expect(new Set(cards.map((c) => `${c.noun_fr}|${c.errorType}`)).size).toBe(3);
     expect(cards.every((c) => c.place === "café" && c.crop === session.frame)).toBe(true);
     expect(cards.find((c) => c.phrase_fr === "la tasse")).toMatchObject({ errorType: "gender", phrase_en: "tasse is feminine" });
-    expect(screen.getByText("you can now say")).toBeInTheDocument();
+    expect(screen.getByText("You can now say")).toBeInTheDocument();
     for (const p of ["je voudrais un café", "la tasse", "l'addition, s'il vous plaît"]) {
       expect(screen.getByText(p)).toBeInTheDocument();
     }

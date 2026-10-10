@@ -43,21 +43,34 @@ function micState(state: string): MicState {
   return state === "done" ? "thinking" : "idle";
 }
 
-function Transcript({ messages }: { messages: Bubble[] }) {
+const EYEBROW = "font-mono text-[11px] leading-[14px] font-medium uppercase tracking-[0.08em]";
+
+function Transcript({ messages, role, dim }: { messages: Bubble[]; role: string; dim: boolean }) {
   return (
-    <ol className="flex flex-1 flex-col gap-3 overflow-y-auto p-4">
-      {messages.map((m, i) => (
-        <li
-          key={i}
-          data-role={m.role}
-          className={`max-w-[80%] rounded-[var(--radius-m)] px-4 py-2 ${
-            m.role === "tutor" ? "self-start bg-card text-ink shadow" : "self-end bg-accent text-card"
-          }`}
-        >
-          <p>{m.text}</p>
-          {m.en && <p className="text-[length:var(--text-s)] text-muted">{m.en}</p>}
-        </li>
-      ))}
+    <ol className="flex flex-1 flex-col gap-3 overflow-y-auto px-[var(--gutter)] py-4">
+      {messages.map((m, i) =>
+        m.role === "tutor" ? (
+          <li
+            key={i}
+            data-role={m.role}
+            className={`rise-in flex max-w-[88%] flex-col gap-2 self-start rounded-[var(--radius-card)] border border-snow/6 bg-[var(--raised)] p-5 transition-opacity duration-[var(--dur-2)] ${
+              dim ? "opacity-50" : ""
+            }`}
+          >
+            <span className={`${EYEBROW} text-[color:var(--moss-on-dark)]`}>noé · {role}</span>
+            <p className="font-display text-[24px] leading-[30px]">{m.text}</p>
+            {m.en && <p className="text-[15px] leading-[21px] text-[color:var(--night-text2)]">{m.en}</p>}
+          </li>
+        ) : (
+          <li
+            key={i}
+            data-role={m.role}
+            className="glass-dark glass-specular rise-in max-w-[80%] self-end rounded-[var(--radius-card)] px-4 py-3"
+          >
+            <p className="relative font-display text-[19px] leading-[25px]">{m.text}</p>
+          </li>
+        ),
+      )}
     </ol>
   );
 }
@@ -132,12 +145,12 @@ export default function Roleplay() {
 
   if (!scene) {
     return (
-      <section className="bg-night flex min-h-dvh flex-col items-center justify-center gap-4 p-6 pb-tabbar text-snow">
-        <p className="text-snow/72">nothing to talk about yet</p>
+      <section className="screen-enter bg-night flex min-h-dvh flex-col items-center justify-center gap-6 px-[var(--gutter)] pb-tabbar text-[color:var(--night-text)]">
+        <p className="text-[16px] leading-[23px] text-[color:var(--night-text2)]">nothing to talk about yet</p>
         <button
           type="button"
           onClick={() => go("look")}
-          className="rounded-[26px] bg-accent px-6 py-3 text-[length:var(--text-m)] font-semibold text-card"
+          className="press h-14 w-full rounded-[28px] bg-snow px-6 text-[17px] font-semibold text-ink"
         >
           look
         </button>
@@ -178,29 +191,46 @@ export default function Roleplay() {
           : "connecting";
 
   return (
-    <section className={`bg-night flex min-h-dvh flex-col text-snow ${fallback ? "pb-tabbar" : "pb-[env(safe-area-inset-bottom)]"}`}>
-      <header className="pt-safe sticky top-0 z-10 flex items-center justify-between gap-3 px-4 pb-2">
-        <p
-          data-testid="task-pill"
-          className="glass-dark glass-specular flex h-9 items-center rounded-[18px] px-4 text-[15px] font-semibold"
-        >
-          {scene.task.fr}
-        </p>
+    <section
+      className={`bg-night relative flex min-h-dvh flex-col overflow-hidden text-[color:var(--night-text)] ${fallback ? "pb-tabbar" : "pb-[calc(env(safe-area-inset-bottom)+12px)]"}`}
+    >
+      {!fallback && live.state === "listening" && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-[300px]"
+          style={{
+            background: "radial-gradient(60% 50% at 50% 100%, rgba(47,163,127,0.38), rgba(47,163,127,0))",
+            animation: "glowPulse 1.1s var(--ease-loop) infinite",
+          }}
+        />
+      )}
+      <header className="pt-safe sticky top-0 z-10 flex items-center gap-3 px-[var(--gutter)] pb-2">
         {!fallback && (
-          <GlassButton variant="dark" aria-label="end" onClick={() => void finish(live.transcript)}>
+          <GlassButton variant="dark" aria-label="end" onClick={() => void finish(live.transcript)} className="fade-in">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden>
               <path d="M6 6l12 12M18 6L6 18" />
             </svg>
           </GlassButton>
         )}
+        <p
+          data-testid="task-pill"
+          className="glass-dark glass-specular fade-in flex min-h-14 min-w-0 flex-1 flex-col justify-center gap-[3px] rounded-[28px] px-[22px] py-2"
+        >
+          <span className={`relative ${EYEBROW} text-[color:var(--sun-on-dark)]`}>your task</span>
+          <span className="relative text-[13px] leading-[18px]">{scene.task.fr}</span>
+        </p>
       </header>
 
-      <Transcript messages={fallback ? messages : live.transcript} />
+      <Transcript
+        messages={fallback ? messages : live.transcript}
+        role={scene.task.role}
+        dim={!fallback && live.state === "listening"}
+      />
 
       {fallback && messages.some((m) => m.local) && (
         <p
           data-testid="offline-pill"
-          className="glass-dark glass-specular flex h-9 items-center self-center rounded-[18px] px-4 text-[length:var(--text-s)] text-snow/72"
+          className="glass-dark glass-specular fade-in flex h-9 items-center self-center rounded-[18px] px-4 text-[13px] leading-[18px] text-[color:var(--night-text2)]"
         >
           offline, noé runs on this device
         </p>
@@ -208,39 +238,45 @@ export default function Roleplay() {
 
       {fallback ? (
         <form
-          className="flex flex-col gap-2 p-4"
+          className="relative flex flex-col gap-2 px-[var(--gutter)] py-4"
           onSubmit={(e) => {
             e.preventDefault();
             void send();
           }}
         >
-          {failed && <p className="text-[length:var(--text-s)] text-snow/72">noé did not hear that, try again</p>}
-          {busy && <p className="text-[length:var(--text-s)] text-snow/72">noé is thinking</p>}
+          {failed && <p className="text-[13px] leading-[18px] text-[color:var(--night-text2)]">noé did not hear that, try again</p>}
+          {busy && <p className="text-[13px] leading-[18px] text-[color:var(--night-text2)]">noé is thinking</p>}
           <div className="flex gap-2">
             <input
               aria-label="your reply"
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
-              className="flex-1 rounded-[var(--radius-pill)] border border-line bg-card px-4 py-2 text-ink"
+              className="h-14 min-w-0 flex-1 rounded-[28px] border border-snow/14 bg-[var(--raised)] px-5 font-display text-[19px] leading-[25px] text-[color:var(--night-text)] outline-none focus:border-[color:var(--moss-on-dark)]"
             />
             <button
               type="submit"
               disabled={busy}
-              className="rounded-[var(--radius-pill)] bg-accent px-5 py-2 text-card"
+              className="press h-14 rounded-[28px] bg-snow px-6 text-[17px] font-semibold text-ink disabled:opacity-50"
             >
               send
             </button>
           </div>
         </form>
       ) : (
-        <div className="flex flex-col items-center gap-3 p-6">
+        <div className="relative flex flex-col items-center gap-3 px-[var(--gutter)] pt-4 pb-2">
           {live.state === "listening" && live.partialUser && (
-            <p className="text-snow/72">{live.partialUser}</p>
+            <p className="glass-dark glass-specular rise-in max-w-full rounded-[var(--radius-card)] px-5 py-3 font-display text-[19px] leading-[25px] text-snow">
+              {live.partialUser}
+              <span aria-hidden className="caret relative ml-0.5 inline-block h-[19px] w-[2px] translate-y-[3px] bg-snow" />
+            </p>
           )}
           <div data-state={live.state} aria-hidden>
             <Orb size={96} state={micState(live.state)} />
           </div>
-          <p className="text-[length:var(--text-s)] text-snow/72">{status}</p>
+          <p className={`${EYEBROW} text-[color:var(--night-text2)]`}>{status}</p>
+          {live.state !== "listening" && live.state !== "speaking" && (
+            <p className="text-[13px] leading-[18px] text-[color:var(--night-text2)]">Noé corrects you after, not during.</p>
+          )}
         </div>
       )}
     </section>
