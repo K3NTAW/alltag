@@ -1,5 +1,5 @@
 # Supabase CLI config for the hosted project "alltag" (eu-central-2).
-# No keys here. CLERK_DOMAIN comes from the environment at `supabase config push` time.
+# No keys here.
 project_id = "alltag"
 
 [api]
@@ -16,7 +16,6 @@ file_size_limit = "10MiB"
 [auth]
 enabled = true
 
-# Clerk is the identity provider. Supabase accepts Clerk session tokens as third-party auth.
-[auth.third_party.clerk]
-enabled = true
-domain = "env(CLERK_DOMAIN)"
+[auth.email]
+enable_signup = true
+enable_confirmations = false

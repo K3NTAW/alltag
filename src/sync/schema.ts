@@ -4,7 +4,7 @@
 
 export type Level = "A1" | "A2" | "B1" | "B2";
 
-/** Columns every synced table carries. user_id is the Clerk sub. */
+/** Columns every synced table carries. user_id is the auth user id (JWT sub). */
 export interface SyncColumns {
   user_id: string;
   updated_at: string;

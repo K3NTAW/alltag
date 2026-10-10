@@ -4,6 +4,7 @@ import type { Level } from "../lib/types";
 import * as store from "../srs/store";
 import { gemma, MODEL_FILE, MODEL_LABEL, MODEL_LICENCE, type GemmaStatus } from "../offline/gemma";
 import { useInstallPrompt } from "../pwa/install";
+import { useAuth } from "../auth/auth";
 
 const levels: Level[] = ["A1", "A2", "B1", "B2"];
 
@@ -99,6 +100,8 @@ export default function Settings() {
 
       <OnYourPhone />
 
+      <AccountSection />
+
       <OfflineTutor />
 
       <div className={row}>
@@ -114,6 +117,58 @@ export default function Settings() {
         {cleared && <p className="text-[length:var(--text-small)] text-muted">cleared</p>}
       </div>
     </section>
+  );
+}
+
+function AccountSection() {
+  const { status, address, openAccount, signOut } = useAuth();
+  const muted = "text-[length:var(--text-small)] text-muted";
+
+  let body;
+  if (status === "disabled") {
+    body = <p className={muted}>sync is off in this build</p>;
+  } else if (status === "loading") {
+    body = <p className={muted}>checking your account…</p>;
+  } else if (status === "signed_out") {
+    body = (
+      <>
+        <p className="text-[length:var(--text-small)]">
+          sign in to sync your words, scenes and conversations across devices. everything also works without an account.
+        </p>
+        <button
+          type="button"
+          onClick={openAccount}
+          className="self-start rounded-[var(--radius-pill)] bg-moss px-5 py-2 font-semibold text-snow"
+        >
+          sign in
+        </button>
+      </>
+    );
+  } else {
+    body = (
+      <>
+        <p data-testid="account-address">{address}</p>
+        <p className={muted}>signed in</p>
+        <div className="flex items-center justify-between">
+          <span className="text-muted">sync</span>
+          <span data-testid="sync-state">ready</span>
+        </div>
+        <button
+          type="button"
+          onClick={() => void signOut()}
+          className="self-start rounded-[var(--radius-pill)] border border-line px-4 py-2"
+        >
+          sign out
+        </button>
+      </>
+    );
+  }
+
+  return (
+    <div className={row} data-testid="account">
+      <span className="text-muted">account</span>
+      {body}
+    </div>
   );
 }
 

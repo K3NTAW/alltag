@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import type { GemmaStatus } from "../offline/gemma";
+import { AuthContext, DISABLED, type AuthValue } from "../auth/auth";
 import Settings from "./Settings";
 
 const fake = vi.hoisted(() => {
@@ -181,5 +182,57 @@ describe("Settings offline tutor", () => {
       expect(screen.queryByRole("link", { name: /prohibited use/ })).not.toBeInTheDocument();
       view.unmount();
     }
+  });
+});
+
+describe("Settings account", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    fake.set({ state: "absent" });
+    pwa.state = pwa.base();
+  });
+
+  function withAuth(over: Partial<AuthValue>) {
+    const value: AuthValue = { ...DISABLED, ...over };
+    render(
+      <AuthContext.Provider value={value}>
+        <Settings />
+      </AuthContext.Provider>,
+    );
+    return value;
+  }
+
+  it("disabled outside a provider, above the offline tutor", () => {
+    render(<Settings />);
+    const account = screen.getByTestId("account");
+    expect(account).toHaveTextContent("sync is off in this build");
+    expect(account.compareDocumentPosition(screen.getByText("offline tutor")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("loading", () => {
+    withAuth({ status: "loading" });
+    expect(screen.getByTestId("account")).toHaveTextContent("checking your account…");
+  });
+
+  it("signed out: sign in opens Account", () => {
+    const value = withAuth({ status: "signed_out", openAccount: vi.fn() });
+    expect(screen.getByTestId("account")).toHaveTextContent("everything also works without an account.");
+    fireEvent.click(within(screen.getByTestId("account")).getByRole("button", { name: "sign in" }));
+    expect(value.openAccount).toHaveBeenCalledTimes(1);
+  });
+
+  it("signed in: address, sync ready, sign out", () => {
+    const value = withAuth({
+      status: "signed_in",
+      userId: "u1",
+      address: "a@b.ch",
+      signOut: vi.fn(async () => ({ ok: true, error: null })),
+    });
+    const account = within(screen.getByTestId("account"));
+    expect(account.getByText("a@b.ch")).toBeInTheDocument();
+    expect(account.getByText("signed in")).toBeInTheDocument();
+    expect(account.getByTestId("sync-state")).toHaveTextContent("ready");
+    fireEvent.click(account.getByRole("button", { name: "sign out" }));
+    expect(value.signOut).toHaveBeenCalledTimes(1);
   });
 });
