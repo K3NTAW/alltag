@@ -1,0 +1,64 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4K2NBP5AN71FRJ3X4NHQR74",
+  "session_id": "01202ee6-0bef-4705-a4f2-e16ac3cf3de3",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T14:14:54.816148Z",
+  "branch": "task/T-0064",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    ".env.example",
+    "README.md",
+    "docs/SUPABASE.md",
+    "package.json",
+    "pnpm-lock.yaml",
+    "src/auth/auth.test.tsx",
+    "src/auth/auth.tsx",
+    "src/main.tsx",
+    "src/screens/Account.test.tsx",
+    "src/screens/Account.tsx",
+    "src/screens/Settings.test.tsx",
+    "src/screens/Settings.tsx",
+    "src/sync/schema.ts",
+    "src/sync/supabase.test.ts",
+    "src/sync/supabase.ts",
+    "supabase/config.toml",
+    "supabase/seed.sql"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "aa1103e863d8",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 50,
+    "cache_creation_tokens": 60299,
+    "cache_read_tokens": 1475061,
+    "output_tokens": 29797,
+    "api_call_count": 25
+  },
+  "session_metrics": {
+    "turn_count": 1
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-10T14:14:54.766498Z",
+    "agent_lines": 1295,
+    "agent_removed": 30,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 1295,
+    "total_lines_changed": 1325,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}

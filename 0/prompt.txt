@@ -1,0 +1,167 @@
+Implement this single task in the current worktree. Commit the completed changes on the current branch with a message that starts with the task id before testing. Never leave uncommitted changes and never touch files outside scope.
+The packet above is the task contract: implement the ## objective, satisfy every line of ## acceptance, and edit only paths listed in ## write_scope.
+Run only the acceptance-named tests in the foreground; never background a command. Each command must finish in under 10 minutes. The daemon runs the full gate externally.
+No new dependencies without stating why. Finish with: summary, files changed, failures-only test output.
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read.
+
+packet vbe948f127ced base 5ef24be4726f sources pool.toml@19c37ec8af44 gotchas@374d2195ba90 memory@notes specialist: execute+implement-spec over cap by 15197 chars: acceptance kept whole routed=shadow
+## skills
+### executor/implement-spec (v6ba2f814dd6f)
+## Trigger
+Any execute task from the orchestrator.
+
+## Objective
+Implement one atomic task within its Scope and leave tests green.
+
+## Procedure
+Read Spec, Acceptance, Scope. Run `scripts/tests_green.sh` first. Make the smallest accepted change. Run it again; iterate on failure. Commit on the task branch.
+
+## Tools
+Read, Edit, Bash; `scripts/failures_only.sh`.
+
+## Evidence requirements
+Acceptance checks and tests-green result.
+
+## Output contract
+Finish with: 3-line summary, `git diff --stat`, failures-only output (empty when green).
+
+## Stop conditions
+Stop when Acceptance passes or budget ends.
+
+## Failure/recovery
+Report only `scripts/failures_only.sh` output. Edit only paths in Scope. No new dependencies unless the spec names them.
+## objective
+own auth build (spec review waived by the human): Supabase Auth, own Account screen, withSession, Settings account section
+- discovery: Human decision 2026-10-10 15:45: "we dont need to use clerk it might be better to have our own auth ... also because of our design". Clerk is dropped (never installed on goal/T-0001). Auth is Supabase Auth on the existing project (ref hrwhjngmrdoxkxgnlrra), with sign-in screens we draw ourselves in the app's design. Work in your own worktree from goal/T-0001 (head fb2f47c). Run `pnpm install --frozen-lockfile` first; add the one new dependency with `pnpm add @supabase/supabase-js` (pnpm-lock.yaml stays the only lockfile). No Clerk package, no other new dependency.
+
+Design rule: the app stays fully usable signed out and offline; an account only adds sync. Only VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are client-side. Never log a password, token or session. The database already keys every row on `auth.jwt()->>'sub'` (supabase/migrations/20261010120000_init.sql, applied live), which Supabase Auth fills with the user id, so NO migration change.
+
+Read first: src/App.tsx, src/main.tsx, src/screens/Settings.tsx (keep the T-0034 glass styling and the T-0037 Gemma licence line untouched), src/screens/Settings.test.tsx, src/test/setup.ts, src/sync/schema.ts, src/styles or tokens file used by T-0034, docs/SUPABASE.md, .env.example, README.md.
+
+1. src/sync/supabase.ts
+   - `getSupabase()` returns ONE memoised supabase-js client from VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY with auth options {persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: "alltag.auth"} (localStorage works in the Capacitor webview); null when either var is missing.
+   - `isSupabaseConfigured()`.
+   - `withSession<T>(fn: (client, userId: string) => Promise<T>): Promise<T | null>`: returns null WITHOUT calling fn unless configured AND `client.auth.getSession()` yields a session; otherwise calls fn with the client and session.user.id. This is the only door for the sync task: signed out means no network at all.
+   - `__resetSupabaseForTests()`.
+2. src/auth/auth.tsx
+   - Context default DISABLED = {status: "disabled", userId: null, address: null, signIn, signUp, signOut, resetError, error: null} where the functions resolve to {ok: false, error: "off"}.
+   - `AuthProvider`: not configured -> provides DISABLED, no network. Configured -> status "loading" until the first `getSession()` resolves, then "signed_in" (userId = user.id, address = user.email) or "signed_out"; subscribes to `onAuthStateChange` and unsubscribes on unmount.
+   - `signIn(address, password)` -> supabase.auth.signInWithPassword; `signUp(address, password)` -> supabase.auth.signUp; returns {ok, needsConfirm, error}. needsConfirm = true when signUp returns a user but no session (project requires confirming the address). `signOut()` -> supabase.auth.signOut(). Map errors to calm copy: invalid credentials -> "that address and password don't match"; user exists -> "there is already an account for this address, sign in instead"; weak password -> "use at least 8 characters"; network/fetch -> "no connection, try again when you are online"; anything else -> "something went wrong, try again".
+   - `useAuth()` reads only the context.
+   - main.tsx wraps <App/> in <AuthProvider>.
+3. src/screens/Account.tsx (our own sign-in UI, no third-party widgets): a sheet/screen in the T-0034 design language (paper ground, large title, glass close button, moss primary capsule, calm lowercase copy). Two modes switched by a segmented control: "sign in" and "create account". Fields: address (<label>, type email, autocomplete email/username) and password (<label>, type password, autocomplete current-password or new-password), a show/hide password toggle button with aria-label. Client validation before calling: address must contain "@" and a dot after it, password at least 8 characters; inline error line under the fields (role="alert"). Primary button text "sign in" / "create account", disabled while pending with a spinner. Below: "not now" text button that closes. Footnote: "optional. without an account everything stays on this phone. your words sync to an EU server (Supabase)." After needsConfirm: replace the form with "check your inbox to confirm your address, then sign in here." and a "back to sign in" button. On success: close and return to Settings.
+   - Reachable from Settings (and from onboarding's "I have an account" link if onboarding has one; if not, skip). Use whatever routing/overlay pattern App.tsx already uses for screens.
+4. Settings: an "account" section above the offline tutor section. disabled -> muted "sync is off in this build". loading -> muted "checking your account…". signed_out -> "sign in to sync your words, scenes and conversations across devices. everything also works without an account." + primary moss capsule "sign in" opening Account. signed_in -> the address, "signed in", a "sync" row reading "ready" (U3 fills it), secondary "sign out".
+5. Docs and config: docs/SUPABASE.md replaces every Clerk mention with a Supabase Auth section (email + password, the "Confirm email" project setting and what the app does in each case, no redirect URLs needed because there are no magic links, sessions stored on the device under alltag.auth, sign-out keeps local data). .env.example: delete the Clerk line; the anon key comment says "RLS on auth.jwt() sub protects the data". README env list: drop Clerk. supabase/config.toml: if it has an [auth] section, set `site_url` unchanged and add `[auth.email] enable_signup = true` only if absent (do not change other keys).
+6. Tests (mock @supabase/supabase-js createClient locally per file with vi.hoisted spies; no global mocks in src/test/setup.ts):
+   - src/sync/supabase.test.ts: null when unconfigured; one client; withSession does not call fn without a session; calls fn with userId when a session exists.
+   - src/auth/auth.test.tsx: no env -> disabled and createClient never called; configured -> loading, then signed_in after getSession; onAuthStateChange sign-out flips to signed_out; unsubscribe on unmount; signIn/signUp map the five error cases; needsConfirm when signUp returns no session.
+   - src/screens/Account.test.tsx: validation blocks bad address and short password without calling signIn; signIn called with the typed values; error line renders the mapped copy; create-account with needsConfirm shows the confirm message; "not now" closes.
+   - Settings.test.tsx: the four account states by wrapping in the auth context with test values; existing Settings tests stay green unchanged (they render outside AuthProvider and get DISABLED).
+Finish: `npm test -- --watch=false`, `npx tsc --noEmit`, `npm run lint`, `pnpm build`. `git grep -n -i clerk -- src docs .env.example README.md` must find nothing. Commit as "U2 v4: own auth with Supabase Auth (password), our own sign-in screen, withSession for sync" and report `git diff --name-only HEAD~1`.
+
+AMENDMENTS from spec review T-0057 (binding; where they conflict with the text above, these win):
+B1 Live project facts (Planner, 2026-10-10): the human turned OFF address confirmation on the Supabase project, so signUp returns a session and signs the user in at once. The project region is eu-central-2, which is ZURICH: footnote copy says "your words sync to a server in Zurich (Supabase)", never "EU". Clerk third-party auth was never enabled on the live project, so there is no live-side change in this task.
+B2 supabase/config.toml: delete the whole [auth.third_party.clerk] block (and any CLERK_DOMAIN env reference); then add `[auth.email] enable_signup = true` only if absent; set `enable_confirmations = false` under [auth.email] to match the live project. Change no other key.
+B3 Clerk wording: fix comments only, no SQL or behaviour change: src/sync/schema.ts (line 7 says the Clerk sub -> "the auth user id (JWT sub)"), the comment lines in supabase/migrations/20261010120000_init.sql, and the test title in supabase/migrations.test.ts. All three are added to scope. The acceptance grep becomes `git grep -n -i clerk -- src docs supabase .env.example README.md` finds nothing. The T-0038 depends_on text mentioning Clerk is history, not a requirement.
+B4 Account placement: local overlay state in App.tsx (`accountOpen` boolean), opened from Settings through a prop or a tiny event in src/auth/auth.tsx (`openAccount()` via context). Do NOT touch src/lib/screen.ts or TabBar. The tab bar is hidden while Account is open (Account renders full-screen above it). src/screens/Onboarding.tsx is removed from scope; do not create it.
+B5 signUp result: if `data.user` exists and `data.user.identities?.length === 0`, return {ok: false, needsConfirm: true} with the same neutral copy as the confirm case ("check your inbox to confirm your address, then sign in here."), never "already exists" (no account enumeration). If a session is returned, ok: true and the provider flips to signed_in.
+B6 Error mapping on codes, not messages: `error.code === "invalid_credentials"` -> "that address and password don't match"; `"user_already_exists"` or `"email_exists"` -> the neutral confirm copy from B5 (no enumeration); `"weak_password"` -> "use at least 8 characters"; `isAuthRetryableFetchError(error)` (exported by @supabase/supabase-js / auth-js) or `error.status === 0` -> "no connection, try again when you are online"; everything else -> "something went wrong, try again". Tests build real AuthError-shaped objects with these codes. docs/SUPABASE.md names the project's minimum password length setting (Supabase default 6, the app enforces 8 client-side).
+B7 withSession: wrap getSession in try/catch and return null on failure; errors thrown by fn propagate unchanged. Doc comment: reads the stored session, does not verify it online.
+B8 Tests mechanics: vi.stubEnv + vi.unstubAllEnvs in afterEach, `__resetSupabaseForTests()` in beforeEach, vi.hoisted spies per file, no global mocks in src/test/setup.ts. Add a React.StrictMode double-mount test proving exactly one live onAuthStateChange subscription after mount/unmount/mount.
+B9 Account.tsx: block double submit while pending; clear the password field on success and on mode switch; "back to sign in" after needsConfirm; mode switch keeps the typed address.
+B10 Rollback note in the result: revert the commit and `pnpm remove @supabase/supabase-js`; no live-side state to restore.
+Acceptance adds: identities-empty test; code-based mapping tests; StrictMode subscription test; widened clerk grep is empty.
+
+AMENDMENTS from spec review T-0059 (binding; they win over everything above, including B3, B4, B5 and B6):
+C1 Applied migration stays untouched: do NOT edit supabase/migrations/20261010120000_init.sql or supabase/migrations.test.ts (their Clerk comments are history). Do fix the comment on line 1 of supabase/seed.sql and the src/sync/schema.ts comment. The clerk grep is `git grep -n -i clerk -- src docs .env.example README.md supabase/config.toml supabase/seed.sql` and must find nothing.
+C2 Existing address on sign-up: address confirmation is OFF on the live project, so Supabase answers a duplicate sign-up with error code user_already_exists (or email_exists). Map both to "there is already an account for this address. sign in instead." and switch Account to sign-in mode keeping the typed address. Only when signUp returns a user with `identities?.length === 0` (happens only if confirmation is turned back on) use the neutral "check your inbox to confirm your address, then sign in here." with "back to sign in".
+C3 Account lives inside AuthProvider: AuthProvider owns `accountOpen` state and renders <Account onClose=...> as a full-screen overlay above its children when open. The context gains `openAccount()` and `closeAccount()`; DISABLED has no-op versions. Settings calls `useAuth().openAccount()` (no props). App.tsx needs no change beyond what main.tsx wrapping requires; remove App.tsx edits if none are needed. Escape key on the Account root (onKeyDown on the overlay element, not a global listener) and "not now" both close. Account unmounts on sign-in success. Results that resolve after close are ignored (mounted ref).
+C4 Status source: status comes ONLY from onAuthStateChange. supabase-js v2 emits INITIAL_SESSION on subscribe; until the first event, status is "loading". Do not call getSession for status. The callback is synchronous: no await and no other supabase call inside it (supabase-js deadlocks otherwise); it sets state from the event's session only.
+C5 getSupabase() and isSupabaseConfigured() read import.meta.env at CALL time, never at module load, so vi.stubEnv + __resetSupabaseForTests work. withSession still uses getSession (stored session, not verified online) inside try/catch.
+C6 No stray lockfile: after `pnpm add @supabase/supabase-js`, `git status --short` shows no package-lock.json.
+THE ACCEPTANCE LIST OF THIS TASK REPLACES all earlier acceptance text.
+
+AMENDMENTS from spec review T-0061 (binding; they win over everything above):
+D1 README: update the sentence that counts the VITE_ vars (it says "these three VITE_ vars") to the new count and list; docs/readme.test.ts requires every .env.example var to appear in README.md, keep that true. docs/readme.test.ts itself is not edited.
+D2 supabase/config.toml: also remove the CLERK_DOMAIN header comment; the file has no [auth.email] section today, so add `[auth.email]` with `enable_signup = true` and `enable_confirmations = false`.
+D3 Loading fallback: if no auth event arrives within 4000 ms of subscribing, call `getSession()` once OUTSIDE the event callback and set signed_in/signed_out from it; if that throws, set signed_out. A later auth event always wins over the fallback. Test with fake timers.
+D4 Results vs events: signIn/signUp return values drive the Account UI (ok -> close the overlay); the provider status flips only from the auth event. Settings shows the new status as soon as the event lands. Tests assert both: the returned ok closes Account, and an emitted SIGNED_IN event sets signed_in.
+D5 Mapping order: first the code checks (invalid_credentials; user_already_exists or email_exists; weak_password), then retryable fetch error or status 0 (offline copy), then the generic copy.
+D6 withSession: if the stored session expires within 30 s (session.expires_at * 1000 < Date.now() + 30000), call `client.auth.refreshSession()` first and use its session; if refresh fails or yields no session, return null without calling fn. Test the expired path.
+Acceptance adds: loading fallback test with fake timers; expired-session refresh test; mapping order test (a weak_password error with status 0 still maps to the weak password copy).
+
+SPEC REVIEW WAIVED by the human (2026-10-10 15:55). Build exactly the spec above, including every amendment; where spec review notes on T-0063 point at real defects you can fix inside scope, fix them and list them in your result. Known ones: (1) per-file vi.mock of @supabase/supabase-js must spread `await vi.importActual(...)` so isAuthRetryableFetchError stays real; (2) export AuthContext from src/auth/auth.tsx so Settings.test.tsx can wrap Settings with test values; (3) in withSession treat a missing or non-numeric expires_at as expiring and refresh; (4) the D3 fallback getSession is bounded by its own 3 s timeout and falls back to signed_out offline; (5) README counts the VITE_ vars correctly (VITE_API_BASE included). Out of scope here: what happens to local rows when a different user signs in (the sync task owns that).
+## acceptance
+- src/sync/supabase.test.ts passes: null when unconfigured (env read at call time); one client; withSession returns null without calling fn when there is no session or getSession throws; passes userId when a session exists
+- src/auth/auth.test.tsx passes: disabled without env (createClient never called); loading until INITIAL_SESSION, then signed_in or signed_out from events; StrictMode mount/unmount/mount leaves exactly one subscription; unsubscribe on unmount
+- Error mapping tested by code: invalid_credentials; user_already_exists and email_exists give 'there is already an account for this address. sign in instead.'; weak_password; retryable fetch error or status 0 gives the offline copy; anything else the generic copy; identities-empty signUp gives the neutral confirm copy
+- src/screens/Account.test.tsx passes: validation blocks bad address and short password without calling signIn; signIn gets the typed values; duplicate submit blocked while pending; existing-address error switches to sign-in mode keeping the address; Escape and 'not now' close
+- Settings.test.tsx covers disabled, loading, signed out (sign in calls openAccount) and signed in (address, sign out); existing Settings tests pass unchanged
+- supabase/config.toml has no Clerk block and enable_confirmations = false under [auth.email]; the applied migration and migrations.test.ts are unchanged; the C1 clerk grep finds nothing
+- package.json adds only @supabase/supabase-js, pnpm-lock.yaml is the only lockfile; gate green: npm test -- --watch=false, npx tsc --noEmit, npm run lint; pnpm build exits 0
+- Amendments D1-D6 met: 4 s loading fallback tested with fake timers; withSession refreshes an expiring session or returns null; code checks run before the offline check; README VITE_ count updated; config.toml has [auth.email] and no Clerk text
+## base
+- branch: main
+- merge-base goal/T-0001: 5ef24be4726f745612785cfba5e120dfd068ed32
+- goal: T-0001
+## write_scope
+- .env.example
+- README.md
+- docs/SUPABASE.md
+- package.json
+- pnpm-lock.yaml
+- src/App.tsx
+- src/auth/auth.test.tsx
+- src/auth/auth.tsx
+- src/main.tsx
+- src/screens/Account.test.tsx
+- src/screens/Account.tsx
+- src/screens/Settings.test.tsx
+- src/screens/Settings.tsx
+- src/sync/schema.ts
+- src/sync/supabase.test.ts
+- src/sync/supabase.ts
+- supabase/config.toml
+- supabase/seed.sql
+## read_scope
+- .
+- docs/
+- src/
+- src/auth/
+- src/screens/
+- src/sync/
+- supabase/
+- tests/
+## constraints
+- allowed_dependencies: "@supabase/supabase-js only"
+- auto_round: 4
+- budget_turns: 50
+- fix_round_for: "T-0062"
+- interface_contract: "useAuth() {status: disabled|loading|signed_out|signed_in, userId, address, signIn, signUp, signOut, error}; getSupabase() | null; isSupabaseConfigured(); withSession(fn(client, userId)) -> null when signed out. U3 syncs only through withSession."
+- read_only: false
+- read_scope: ["src/**", "docs/*.md", ".env.example", "README.md", "supabase/**", "package.json", "vite.config.ts", "node_modules/@supabase/supabase-js/dist/**/*.d.ts", "node_modules/@supabase/auth-js/dist/**/*.d.ts", "src/lib/screen.ts", "src/components/**"]
+- route: "straightforward"
+- security_path: true
+- spec_review_waived: "human 2026-10-10 15:55"
+- task_class: "unfamiliar"
+- timeout_s: 2400
+## relevant_tests
+
+## symbols
+
+## gotchas
+
+## decisions
+
+## verify
+- .claude/hooks/tests-green.sh .
+- On failure, report only scripts/failures_only.sh output.
+## evidence
+
+
+## conditional instructions
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read; run the test script at most twice.
+
+You are a Claude fallback executor (Codex is unavailable); a human reviews merges. Commit on the task branch when green.
+If you need a tool outside your allowlist, post bus_post_result with status held and result reason needs_tool:<tool id>.

@@ -1,0 +1,42 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4K2NBP5AN71FRJ3X4NHQR74",
+  "strategy": "manual-commit",
+  "branch": "task/T-0064",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".env.example",
+    "README.md",
+    "docs/SUPABASE.md",
+    "package.json",
+    "pnpm-lock.yaml",
+    "src/auth/auth.test.tsx",
+    "src/auth/auth.tsx",
+    "src/main.tsx",
+    "src/screens/Account.test.tsx",
+    "src/screens/Account.tsx",
+    "src/screens/Settings.test.tsx",
+    "src/screens/Settings.tsx",
+    "src/sync/schema.ts",
+    "src/sync/supabase.test.ts",
+    "src/sync/supabase.ts",
+    "supabase/config.toml",
+    "supabase/seed.sql"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 50,
+    "cache_creation_tokens": 60299,
+    "cache_read_tokens": 1475061,
+    "output_tokens": 29797,
+    "api_call_count": 25
+  }
+}
