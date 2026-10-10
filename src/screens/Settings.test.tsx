@@ -18,8 +18,8 @@ const fake = vi.hoisted(() => {
       };
     },
     refresh: vi.fn(async () => undefined),
-    importFile: vi.fn(async (_file: File) => undefined),
-    importUrl: vi.fn(async (_url: string) => undefined),
+    importFile: vi.fn<(file: File) => Promise<void>>(async () => undefined),
+    importUrl: vi.fn<(url: string) => Promise<void>>(async () => undefined),
     remove: vi.fn(async () => undefined),
   };
 });
