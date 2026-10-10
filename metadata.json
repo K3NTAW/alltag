@@ -1,0 +1,28 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4K8MAXHC81BQ8GDPBEB3PYK",
+  "strategy": "manual-commit",
+  "branch": "task/T-0090",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "src/lib/cover.ts",
+    "src/screens/Scene.test.tsx",
+    "src/screens/Scene.tsx"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 10,
+    "cache_creation_tokens": 2495,
+    "cache_read_tokens": 230752,
+    "output_tokens": 1078,
+    "api_call_count": 5
+  }
+}
