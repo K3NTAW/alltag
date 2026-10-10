@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import type { GemmaStatus } from "../offline/gemma";
+import type { BackupStatus } from "../sync/backup";
 import { AuthContext, DISABLED, type AuthValue } from "../auth/auth";
 import Settings from "./Settings";
 
@@ -50,6 +51,10 @@ const pwa = vi.hoisted(() => {
 });
 
 vi.mock("../pwa/install", () => ({ useInstallPrompt: () => pwa.state }));
+
+const backup = vi.hoisted(() => ({ status: { state: "off", lastOkAt: null } as BackupStatus }));
+
+vi.mock("../sync/backup", () => ({ useBackupStatus: () => backup.status }));
 
 describe("Settings on your phone", () => {
   beforeEach(() => {
@@ -190,6 +195,7 @@ describe("Settings account", () => {
     localStorage.clear();
     fake.set({ state: "absent" });
     pwa.state = pwa.base();
+    backup.status = { state: "off", lastOkAt: null };
   });
 
   function withAuth(over: Partial<AuthValue>) {
@@ -234,5 +240,26 @@ describe("Settings account", () => {
     expect(account.getByTestId("sync-state")).toHaveTextContent("ready");
     fireEvent.click(account.getByRole("button", { name: "sign out" }));
     expect(value.signOut).toHaveBeenCalledTimes(1);
+  });
+
+  it("signed in: sync-state text per backup state", () => {
+    const cases: [BackupStatus, string][] = [
+      // 12:34 UTC is 14:34 in Zurich (CEST)
+      [{ state: "ok", lastOkAt: Date.UTC(2026, 9, 10, 12, 34) }, "backed up 14:34"],
+      [{ state: "working", lastOkAt: null }, "backing up…"],
+      [{ state: "error", lastOkAt: null }, "backup failed, will retry"],
+      [{ state: "offline", lastOkAt: null }, "offline, will back up later"],
+      [{ state: "off", lastOkAt: null }, "ready"],
+    ];
+    for (const [status, text] of cases) {
+      backup.status = status;
+      const view = render(
+        <AuthContext.Provider value={{ ...DISABLED, status: "signed_in", userId: "u1", address: "a@b.ch" }}>
+          <Settings />
+        </AuthContext.Provider>,
+      );
+      expect(screen.getByTestId("sync-state")).toHaveTextContent(text);
+      view.unmount();
+    }
   });
 });

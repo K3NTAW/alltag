@@ -29,6 +29,23 @@ Row types for the client: `src/sync/schema.ts` (`ProfileRow`, `ItemRow`, `SceneR
 - **Sign out keeps local data.** Only the session is removed; words, scenes and conversations stay on the phone.
 - **Sync goes through `withSession`** in `src/sync/supabase.ts`. Signed out, it returns null and makes no network call.
 
+## Card backup
+
+Signed in, your cards are backed up to your account and restored on a new device. Photos (card crops, scenes) and conversations stay on the device.
+
+- **Backup** (`src/sync/backup.ts`, driven by `src/sync/BackupRunner.tsx`): every local card is upserted to `items` on `id`, 200 rows per request. It runs after sign-in, 3 s after a card changes, when the device comes back online, and every 60 s after a failure. Each run resends all cards.
+- **Restore**: after sign-in and on reconnect, rows without `deleted_at` are read page by page and every card whose id is not on the device is added. A card already on the device is never overwritten or removed.
+- **No deletes travel.** The client never writes `deleted_at` and keeps no removal lists.
+
+Limits, stated plainly:
+
+- **Deletes are device-only.** Deleting a card or resetting a device removes it only on that device. The backup keeps it, and it comes back on the next restore (sign-in or reconnect).
+- **Twins.** A word kept on two devices before both backed up appears twice.
+- **Last backup wins.** The last device to back up wins review progress for a card.
+- **Unreadable review state.** A row whose review state cannot be read restores with fresh review state.
+
+Rollback: `git revert` the commit. There is no schema or live change to undo.
+
 ## Keys
 
 Only public values go to the client, as `VITE_*` vars: the Supabase project URL and anon key. No service role key is used or stored anywhere in the repo.

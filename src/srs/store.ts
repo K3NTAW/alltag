@@ -10,6 +10,7 @@ export type KeepInput = Omit<Card, "id" | "ease" | "interval" | "reps" | "due" |
 // In-memory fallback when localStorage is missing or throws.
 let memory: Card[] = [];
 let counter = 0;
+const subscribers = new Set<() => void>();
 
 function storage(): Storage | null {
   try {
@@ -34,12 +35,22 @@ function load(): Card[] {
 function save(cards: Card[]): void {
   memory = cards;
   const ls = storage();
-  if (!ls) return;
-  try {
-    ls.setItem(KEY, JSON.stringify(cards));
-  } catch {
-    // quota or private mode: memory copy still holds
+  if (ls) {
+    try {
+      ls.setItem(KEY, JSON.stringify(cards));
+    } catch {
+      // quota or private mode: memory copy still holds
+    }
   }
+  subscribers.forEach((fn) => fn());
+}
+
+/** fn runs after every save. Returns the unsubscribe. */
+export function subscribe(fn: () => void): () => void {
+  subscribers.add(fn);
+  return () => {
+    subscribers.delete(fn);
+  };
 }
 
 function newId(): string {
@@ -125,4 +136,22 @@ export function remove(id: string): void {
 
 export function clear(): void {
   save([]);
+}
+
+/**
+ * Appends restored cards whose id is not already here (first wins, also within the batch).
+ * Never overwrites or removes a local card. Saves once, or not at all when nothing is new.
+ */
+export function addRestored(cards: Card[]): number {
+  const current = load();
+  const seen = new Set(current.map((c) => c.id));
+  const added: Card[] = [];
+  for (const card of cards) {
+    if (seen.has(card.id)) continue;
+    seen.add(card.id);
+    added.push(card);
+  }
+  if (added.length === 0) return 0;
+  save([...current, ...added]);
+  return added.length;
 }

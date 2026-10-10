@@ -1,4 +1,5 @@
-import { all, byNoun, clear, due, get, grade, keep, remove } from "./store";
+import type { Card } from "../lib/types";
+import { addRestored, all, byNoun, clear, due, get, grade, keep, remove, subscribe } from "./store";
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -64,5 +65,46 @@ describe("srs store", () => {
     expect(due(now + 1000).map((c) => c.id)).toEqual([a.id]);
     remove(a.id);
     expect(due(now + 1000)).toEqual([]);
+  });
+});
+
+describe("srs store hooks", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    clear();
+  });
+
+  function restored(id: string, phrase_fr = id): Card {
+    return { id, phrase_fr, phrase_en: "", ease: 2.5, interval: 0, reps: 0, due: 0, learnedAt: 0 };
+  }
+
+  it("subscribe fires after keep, grade, remove and clear; unsubscribe stops it", () => {
+    const fn = vi.fn();
+    const unsubscribe = subscribe(fn);
+    const card = fresh();
+    expect(fn).toHaveBeenCalledTimes(1);
+    grade(card.id, 5);
+    expect(fn).toHaveBeenCalledTimes(2);
+    remove(card.id);
+    expect(fn).toHaveBeenCalledTimes(3);
+    clear();
+    expect(fn).toHaveBeenCalledTimes(4);
+    unsubscribe();
+    fresh();
+    expect(fn).toHaveBeenCalledTimes(4);
+  });
+
+  it("addRestored skips local ids and in-batch twins, first wins, saves once", () => {
+    const local = fresh();
+    const fn = vi.fn();
+    subscribe(fn);
+    const n = addRestored([restored(local.id, "remote"), restored("a", "first"), restored("a", "second"), restored("b")]);
+    expect(n).toBe(2);
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(get(local.id)).toEqual(local);
+    expect(get("a")?.phrase_fr).toBe("first");
+    expect(all().map((c) => c.id)).toEqual([local.id, "a", "b"]);
+    expect(addRestored([restored("a"), restored(local.id)])).toBe(0);
+    expect(fn).toHaveBeenCalledTimes(1);
   });
 });

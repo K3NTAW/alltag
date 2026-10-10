@@ -5,6 +5,7 @@ import * as store from "../srs/store";
 import { gemma, MODEL_FILE, MODEL_LABEL, MODEL_LICENCE, type GemmaStatus } from "../offline/gemma";
 import { useInstallPrompt } from "../pwa/install";
 import { useAuth } from "../auth/auth";
+import { useBackupStatus, type BackupStatus } from "../sync/backup";
 
 const levels: Level[] = ["A1", "A2", "B1", "B2"];
 
@@ -30,6 +31,29 @@ function statusText(s: GemmaStatus): string {
       return s.source === "bundled" ? "ready, built into the app" : "ready";
     case "error":
       return s.reason ? `error: ${s.reason}` : "error";
+  }
+}
+
+function backupText(s: BackupStatus): string {
+  switch (s.state) {
+    case "ok": {
+      if (s.lastOkAt === null) return "ready";
+      const time = new Date(s.lastOkAt).toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+        timeZone: "Europe/Zurich",
+      });
+      return `backed up ${time}`;
+    }
+    case "working":
+      return "backing up…";
+    case "error":
+      return "backup failed, will retry";
+    case "offline":
+      return "offline, will back up later";
+    case "off":
+      return "ready";
   }
 }
 
@@ -122,6 +146,7 @@ export default function Settings() {
 
 function AccountSection() {
   const { status, address, openAccount, signOut } = useAuth();
+  const backup = useBackupStatus();
   const muted = "text-[length:var(--text-small)] text-muted";
 
   let body;
@@ -151,7 +176,7 @@ function AccountSection() {
         <p className={muted}>signed in</p>
         <div className="flex items-center justify-between">
           <span className="text-muted">sync</span>
-          <span data-testid="sync-state">ready</span>
+          <span data-testid="sync-state">{backupText(backup)}</span>
         </div>
         <button
           type="button"

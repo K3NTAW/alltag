@@ -17,12 +17,15 @@ export interface ProfileRow extends SyncColumns {
   settings: Record<string, unknown>;
 }
 
-/** SM-2 state stored in items.srs. due is an ISO date. */
+/** SM-2 state stored in items.srs. due and learnedAt are ISO dates. */
 export interface SrsState {
   interval: number;
   ease: number;
   reps: number;
   due: string;
+  learnedAt?: string;
+  objectId?: string;
+  place?: string;
 }
 
 export interface ItemRow extends SyncColumns {
