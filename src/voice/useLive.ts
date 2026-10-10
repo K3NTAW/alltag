@@ -47,7 +47,8 @@ export function useLive(deps?: LiveDeps) {
     sessionRef.current = session;
     const live = () => genRef.current === gen;
     const fail = (message: string) => {
-      if (!live()) return;
+      // A late error after the task is done (e.g. during the goodbye line) is not a failure.
+      if (!live() || doneRef.current) return;
       setError(message);
       setState("error");
     };
@@ -83,9 +84,15 @@ export function useLive(deps?: LiveDeps) {
     });
 
     try {
-      const token = opts.token ?? (await getLiveToken()).token;
+      let { token, model } = opts;
+      if (!token) {
+        // Use the model the token is constrained to so client and route cannot drift.
+        const res = await getLiveToken();
+        token = res.token;
+        model ??= res.model;
+      }
       if (!live()) return;
-      await session.connect({ ...opts, token });
+      await session.connect({ ...opts, token, model });
     } catch (e) {
       fail(e instanceof Error ? e.message : String(e));
     }

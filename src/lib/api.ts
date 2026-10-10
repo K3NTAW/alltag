@@ -55,6 +55,6 @@ export function postCheck(req: CheckRequest): Promise<CheckResponse> {
   return post("check", req);
 }
 
-export function getLiveToken(): Promise<{ token: string; expires_at: string }> {
+export function getLiveToken(): Promise<{ token: string; expires_at: string; model?: string }> {
   return call("live-token", { method: "POST" });
 }

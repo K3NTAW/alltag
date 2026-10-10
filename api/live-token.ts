@@ -21,7 +21,8 @@ function header(req: VercelRequest, name: string): string | undefined {
   return Array.isArray(v) ? v[0] : v;
 }
 
-// Browser guard: reject cross-site callers. Not a substitute for auth or rate limiting.
+// Browser guard: reject cross-site callers. Header-less callers (curl, scripts) pass.
+// Not a substitute for auth or rate limiting; tracked as a follow-up.
 function sameOrigin(req: VercelRequest): boolean {
   const site = header(req, "sec-fetch-site");
   if (site && site !== "same-origin" && site !== "none") return false;
@@ -58,6 +59,7 @@ export function createHandler({
       res.status(500).json({ error: "missing_key" });
       return;
     }
+    const model = process.env.GEMINI_MODEL_LIVE || DEFAULT_LIVE_MODEL;
     const t = now();
     const expireTime = new Date(t + 30 * 60_000).toISOString();
     try {
@@ -66,14 +68,14 @@ export function createHandler({
           uses: 1,
           expireTime,
           newSessionExpireTime: new Date(t + 60_000).toISOString(),
-          liveConnectConstraints: { model: process.env.GEMINI_MODEL_LIVE ?? DEFAULT_LIVE_MODEL },
+          liveConnectConstraints: { model },
         },
       });
       if (typeof token.name !== "string" || !token.name || token.name.includes(key)) {
         res.status(502).json({ error: "token_failed" });
         return;
       }
-      res.status(200).json({ token: token.name, expires_at: expireTime });
+      res.status(200).json({ token: token.name, expires_at: expireTime, model });
     } catch {
       res.status(502).json({ error: "token_failed" });
     }

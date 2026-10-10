@@ -235,6 +235,22 @@ describe("LiveSession", () => {
     expect(speaking).toEqual([true, false]);
   });
 
+  it("closes the interrupted tutor turn instead of merging it into the next", async () => {
+    const { deps, ai } = makeDeps();
+    const s = new LiveSession(deps);
+    const tutor: { text: string; final: boolean }[] = [];
+    s.on("tutorText", (e) => e.final && tutor.push(e));
+    await s.connect(base);
+    ai.state.send({ serverContent: { outputTranscription: { text: "Bien sûr, je" } } });
+    ai.state.send({ serverContent: { interrupted: true } });
+    ai.state.send({ serverContent: { outputTranscription: { text: "Oui ?" } } });
+    ai.state.send({ serverContent: { turnComplete: true } });
+    expect(tutor).toEqual([
+      { text: "Bien sûr, je", final: true },
+      { text: "Oui ?", final: true },
+    ]);
+  });
+
   it("emits speaking false when the queue drains", async () => {
     const { deps, ai, ctx } = makeDeps();
     const s = new LiveSession(deps);

@@ -264,7 +264,11 @@ export class LiveSession {
     if (this.ended) return;
     const content = msg.serverContent;
     if (content) {
-      if (content.interrupted) this.clearPlayback();
+      if (content.interrupted) {
+        this.clearPlayback();
+        // Close the cut-off tutor turn so it does not merge into the next one.
+        this.flushTutor();
+      }
       for (const part of content.modelTurn?.parts ?? []) {
         const data = part.inlineData;
         if (data?.data && (data.mimeType ?? "audio/pcm").startsWith("audio/pcm")) {

@@ -51,7 +51,11 @@ describe("api/live-token", () => {
     const { res, out } = mockRes();
     await createHandler({ createClient, now: () => NOW })({ method: "POST" } as VercelRequest, res);
     expect(out.code).toBe(200);
-    expect(out.body).toEqual({ token: "auth_tokens/abc", expires_at: "2026-10-10T12:30:00.000Z" });
+    expect(out.body).toEqual({
+      token: "auth_tokens/abc",
+      expires_at: "2026-10-10T12:30:00.000Z",
+      model: "gemini-3.8-live",
+    });
     expect(JSON.stringify(out.body)).not.toContain(KEY);
     expect(out.headers["cache-control"]).toBe("no-store");
     expect(createClient).toHaveBeenCalledWith(KEY);
@@ -74,6 +78,7 @@ describe("api/live-token", () => {
     expect(out.code).toBe(200);
     const params = create.mock.calls[0] as unknown as [{ config: { liveConnectConstraints: { model: string } } }];
     expect(params[0].config.liveConnectConstraints.model).toBe("gemini-live-custom");
+    expect((out.body as { model: string }).model).toBe("gemini-live-custom");
   });
 
   it("returns 500 without GEMINI_API_KEY", async () => {

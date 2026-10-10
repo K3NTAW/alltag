@@ -5,7 +5,11 @@ import type { LiveDeps } from "./live";
 import { useLive } from "./useLive";
 
 vi.mock("../lib/api", () => ({
-  getLiveToken: vi.fn(async () => ({ token: "auth_tokens/fetched", expires_at: "2026-10-10T12:30:00Z" })),
+  getLiveToken: vi.fn(async () => ({
+    token: "auth_tokens/fetched",
+    expires_at: "2026-10-10T12:30:00Z",
+    model: "gemini-live-route",
+  })),
 }));
 
 const scene: SceneResult = {
@@ -96,6 +100,7 @@ describe("useLive", () => {
       await pending;
     });
     expect(ai.state.ctorArgs).toMatchObject({ apiKey: "auth_tokens/fetched" });
+    expect(ai.state.params?.model).toBe("gemini-live-route");
     expect(result.current.state).toBe("listening");
 
     act(() => ai.state.send({ serverContent: { inputTranscription: { text: "Un café" } } }));
@@ -119,6 +124,8 @@ describe("useLive", () => {
     act(() => ai.state.send({ toolCall: { functionCalls: [{ id: "c", name: "mark_task_done" }] } }));
     expect(result.current.state).toBe("done");
     act(() => ai.state.send(audioMessage()));
+    expect(result.current.state).toBe("done");
+    act(() => ai.state.params?.callbacks.onerror?.({ message: "socket reset" } as ErrorEvent));
     expect(result.current.state).toBe("done");
 
     act(() => result.current.stop());
