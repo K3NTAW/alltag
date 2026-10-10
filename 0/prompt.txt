@@ -1,0 +1,51 @@
+<task-notification>
+<task-id>btizounaf</task-id>
+<tool-use-id>toolu_019QFV7ctHo8LRL4cYSgM1zg</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-k3ntaw-code-alltag-wt-T-0048/25a758e4-c0b9-43c1-b6a4-80e34d38d788/tasks/btizounaf.output</output-file>
+<status>completed</status>
+<summary>Background command "python3 - &lt;&lt;'EOF'
+ref=open("/Users/k3ntaw/code/alltag/.orchestrator/languages-reference.md").read().splitlines()
+rows=[l for l in ref if l.startswith("| ") and not l.startswith("| Language")]
+assert len(rows)==99, len(rows)
+head="""# Languages
+
+What alltag teaches today, what the stack underneath could carry, and what adding a language takes. Researched 2026-10-10 from the Gradium docs, the Gemini Live guide and the Gemma 4 model card.
+
+## Today
+
+The app teaches French only. The target language is fixed in settings and in the prompts (Noé, review, Listen, the offline prompts); there is no picker.
+
+## What the stack supports
+
+Three tiers, from the full experience down to offline text.
+
+### A. Full experience with Gradium voice
+
+English (`en`), French (`fr`), German (`de`), Spanish (`es`), Portuguese (`pt`), plus the Swiss French (`fr-ch`) and Swiss German accents of the Gradium voice library.
+
+Gradium voice persona, Gradium STT for review, `/api/translate` and Gemini on top. Gradium transcription accepts only these five languages (or `any`); more are announced.
+
+### B. Gemini only: voice and transcription
+
+Gemini Live native audio voice, input transcription, vision and grading, with no Gradium voice. The Live API and its input transcription cover the 99 languages below. Native audio output has 30 HD voices in 24 languages (no per-language list published), so expect the best voice quality in those.
+
+| Language | Code |
+|---|---|
+"""
+tail="""
+### C. Offline: Gemma 4 E2B on device
+
+Gemma 4 E2B (`src/offline/gemma.ts`, Apache 2.0) is pretrained on 140+ languages with out-of-the-box support for 35+. The model card has no per-language list. On the web it is text only and needs WebGPU: typed roleplay and corrections, no voice, no camera.
+
+## What it takes to add a language
+
+1. Settings: a target language field (stored with the other settings) instead of the fixed French.
+2. Prompts: pass the language as a parameter to every prompt (Noé, corrections, review, Listen translate and extract, the offline prompts in `src/offline/prompts.ts`) instead of hard-coded French.
+3. Tier A only: route Gradium voice and STT to that language and pick a voice or accent from the library.
+4. Tier B: Gemini Live voice and Gemini TTS for that language, with the Gemini Live transcription language set to match; no Gradium.
+5. Onboarding: a language picker on first run, limited to the languages wired up so far.
+"""
+open("docs/LANGUAGES.md","w").write(head+"\n".join(rows)+"\n"+tail)
+EOF
+ls node_modules &gt;/dev/null 2&gt;&amp;1 || pnpm install --frozen-lockfile 2&gt;&amp;1 | tail -3" completed (exit code 0)</summary>
+</task-notification>
