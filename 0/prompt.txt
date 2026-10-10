@@ -1,0 +1,99 @@
+Implement this single task in the current worktree. Commit the completed changes on the current branch with a message that starts with the task id before testing. Never leave uncommitted changes and never touch files outside scope.
+The packet above is the task contract: implement the ## objective, satisfy every line of ## acceptance, and edit only paths listed in ## write_scope.
+Run only the acceptance-named tests in the foreground; never background a command. Each command must finish in under 10 minutes. The daemon runs the full gate externally.
+No new dependencies without stating why. Finish with: summary, files changed, failures-only test output.
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read.
+
+packet v4284453a838e base 5ef24be4726f sources pool.toml@19c37ec8af44 gotchas@4389a0c0f548 memory@notes specialist: execute+implement-spec over cap by 89 chars: acceptance kept whole routed=shadow
+## skills
+### executor/implement-spec (v6ba2f814dd6f)
+## Trigger
+Any execute task from the orchestrator.
+
+## Objective
+Implement one atomic task within its Scope and leave tests green.
+
+## Procedure
+Read Spec, Acceptance, Scope. Run `scripts/tests_green.sh` first. Make the smallest accepted change. Run it again; iterate on failure. Commit on the task branch.
+
+## Tools
+Read, Edit, Bash; `scripts/failures_only.sh`.
+
+## Evidence requirements
+Acceptance checks and tests-green result.
+
+## Output contract
+Finish with: 3-line summary, `git diff --stat`, failures-only output (empty when green).
+
+## Stop conditions
+Stop when Acceptance passes or budget ends.
+
+## Failure/recovery
+Report only `scripts/failures_only.sh` output. Edit only paths in Scope. No new dependencies unless the spec names them.
+## objective
+docs: README team (Kenta), Entire sessions link and checkpoint refs
+- discovery: Docs only, README.md on goal/T-0001. FIRST run `pnpm install --frozen-lockfile` in your worktree (the previous attempt failed the gate because node_modules was missing); leave no untracked files.
+1. Add a "## Team" section right after the intro line "Learn a language from the room you are in." and before "## 1. What it is": a single line "Kenta". Do not renumber sections.
+2. In the "**Entire** (session capture behind commits)" block, replace the line "- checkpoints branch: <the human fills this in>" with two lines:
+   "- Sessions: https://entire.io/gh/K3NTAW/alltag"
+   "- Checkpoints: stored as `refs/entire/checkpoints/*` in https://github.com/K3NTAW/alltag. Fetch them with `git fetch origin 'refs/entire/*:refs/entire/*'`."
+3. No other change. Run the gate yourself before committing: npm test -- --watch=false, npx tsc --noEmit, npm run lint.
+Rollback: git revert the commit.
+## acceptance
+- README.md has '## Team' with Kenta before section 1
+- Entire block has the Sessions link https://entire.io/gh/K3NTAW/alltag and the checkpoints refs line; placeholder gone
+- Gate green: npm test -- --watch=false, npx tsc --noEmit, npm run lint
+## base
+- branch: main
+- merge-base goal/T-0001: 5ef24be4726f745612785cfba5e120dfd068ed32
+- goal: T-0001
+## write_scope
+- README.md
+## read_scope
+- .
+- tests/
+## constraints
+- allowed_dependencies: "none new"
+- budget_turns: 15
+- dedupe: "readme-team-entire-v2"
+- interface_contract: "README only."
+- priority: "high"
+- read_only: false
+- read_scope: ["**"]
+- route: "straightforward"
+- task_class: "mechanical"
+- timeout_s: 900
+## relevant_tests
+- (none found)
+## symbols
+- (none)
+## gotchas
+- mem:gotchas.md:17 Worktree prune during a running executor left a stale index.lock
+- mem:gotchas.md:3 Gradium WebSocket shapes verified 2026-10-10
+- mem:gotchas.md:10 Vercel functions need .js on relative imports (type=module)
+## decisions
+- 2026-10-10 Alltag build order A..H as 8 execute tasks with shared contracts owned by the scaffold
+- 2026-10-10 T-0001 closable: pushed goal/T-0001 19e9771..a0b9ef8 (T-0029 merge was local only), updated PR 1 body with O and S, posted PR url as goal result
+- 2026-10-10 T-0041 gate_red was load noise: external gate green, hold released for re-gate instead of respec or split
+## verify
+- .claude/hooks/tests-green.sh .
+- On failure, report only scripts/failures_only.sh output.
+## evidence
+- T-0092: I added the Team section and the checkpoint refs line, and committed on `task/T-0092`. I couldn't run the gate because this worktree has no `node_modules`, so vitest, tsc and eslint are not installed.
+- T-0093: {}
+- 00851d98701a task:T-0017:gotcha:1: - mem:gotchas.md:3 Gradium WebSocket shapes verified 2026-10-10
+- 008d42d3d978 task:T-0091:acceptance:4: Gate green: npm test -- --watch=false, npx tsc --noEmit, npm run lint
+- 00b70401a0eb task:T-0009:acceptance:1: docs/readme.test.ts passes: README names every /api route found in api/*.ts, every env var in .env.example, the words Entire, Gradium and Gemini; manifest parse
+- 00d21a903c9d src/screens/Diary.tsx: diff --git a/src/screens/Diary.tsx b/src/screens/Diary.tsx
+- 0121eed902a7 task:T-0082:acceptance:5: docs/SUPABASE.md has a Card backup section listing the four limits (device-only deletes, twins, last backup wins, unreadable srs)
+- 018b2804f326 task:T-0083:acceptance:1: tokens.css carries the v3 palette, fonts, radii and motion tokens with all old variable names still defined; tokens.test.ts asserts them and passes
+- 01c568c6ca81 task:T-0072:gotcha:1: - mem:gotchas.md:3 Gradium WebSocket shapes verified 2026-10-10
+- 025e23cf2017 src/screens/Roleplay.test.tsx: diff --git a/src/screens/Roleplay.test.tsx b/src/screens/Roleplay.test.tsx
+- 02d44839a982 src/sync/supabase.test.ts: diff --git a/src/sync/supabase.test.ts b/src/sync/supabase.test.ts
+
+## conditional instructions
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read; run the test script at most twice.
+No tests to add; keep line width; link revert path.
+
+You are a Claude fallback executor (Codex is unavailable); a human reviews merges. Commit on the task branch when green.
+If you need a tool outside your allowlist, post bus_post_result with status held and result reason needs_tool:<tool id>.
