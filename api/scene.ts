@@ -10,6 +10,15 @@ import { SCENE_SCHEMA, buildScenePrompt } from "./_prompts/scene";
 
 const LEVELS: Level[] = ["A1", "A2", "B1", "B2"];
 const DATA_PREFIX = "data:image/jpeg;base64,";
+export const DEFAULT_VISION_MODEL = "gemini-3.8-flash";
+
+export function visionModel(): string {
+  return (
+    process.env.GEMINI_MODEL_VISION ??
+    process.env.GEMINI_MODEL ??
+    DEFAULT_VISION_MODEL
+  );
+}
 
 export interface GenerateArgs {
   model: string;
@@ -121,7 +130,7 @@ export function createHandler(deps: SceneDeps) {
     let text: string | undefined;
     try {
       const response = await deps.generate({
-        model: process.env.GEMINI_MODEL ?? "gemini-2.5-flash",
+        model: visionModel(),
         contents: [
           {
             role: "user",

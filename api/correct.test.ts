@@ -81,7 +81,82 @@ describe("api/correct", () => {
     expect(out.body).toEqual({
       corrections: [valid],
       kept_phrase_fr: "Je voudrais la tasse.",
+      model_used: "gemini-3.1-pro-preview",
     });
+  });
+
+  const good = JSON.stringify({ corrections: [], kept_phrase_fr: "Je voudrais la tasse." });
+
+  it("model defaults to gemini-3.1-pro-preview", async () => {
+    vi.stubEnv("GEMINI_MODEL_GRADER", undefined);
+    vi.stubEnv("GEMINI_MODEL", undefined);
+    const models: string[] = [];
+    const out = await call(request, async (args) => {
+      models.push(args.model);
+      return good;
+    });
+    expect(models).toEqual(["gemini-3.1-pro-preview"]);
+    expect(out.body).toHaveProperty("model_used", "gemini-3.1-pro-preview");
+  });
+
+  it("model reads GEMINI_MODEL_GRADER before the GEMINI_MODEL alias", async () => {
+    const models: string[] = [];
+    const generate: Generate = async (args) => {
+      models.push(args.model);
+      return good;
+    };
+    vi.stubEnv("GEMINI_MODEL", "alias-model");
+    await call(request, generate);
+    vi.stubEnv("GEMINI_MODEL_GRADER", "grader-model");
+    const out = await call(request, generate);
+    expect(models).toEqual(["alias-model", "grader-model"]);
+    expect(out.body).toHaveProperty("model_used", "grader-model");
+  });
+
+  it("falls back to gemini-3.8-flash when the grader errors", async () => {
+    const models: string[] = [];
+    const out = await call(request, async (args) => {
+      models.push(args.model);
+      if (args.model === "gemini-3.1-pro-preview") throw new Error("boom");
+      return good;
+    });
+    expect(models).toEqual(["gemini-3.1-pro-preview", "gemini-3.8-flash"]);
+    expect(out.code).toBe(200);
+    expect(out.body).toHaveProperty("model_used", "gemini-3.8-flash");
+  });
+
+  it("falls back to gemini-3.8-flash and aborts the grader after 8 s", async () => {
+    vi.useFakeTimers();
+    try {
+      const models: string[] = [];
+      let aborted = false;
+      const pending = call(request, (args) => {
+        models.push(args.model);
+        if (args.model === "gemini-3.8-flash") return Promise.resolve(good);
+        args.signal?.addEventListener("abort", () => {
+          aborted = true;
+        });
+        return new Promise<string>(() => {});
+      });
+      await vi.advanceTimersByTimeAsync(7999);
+      expect(models).toEqual(["gemini-3.1-pro-preview"]);
+      await vi.advanceTimersByTimeAsync(1);
+      const out = await pending;
+      expect(aborted).toBe(true);
+      expect(models).toEqual(["gemini-3.1-pro-preview", "gemini-3.8-flash"]);
+      expect(out.code).toBe(200);
+      expect(out.body).toHaveProperty("model_used", "gemini-3.8-flash");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("502 when the fallback also errors", async () => {
+    const out = await call(request, async () => {
+      throw new Error("boom");
+    });
+    expect(out.code).toBe(502);
+    expect(out.body).toEqual({ error: "generation_failed" });
   });
 
   it("400 on missing scene", async () => {

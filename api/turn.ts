@@ -3,20 +3,30 @@ import { GoogleGenAI } from "@google/genai";
 import type { TurnRequest, TurnResponse } from "../src/lib/types";
 import { TURN_SCHEMA, buildTurnPrompt } from "./_prompts/turn";
 
+export const DEFAULT_TURN_MODEL = "gemini-3.8-flash";
+
+export function turnModel(): string {
+  return (
+    process.env.GEMINI_MODEL_TURN ?? process.env.GEMINI_MODEL ?? DEFAULT_TURN_MODEL
+  );
+}
+
 export type Generate = (args: {
+  model: string;
   system: string;
   user: string;
   responseSchema: unknown;
 }) => Promise<string | undefined>;
 
 async function geminiGenerate({
+  model,
   system,
   user,
   responseSchema,
 }: Parameters<Generate>[0]): Promise<string | undefined> {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   const response = await ai.models.generateContent({
-    model: process.env.GEMINI_MODEL ?? "gemini-2.5-flash",
+    model,
     contents: [{ role: "user", parts: [{ text: user }] }],
     config: {
       systemInstruction: system,
@@ -76,7 +86,12 @@ export function createHandler(deps: { generate: Generate }) {
     });
     let text: string | undefined;
     try {
-      text = await deps.generate({ system, user, responseSchema: TURN_SCHEMA });
+      text = await deps.generate({
+        model: turnModel(),
+        system,
+        user,
+        responseSchema: TURN_SCHEMA,
+      });
     } catch {
       res.status(502).json({ error: "generation_failed" });
       return;

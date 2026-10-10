@@ -92,6 +92,31 @@ describe("api/turn", () => {
     expect(system).toContain("Noé");
   });
 
+  it("model defaults to gemini-3.8-flash", async () => {
+    vi.stubEnv("GEMINI_MODEL_TURN", undefined);
+    vi.stubEnv("GEMINI_MODEL", undefined);
+    let model = "";
+    await call(request, async (args) => {
+      model = args.model;
+      return JSON.stringify({ reply_fr: "a", reply_en: "b", task_done: false });
+    });
+    expect(model).toBe("gemini-3.8-flash");
+  });
+
+  it("model reads GEMINI_MODEL_TURN before the GEMINI_MODEL alias", async () => {
+    let model = "";
+    const generate: Generate = async (args) => {
+      model = args.model;
+      return JSON.stringify({ reply_fr: "a", reply_en: "b", task_done: false });
+    };
+    vi.stubEnv("GEMINI_MODEL", "alias-model");
+    await call(request, generate);
+    expect(model).toBe("alias-model");
+    vi.stubEnv("GEMINI_MODEL_TURN", "turn-model");
+    await call(request, generate);
+    expect(model).toBe("turn-model");
+  });
+
   it("400 on missing userText", async () => {
     const out = await call({ ...request, userText: undefined }, async () => "{}");
     expect(out.code).toBe(400);

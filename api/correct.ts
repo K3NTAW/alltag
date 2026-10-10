@@ -12,28 +12,69 @@ import {
   buildCorrectPrompt,
 } from "./_prompts/correct";
 
+export const DEFAULT_GRADER_MODEL = "gemini-3.1-pro-preview";
+export const FALLBACK_GRADER_MODEL = "gemini-3.8-flash";
+export const GRADER_TIMEOUT_MS = 8000;
+
+export function graderModel(): string {
+  return (
+    process.env.GEMINI_MODEL_GRADER ??
+    process.env.GEMINI_MODEL ??
+    DEFAULT_GRADER_MODEL
+  );
+}
+
 export type Generate = (args: {
+  model: string;
   system: string;
   user: string;
   responseSchema: unknown;
+  signal?: AbortSignal;
 }) => Promise<string | undefined>;
 
 async function geminiGenerate({
+  model,
   system,
   user,
   responseSchema,
+  signal,
 }: Parameters<Generate>[0]): Promise<string | undefined> {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   const response = await ai.models.generateContent({
-    model: process.env.GEMINI_MODEL ?? "gemini-2.5-flash",
+    model,
     contents: [{ role: "user", parts: [{ text: user }] }],
     config: {
+      abortSignal: signal,
       systemInstruction: system,
       responseMimeType: "application/json",
       responseSchema,
     },
   });
   return response.text;
+}
+
+// Races the primary call against the timeout and aborts it when the timer wins.
+async function withTimeout(
+  generate: Generate,
+  args: Omit<Parameters<Generate>[0], "signal">,
+  ms: number,
+): Promise<string | undefined> {
+  const controller = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      controller.abort();
+      reject(new Error("grader_timeout"));
+    }, ms);
+  });
+  try {
+    return await Promise.race([
+      generate({ ...args, signal: controller.signal }),
+      timeout,
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function isCorrection(c: unknown): c is Correction {
@@ -69,7 +110,8 @@ function parseCorrect(text: string | undefined): CorrectResponse | null {
   return { corrections, kept_phrase_fr: d.kept_phrase_fr };
 }
 
-export function createHandler(deps: { generate: Generate }) {
+export function createHandler(deps: { generate: Generate; timeoutMs?: number }) {
+  const timeoutMs = deps.timeoutMs ?? GRADER_TIMEOUT_MS;
   return async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method !== "POST") {
       res.status(405).json({ error: "method_not_allowed" });
@@ -94,19 +136,30 @@ export function createHandler(deps: { generate: Generate }) {
       userText: body.userText,
       level: body.level,
     });
+    const args = { system, user, responseSchema: CORRECT_SCHEMA };
+    let modelUsed = graderModel();
     let text: string | undefined;
     try {
-      text = await deps.generate({ system, user, responseSchema: CORRECT_SCHEMA });
+      text = await withTimeout(
+        deps.generate,
+        { ...args, model: modelUsed },
+        timeoutMs,
+      );
     } catch {
-      res.status(502).json({ error: "generation_failed" });
-      return;
+      modelUsed = FALLBACK_GRADER_MODEL;
+      try {
+        text = await deps.generate({ ...args, model: modelUsed });
+      } catch {
+        res.status(502).json({ error: "generation_failed" });
+        return;
+      }
     }
     const out = parseCorrect(text);
     if (!out) {
       res.status(502).json({ error: "bad_output" });
       return;
     }
-    res.status(200).json(out);
+    res.status(200).json({ ...out, model_used: modelUsed });
   };
 }
 

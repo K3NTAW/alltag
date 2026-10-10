@@ -2,6 +2,7 @@ import type {
   CorrectRequest,
   CorrectResponse,
   GradiumToken,
+  Level,
   SceneRequest,
   SceneResult,
   TurnRequest,
@@ -36,4 +37,20 @@ export function postCorrect(req: CorrectRequest): Promise<CorrectResponse> {
 
 export function getGradiumToken(): Promise<GradiumToken> {
   return call("gradium-token");
+}
+
+export interface CheckRequest {
+  target_fr: string;
+  transcript: string;
+  level: Level;
+}
+
+export interface CheckResponse {
+  grade: 0 | 1 | 2 | 3 | 4 | 5;
+  correct: boolean;
+  note_en: string;
+}
+
+export function postCheck(req: CheckRequest): Promise<CheckResponse> {
+  return post("check", req);
 }

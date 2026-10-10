@@ -105,6 +105,38 @@ describe("api/scene", () => {
     for (const w of goodBody.knownWords) expect(prompt).toContain(w);
   });
 
+  describe("model", () => {
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    async function seenModel() {
+      let model = "";
+      const h = createHandler({
+        generate: async (args) => {
+          model = args.model;
+          return { text: JSON.stringify(fixture) };
+        },
+      });
+      const { res } = mockRes();
+      await h(req("POST", goodBody), res);
+      return model;
+    }
+
+    it("defaults to gemini-3.8-flash", async () => {
+      vi.stubEnv("GEMINI_MODEL_VISION", undefined);
+      vi.stubEnv("GEMINI_MODEL", undefined);
+      expect(await seenModel()).toBe("gemini-3.8-flash");
+    });
+
+    it("reads GEMINI_MODEL_VISION before the GEMINI_MODEL alias", async () => {
+      vi.stubEnv("GEMINI_MODEL", "alias-model");
+      expect(await seenModel()).toBe("alias-model");
+      vi.stubEnv("GEMINI_MODEL_VISION", "vision-model");
+      expect(await seenModel()).toBe("vision-model");
+    });
+  });
+
   it("returns 400 when imageBase64 is missing", async () => {
     const h = createHandler({ generate: async () => ({ text: "{}" }) });
     const { out, res } = mockRes();
