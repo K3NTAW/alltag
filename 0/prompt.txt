@@ -1,0 +1,93 @@
+Implement this single task in the current worktree. Commit the completed changes on the current branch with a message that starts with the task id before testing. Never leave uncommitted changes and never touch files outside scope.
+The packet above is the task contract: implement the ## objective, satisfy every line of ## acceptance, and edit only paths listed in ## write_scope.
+Run only the acceptance-named tests in the foreground; never background a command. Each command must finish in under 10 minutes. The daemon runs the full gate externally.
+No new dependencies without stating why. Finish with: summary, files changed, failures-only test output.
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read.
+
+packet v2043700d0a98 base 5ef24be4726f sources pool.toml@19c37ec8af44 gotchas@52ef3de59e88 memory@notes specialist: execute+implement-spec over cap by 243 chars: acceptance kept whole routed=shadow
+## skills
+### executor/implement-spec (v6ba2f814dd6f)
+## Trigger
+Any execute task from the orchestrator.
+
+## Objective
+Implement one atomic task within its Scope and leave tests green.
+
+## Procedure
+Read Spec, Acceptance, Scope. Run `scripts/tests_green.sh` first. Make the smallest accepted change. Run it again; iterate on failure. Commit on the task branch.
+
+## Tools
+Read, Edit, Bash; `scripts/failures_only.sh`.
+
+## Evidence requirements
+Acceptance checks and tests-green result.
+
+## Output contract
+Finish with: 3-line summary, `git diff --stat`, failures-only output (empty when green).
+
+## Stop conditions
+Stop when Acceptance passes or budget ends.
+
+## Failure/recovery
+Report only `scripts/failures_only.sh` output. Edit only paths in Scope. No new dependencies unless the spec names them.
+## objective
+fix: Scene screen after a photo shows a cut photo and empty black area; full-bleed photo, bottom sheet, cover-mapped label pills
+- discovery: Bug from the human's phone, on goal/T-0001 (20d8791): after taking a picture, src/screens/Scene.tsx renders the photo as a full-width natural-height <img> in normal flow inside a min-h-dvh column. A portrait photo is taller than the screen, so the page scrolls: the user sees the bottom strip of the photo, the Noé sheet under it, and a large empty black area below. Target board: /Users/k3ntaw/code/alltag/.orchestrator/design/v3/project/SceneLabels.dc.html and BOARDS-V3.md "SceneLabels": photo fills the whole screen behind everything with top and bottom dims, label pills on the photo, a bottom sheet about 250 px high anchored to the bottom.
+
+Fix in Scene.tsx (behaviour, aria labels, Pill, ObjectSheet dialog and keep() unchanged):
+1. The screen is exactly one viewport: root `relative h-dvh overflow-hidden bg-night`, no page scroll.
+2. Photo layer: `absolute inset-0`, img `h-full w-full object-cover`. Dims and the header stay on top of it.
+3. Label pills must stay on their objects under object-cover: add a pure helper src/lib/cover.ts `coverPoint(bx, by, natW, natH, boxW, boxH) -> {x, y}` (pixel position inside the box of a normalised image point under object-cover cropping). Measure the img natural size on load and the container size (ResizeObserver, fallback window resize); position each placed pill with coverPoint of its bbox centre. Pills whose point falls outside the visible box are moved to the sheet's stacked row instead. Before the image has loaded, render no placed pills.
+4. Bottom sheet: `absolute inset-x-0 bottom-0`, above the tab bar if the tab bar is visible (bottom offset = calc(var(--tabbar-h) + var(--tabbar-gap) + env(safe-area-inset-bottom)) when App shows the tab bar on this screen; check App.tsx and use the same condition, do not edit App.tsx), max-height 45dvh with internal scroll, keeps sheet-up motion, orb, eyebrow, task fr/en and the stacked pills. Add the board's primary dark button "talk" (mic icon, full width, h-14, radius 28) that does exactly what the ObjectSheet "talk" button does (session.recallCardId = findRecall(scene, store.all())?.id ?? null; go("roleplay")).
+5. Empty state unchanged.
+Tests: src/lib/cover.test.ts (wider image, taller image, exact fit, point cropped out); src/screens/Scene.test.tsx (renders with a session scene: root has h-dvh and overflow-hidden, the sheet is present with the task text, the talk button navigates to roleplay, tapping a stacked pill opens the object dialog). Mock session/go/store as other screen tests do.
+Rollback: git revert the commit.
+## acceptance
+- Scene root is one viewport (h-dvh, overflow-hidden) with the photo absolute inset-0 object-cover; no empty area below the sheet
+- Label pills positioned via coverPoint; src/lib/cover.test.ts covers wider, taller, exact-fit and cropped-out cases
+- Bottom sheet anchored to the bottom (above the tab bar when shown) with a 'talk' button that goes to roleplay like the object sheet's talk
+- src/screens/Scene.test.tsx passes; existing tests pass
+- Gate green: npm test -- --watch=false, npx tsc --noEmit, npm run lint
+## base
+- branch: main
+- merge-base goal/T-0001: 5ef24be4726f745612785cfba5e120dfd068ed32
+- goal: T-0001
+## write_scope
+- src/screens/Scene.tsx
+- src/screens/Scene.test.tsx
+- src/lib/cover.ts
+- src/lib/cover.test.ts
+## read_scope
+- src/lib/
+- src/screens/
+- tests/
+## constraints
+- allowed_dependencies: "none new"
+- budget_turns: 50
+- dedupe: "scene-fullbleed-fix"
+- interface_contract: "Scene keeps its default export, aria labels and ObjectSheet behaviour."
+- priority: "high"
+- read_only: false
+- read_scope: ["**", "/Users/k3ntaw/code/alltag/.orchestrator/design/v3/**"]
+- route: "straightforward"
+- task_class: "bugfix"
+- timeout_s: 1500
+## relevant_tests
+
+## symbols
+
+## gotchas
+
+## decisions
+
+## verify
+- .claude/hooks/tests-green.sh .
+- On failure, report only scripts/failures_only.sh output.
+## evidence
+
+
+## conditional instructions
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read; run the test script at most twice.
+
+You are a Claude fallback executor (Codex is unavailable); a human reviews merges. Commit on the task branch when green.
+If you need a tool outside your allowlist, post bus_post_result with status held and result reason needs_tool:<tool id>.
