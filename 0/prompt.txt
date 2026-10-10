@@ -1,0 +1,100 @@
+Implement this single task in the current worktree. Commit the completed changes on the current branch with a message that starts with the task id before testing. Never leave uncommitted changes and never touch files outside scope.
+The packet above is the task contract: implement the ## objective, satisfy every line of ## acceptance, and edit only paths listed in ## write_scope.
+Run only the acceptance-named tests in the foreground; never background a command. Each command must finish in under 10 minutes. The daemon runs the full gate externally.
+No new dependencies without stating why. Finish with: summary, files changed, failures-only test output.
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read.
+
+packet v8e57e0ddbbd0 base 5ef24be4726f sources pool.toml@19c37ec8af44 gotchas@374d2195ba90 memory@notes specialist: execute+implement-spec over cap by 187 chars: acceptance kept whole routed=shadow
+## skills
+### executor/implement-spec (v6ba2f814dd6f)
+## Trigger
+Any execute task from the orchestrator.
+
+## Objective
+Implement one atomic task within its Scope and leave tests green.
+
+## Procedure
+Read Spec, Acceptance, Scope. Run `scripts/tests_green.sh` first. Make the smallest accepted change. Run it again; iterate on failure. Commit on the task branch.
+
+## Tools
+Read, Edit, Bash; `scripts/failures_only.sh`.
+
+## Evidence requirements
+Acceptance checks and tests-green result.
+
+## Output contract
+Finish with: 3-line summary, `git diff --stat`, failures-only output (empty when green).
+
+## Stop conditions
+Stop when Acceptance passes or budget ends.
+
+## Failure/recovery
+Report only `scripts/failures_only.sh` output. Edit only paths in Scope. No new dependencies unless the spec names them.
+## objective
+fix: Vercel functions crash with ERR_MODULE_NOT_FOUND; add .js extensions to relative imports in api/ (ESM)
+- discovery: Bug, production-blocking: every serverless function on Vercel fails at load. Runtime log on the 04f000c preview:
+`Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/var/task/api/_lib/cors' imported from /var/task/api/health.js`.
+Cause: package.json has "type": "module", so Vercel runs the compiled api/*.js as native Node ESM, which requires explicit file extensions on relative imports. api/*.ts import "./_lib/cors" and "./_prompts/<name>" without one. Vitest resolves bare paths, so the test suite never saw it.
+
+Fix:
+1. In every non-test file under api/ (api/*.ts, api/_lib/**, api/_prompts/**), change each RUNTIME relative import/export specifier to end in ".js" (e.g. `from "./_lib/cors.js"`, `from "./_prompts/scene.js"`). TypeScript with moduleResolution "bundler" resolves ".js" to the .ts source, so tsc and vitest keep working. `import type` specifiers may stay as they are (erased at compile), but changing them is fine.
+2. Do not import runtime values from ../src from api code; if any non-type import from ../src exists, report it (types-only imports are fine).
+3. Add api/esm-imports.test.ts: reads every non-test .ts file under api/ (recursive), and asserts that every relative specifier in a non-type `import ... from` / `export ... from` statement (multi-line aware) ends with ".js". It must fail on the current tree and pass after the fix.
+4. Test files may keep bare specifiers; leave them unless tsc complains.
+Rollback: git revert the commit; no data or config change.
+## acceptance
+- api/esm-imports.test.ts exists and passes; it fails if any runtime relative import under api/ lacks a .js extension
+- No runtime relative import in non-test api/ files lacks a .js extension
+- Gate green: npm test -- --watch=false, npx tsc --noEmit, npm run lint
+## base
+- branch: main
+- merge-base goal/T-0001: 5ef24be4726f745612785cfba5e120dfd068ed32
+- goal: T-0001
+## write_scope
+- api/*.ts
+- api/_lib/**
+- api/_prompts/**
+- api/esm-imports.test.ts
+## read_scope
+- api/
+- api/_lib/
+- api/_prompts/
+- tests/
+## constraints
+- allowed_dependencies: "none new"
+- budget_turns: 30
+- dedupe: "api-esm-extensions"
+- interface_contract: "Handlers' behaviour unchanged; only import specifiers and one new test."
+- priority: "high"
+- read_only: false
+- read_scope: ["**"]
+- route: "straightforward"
+- task_class: "mechanical"
+- timeout_s: 1500
+## relevant_tests
+- (none found)
+## symbols
+- (none)
+## gotchas
+- mem:gotchas.md:3 Gradium WebSocket shapes verified 2026-10-10
+## decisions
+- 2026-10-10 Alltag build order A..H as 8 execute tasks with shared contracts owned by the scaffold
+- 2026-10-10 T-0001 closable: pushed goal/T-0001 19e9771..a0b9ef8 (T-0029 merge was local only), updated PR 1 body with O and S, posted PR url as goal result
+- 2026-10-10 T-0041 gate_red was load noise: external gate green, hold released for re-gate instead of respec or split
+## verify
+- .claude/hooks/tests-green.sh .
+- On failure, report only scripts/failures_only.sh output.
+## evidence
+- 00851d98701a task:T-0017:gotcha:1: - mem:gotchas.md:3 Gradium WebSocket shapes verified 2026-10-10
+- 00b70401a0eb task:T-0009:acceptance:1: docs/readme.test.ts passes: README names every /api route found in api/*.ts, every env var in .env.example, the words Entire, Gradium and Gemini; manifest parse
+- 00d21a903c9d src/screens/Diary.tsx: diff --git a/src/screens/Diary.tsx b/src/screens/Diary.tsx
+- 01c568c6ca81 task:T-0072:gotcha:1: - mem:gotchas.md:3 Gradium WebSocket shapes verified 2026-10-10
+- 025e23cf2017 src/screens/Roleplay.test.tsx: diff --git a/src/screens/Roleplay.test.tsx b/src/screens/Roleplay.test.tsx
+- 02d44839a982 src/sync/supabase.test.ts: diff --git a/src/sync/supabase.test.ts b/src/sync/supabase.test.ts
+- 03241c2d8e6a ios/App/App/Base.lproj/Main.storyboard: diff --git a/ios/App/App/Base.lproj/Main.storyboard b/ios/App/App/Base.lproj/Main.storyboard
+
+## conditional instructions
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read; run the test script at most twice.
+
+You are a Claude fallback executor (Codex is unavailable); a human reviews merges. Commit on the task branch when green.
+If you need a tool outside your allowlist, post bus_post_result with status held and result reason needs_tool:<tool id>.

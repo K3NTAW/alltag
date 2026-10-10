@@ -1,0 +1,44 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4K453P92TA0P4V1ZX4B4DX3",
+  "session_id": "1ca53fcd-2718-4d10-b706-47ccdfd21884",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T14:41:01.252063Z",
+  "branch": "task/T-0072",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "api/esm-imports.test.ts"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "ba2a4cbd8cbb",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 20,
+    "cache_creation_tokens": 15132,
+    "cache_read_tokens": 293601,
+    "output_tokens": 3292,
+    "api_call_count": 10
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-10T14:41:01.239344Z",
+    "agent_lines": 67,
+    "agent_removed": 0,
+    "human_added": 15,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 82,
+    "total_lines_changed": 97,
+    "agent_percentage": 69.0721649484536,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}
