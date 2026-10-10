@@ -1,0 +1,7 @@
+api/**/*.test.ts
+src/**/*.test.ts
+src/**/*.test.tsx
+docs/readme.test.ts
+wt/
+.orchestrator/
+.entire/
