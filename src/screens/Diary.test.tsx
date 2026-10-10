@@ -16,7 +16,7 @@ describe("Diary", () => {
     store.keep({ phrase_fr: "un billet", phrase_en: "a ticket", noun_fr: "billet", place: "gare" });
 
     render(<Diary />);
-    expect(screen.getByText("what you can say now")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Diary" })).toBeInTheDocument();
     const tiles = screen.getAllByTestId("diary-tile");
     expect(tiles).toHaveLength(3);
     for (const phrase of ["la machine à café", "une tasse", "un billet"]) {

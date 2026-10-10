@@ -73,6 +73,6 @@ describe("Review", () => {
     expect(await screen.findByText("not yet, again tomorrow")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "next" }));
-    expect(screen.getByText("nothing due, go look at something")).toBeInTheDocument();
+    expect(screen.getByText("Nothing due")).toBeInTheDocument();
   });
 });
