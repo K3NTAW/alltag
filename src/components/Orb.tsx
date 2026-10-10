@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 export type OrbSize = 28 | 44 | 96 | 168;
 export type OrbState = "idle" | "listening" | "thinking" | "speaking";
 
@@ -53,7 +55,7 @@ export default function Orb({ size = 44, state = "idle", className = "" }: Props
           className="orb-core absolute inset-0 overflow-hidden rounded-full"
           style={{ boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.35), 0 14px 36px rgba(14,92,71,0.28)" }}
         >
-          <div className="orb-spin absolute" style={{ inset: "-35%", background: ORB_GRADIENT, filter: "blur(14px)" }} />
+          <div className="orb-spin absolute" style={{ "--orb-gradient": ORB_GRADIENT, inset: "-35%", background: "var(--orb-gradient)", filter: "blur(14px)" } as CSSProperties} />
           <div
             className="absolute inset-0 rounded-full"
             style={{ background: "radial-gradient(55% 45% at 34% 26%, rgba(255,255,255,0.78), rgba(255,255,255,0) 62%)" }}
