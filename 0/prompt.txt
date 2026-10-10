@@ -1,0 +1,95 @@
+Implement this single task in the current worktree. Commit the completed changes on the current branch with a message that starts with the task id before testing. Never leave uncommitted changes and never touch files outside scope.
+The packet above is the task contract: implement the ## objective, satisfy every line of ## acceptance, and edit only paths listed in ## write_scope.
+Run only the acceptance-named tests in the foreground; never background a command. Each command must finish in under 10 minutes. The daemon runs the full gate externally.
+No new dependencies without stating why. Finish with: summary, files changed, failures-only test output.
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read.
+
+packet vb66aedc2748e base 5ef24be4726f sources pool.toml@19c37ec8af44 gotchas@4cea4f31e183 memory@notes specialist: execute+implement-spec over cap by 979 chars: acceptance kept whole routed=shadow
+## skills
+### executor/implement-spec (v6ba2f814dd6f)
+## Trigger
+Any execute task from the orchestrator.
+
+## Objective
+Implement one atomic task within its Scope and leave tests green.
+
+## Procedure
+Read Spec, Acceptance, Scope. Run `scripts/tests_green.sh` first. Make the smallest accepted change. Run it again; iterate on failure. Commit on the task branch.
+
+## Tools
+Read, Edit, Bash; `scripts/failures_only.sh`.
+
+## Evidence requirements
+Acceptance checks and tests-green result.
+
+## Output contract
+Finish with: 3-line summary, `git diff --stat`, failures-only output (empty when green).
+
+## Stop conditions
+Stop when Acceptance passes or budget ends.
+
+## Failure/recovery
+Report only `scripts/failures_only.sh` output. Edit only paths in Scope. No new dependencies unless the spec names them.
+## objective
+demo video B: 2-minute stills video from the v3 boards of screens that exist in the app, by 19:00
+- discovery: HARD DEADLINE: the MP4 must exist within 13 minutes of your start. Speed over polish. Work in a new folder demo-stills/ (own package.json; add demo-stills/ to root eslint ignores and any root tsconfig/vitest includes so the root gate stays green).
+
+Goal: a ~2-minute 1920x1080 30 fps MP4 demo of Alltag made from phone screenshots of ONLY the screens that exist in the app.
+1. Screens: the v3 board files in /Users/k3ntaw/code/alltag/.orchestrator/design/v3/project/ (static HTML phone screens, 390x844). Use ONLY these boards (they match screens in src/screens): CameraIdle, CameraScanning, SceneLabels, ObjectSheet, RoleplayStart, RoleplayListening, RoleplayReply, Corrections, ExchangeDone, ReviewQueue, ReviewCard, ReviewResult, RecallTrigger, Diary, StateEmptyReview, ListenIdle, ListenLive, ListenLearn, Settings, SignIn, StateOffline. Do NOT use Onb*, Widget*, Foundations, Motion, Components, Research, Proto*, StateNoMic, StateSlow, VoiceIntro, ListenDiary. If a listed board has no file, skip it.
+2. Screenshot each board with headless Chrome (Remotion's browser via `npx remotion browser ensure`, or /Applications/Google Chrome.app with puppeteer-core) at viewport 390x844, deviceScaleFactor 3, after waiting 1200 ms so entry animations settle.
+3. Install remotion + @remotion/cli + @remotion/google-fonts in demo-stills/ (download approved by the human). Composition "AlltagStills" 1920x1080: linen #F4F2EE background, an iPhone frame (55 px corners, thin dark bezel, dynamic island) centre-left showing the screenshot with a gentle 3% zoom and a soft cross-fade between shots; right side an eyebrow chip in Geist Mono (feature name), a headline in Instrument Serif, one Geist line on how it works; the Noé orb (gradient #0E5C47, #2FA37F, #BFE8D6, #F0C766) breathing in a corner. Title card ("alltag", "Learn French from the room you are in.") and end card ("Look around. Speak. Remember.", https://alltag-xi.vercel.app, team Kenta).
+4. Audio: if /Users/k3ntaw/Downloads/alltag-voiceover.mp3 exists, use it (read only) as the full soundtrack and stretch the sections to it; else make a placeholder with macOS `say -v Samantha` of the same narration and note that in the result. Narration sections and the boards they show (time each section by its word count share of the audio length):
+   s01 title card | s02 CameraIdle, CameraScanning, SceneLabels | s03 ObjectSheet | s04 RoleplayStart, RoleplayListening, RoleplayReply | s05 Corrections, ExchangeDone | s06 ReviewQueue, ReviewCard, ReviewResult | s07 RecallTrigger | s08 Diary | s09 ListenIdle, ListenLive, ListenLearn | s10 Settings (offline tutor) | s11 SignIn | s12 StateOffline briefly, then end card.
+   The narration text is in /private/tmp/claude-501/-Users-k3ntaw-code-orchestrator/5466b749-45be-4a0f-829b-0e13d0cf2a89/scratchpad/voiceover.mjs (the text array, s01..s12 in order); copy it, do not change wording. Burn in captions per section.
+5. Render with `npx remotion render AlltagStills out/alltag-demo-stills.mp4 --codec h264 --crf 20` and copy the result to /Users/k3ntaw/Downloads/alltag-demo-stills.mp4. demo-stills/out and screenshots are gitignored; commit only the code.
+Report the output path, duration, and whether the real voice-over or the placeholder was used.
+## acceptance
+- /Users/k3ntaw/Downloads/alltag-demo-stills.mp4 exists, 1920x1080, about 2 minutes, only the listed boards
+- Uses ~/Downloads/alltag-voiceover.mp3 when present, else a say placeholder; captions burned in
+- Root gate green: npm test -- --watch=false, npx tsc --noEmit, npm run lint
+## base
+- branch: main
+- merge-base goal/T-0001: 5ef24be4726f745612785cfba5e120dfd068ed32
+- goal: T-0001
+## write_scope
+- demo-stills/**
+- eslint.config.js
+- tsconfig.json
+- tsconfig.app.json
+- vitest.config.ts
+- .gitignore
+## read_scope
+- .
+- demo-stills/
+- tests/
+## constraints
+- allowed_dependencies: "remotion, @remotion/* in demo-stills/ only (human-approved)"
+- budget_turns: 80
+- dedupe: "demo-video-stills"
+- interface_contract: "Root app untouched except excluding demo-stills/ from lint/tsc/vitest."
+- priority: "high"
+- read_only: false
+- read_scope: ["**", "/Users/k3ntaw/code/alltag/.orchestrator/design/v3/project/**", "/Users/k3ntaw/Downloads/alltag-voiceover.mp3", "/private/tmp/claude-501/-Users-k3ntaw-code-orchestrator/5466b749-45be-4a0f-829b-0e13d0cf2a89/scratchpad/voiceover.mjs"]
+- route: "straightforward"
+- task_class: "media"
+- timeout_s: 1500
+- write_outside: ["/Users/k3ntaw/Downloads/alltag-demo-stills.mp4"]
+## relevant_tests
+
+## symbols
+
+## gotchas
+
+## decisions
+
+## verify
+- .claude/hooks/tests-green.sh .
+- On failure, report only scripts/failures_only.sh output.
+## evidence
+
+
+## conditional instructions
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read; run the test script at most twice.
+
+You are a Claude fallback executor (Codex is unavailable); a human reviews merges. Commit on the task branch when green.
+If you need a tool outside your allowlist, post bus_post_result with status held and result reason needs_tool:<tool id>.
