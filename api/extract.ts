@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { applyCors } from "./_lib/cors";
 import { GoogleGenAI } from "@google/genai";
 import type { ExtractItem, ExtractRequest, ExtractResponse, ExtractType, Level } from "../src/lib/types";
 import { EXTRACT_SCHEMA, EXTRACT_TYPES, MAX_KEEP, buildExtractPrompt } from "./_prompts/extract";
@@ -63,6 +64,7 @@ function parseExtract(text: string | undefined, knownWords: string[]): ExtractRe
 
 export function createHandler(deps: { generate: Generate }) {
   return async function handler(req: VercelRequest, res: VercelResponse) {
+    if (applyCors(req, res)) return;
     if (req.method !== "POST") {
       res.status(405).json({ error: "method_not_allowed" });
       return;

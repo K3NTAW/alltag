@@ -46,9 +46,9 @@ vercel deploy
 
 | Var | Purpose |
 |---|---|
-| `GEMINI_API_KEY` | Google Gemini key for api/scene, api/turn, api/correct, api/check, api/live-token |
+| `GEMINI_API_KEY` | Google Gemini key for api/scene, api/turn, api/correct, api/check, api/live-token, api/translate, api/extract |
 | `GRADIUM_API_KEY` | Gradium key, only used to mint short-lived browser tokens |
-| `GEMINI_MODEL_VISION`, `GEMINI_MODEL_TURN`, `GEMINI_MODEL_GRADER`, `GEMINI_MODEL_LIVE`, `GEMINI_MODEL_CHECK`, `GEMINI_MODEL_LEVEL` | One model per job, see the model table in section 4 |
+| `GEMINI_MODEL_VISION`, `GEMINI_MODEL_TURN`, `GEMINI_MODEL_GRADER`, `GEMINI_MODEL_LIVE`, `GEMINI_MODEL_CHECK`, `GEMINI_MODEL_LEVEL`, `GEMINI_MODEL_TRANSLATE`, `GEMINI_MODEL_EXTRACT` | One model per job, see the model table in section 4 |
 | `GEMINI_MODEL` | Optional last-resort alias read by the routes when their own var is unset |
 | `ALLOWED_ORIGINS` | Extra origins allowed to call `/api`, comma-separated, exact match. Set to `https://localhost` for the iOS app; leave empty for the web only |
 | `VITE_API_BASE` | Client build only, native app only: `https://<your-vercel-host>`. Empty on the web (same origin) |
@@ -79,6 +79,8 @@ On Vercel, add the same vars under Project Settings, Environment Variables (or `
  | /api/turn          Gemini text   -> tutor reply (Live fallback)    |
  | /api/correct       Gemini grader -> corrections JSON               |
  | /api/check         Gemini        -> review grade 0..5              |
+ | /api/translate     Gemini        -> fr line to en (listen fallback)|
+ | /api/extract       Gemini        -> what to learn from a listen    |
  | /api/live-token    Gemini ephemeral token for Live ---------------+ |
  | /api/gradium-token Gradium key -> single-use token ---------------+ |
  | /api/health        { ok: true }                                    |
@@ -117,10 +119,14 @@ Partner split: Noé live = Gemini Live, native speaker playback and review = Gra
 | Grader | api/correct.ts | `GEMINI_MODEL_GRADER` | gemini-3.1-pro-preview | Once per exchange, quality beats speed; falls back to gemini-3.8-flash after 8 s or on error |
 | Live roleplay (Noé) | api/live-token.ts, src/voice/live.ts | `GEMINI_MODEL_LIVE` | gemini-3.8-live | Native audio and barge-in, lowest turn latency |
 | Review check | api/check.ts | `GEMINI_MODEL_CHECK` | gemini-3.5-flash-lite | Trivial transcript vs target comparison, must feel instant |
+| Listen translation | api/translate.ts | `GEMINI_MODEL_TRANSLATE` | gemini-3.5-flash-lite | One short line per utterance, must feel instant |
+| Listen extract | api/extract.ts | `GEMINI_MODEL_EXTRACT` | gemini-3.8-flash | Once per conversation, structured JSON |
 | CEFR level estimate | not wired yet (reserved) | `GEMINI_MODEL_LEVEL` | gemini-3.8-flash | JSON classification at moderate volume |
 | Offline: Gemma 3 1B on device | src/offline/gemma.ts | none (file in OPFS) | gemma3-1b-it-int4-web.task | Text roleplay and corrections when the network is gone; runs in the browser on WebGPU |
 
 More detail in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+Listen: live fr/en transcript of a real conversation through Gemini Live in text mode, Gradium STT plus /api/translate as fallback, learn step through /api/extract, see [docs/LISTEN.md](docs/LISTEN.md).
 
 ### Offline mode (Gemma 3 1B on device)
 
@@ -181,6 +187,8 @@ Types are in `src/lib/types.ts` (`CheckRequest`/`CheckResponse` in `src/lib/api.
 | `/api/turn` | POST | `TurnRequest { scene, history[{ role, text }], userText, level }` | `TurnResponse { reply_fr, reply_en, task_done }` |
 | `/api/correct` | POST | `CorrectRequest { scene, userText, level }` | `CorrectResponse { corrections[{ said, better, type, why_en }], kept_phrase_fr }` plus `model_used` |
 | `/api/check` | POST | `CheckRequest { target_fr, transcript, level }` | `CheckResponse { grade: 0..5, correct, note_en }` |
+| `/api/translate` | POST | `TranslateRequest { text, from, to }` | `{ text }` |
+| `/api/extract` | POST | `ExtractRequest { lines[{ fr, en }], level, knownWords[] }` | `ExtractResponse { keep[{ fr, en, why, type, noun_fr? }], known[], advanced[{ fr, en }] }` |
 | `/api/gradium-token` | GET or POST | none | `GradiumToken { token, expires_at }` |
 | `/api/live-token` | POST | none | `{ token, expires_at, model }` |
 

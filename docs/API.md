@@ -118,6 +118,50 @@ Response 200 (`grade` is an integer 0..5, the SM-2 quality):
 
 Errors: 400 `missing target_fr, transcript or level`, 405, 500 `missing_key`, 502 `generation_failed`, 502 `bad_output`.
 
+## POST /api/translate
+
+One French line to English for the listen fallback (Gradium STT, then this route per utterance). Model: `GEMINI_MODEL_TRANSLATE`, default `gemini-3.5-flash-lite` (no `GEMINI_MODEL` alias). `from` and `to` are optional and only `fr` to `en` is supported. The reply is cut to one line with wrapping quotes stripped.
+
+Request:
+
+```json
+{ "text": "Vous avez réservé ?", "from": "fr", "to": "en" }
+```
+
+Response 200:
+
+```json
+{ "text": "Did you book?" }
+```
+
+Errors: 400 `missing text, or unsupported from/to`, 405, 500 `missing_key`, 502 `generation_failed`.
+
+## POST /api/extract
+
+Learn step after a listened conversation: picks what to keep. Model: `GEMINI_MODEL_EXTRACT`, default `gemini-3.8-flash` (no `GEMINI_MODEL` alias). Items with an unknown `type` or already in `knownWords` are dropped, and `keep` is capped at 6.
+
+Request:
+
+```json
+{
+  "lines": [ { "fr": "Vous avez réservé ?", "en": "Did you book?" } ],
+  "level": "A1",
+  "knownWords": ["la table"]
+}
+```
+
+Response 200 (`ExtractResponse`; `type` is one of `phrase, expression, word`, `noun_fr` optional):
+
+```json
+{
+  "keep": [ { "fr": "réserver", "en": "to book", "why": "Asked at every restaurant door.", "type": "word", "noun_fr": "la réservation" } ],
+  "known": ["la table"],
+  "advanced": [ { "fr": "Vous avez réservé ?", "en": "Did you book?" } ]
+}
+```
+
+Errors: 400 `missing lines or level, or bad knownWords`, 405, 500 `missing_key`, 502 `generation_failed`, 502 `bad_output`.
+
 ## GET or POST /api/gradium-token
 
 Exchanges `GRADIUM_API_KEY` for a short-lived Gradium token. No request body. Sends `Cache-Control: no-store`. Rejects cross-site callers (`Sec-Fetch-Site` other than `same-origin`/`none`, or an `Origin` whose host differs from the request host).
