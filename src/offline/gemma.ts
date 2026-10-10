@@ -1,18 +1,23 @@
 // On-device Gemma 3 1B through the MediaPipe LLM Inference API (WebGPU).
 // The model file is gated and ~700 MB, so the app never fetches it on its own:
 // the human picks it in Settings (or downloads from VITE_GEMMA_MODEL_URL) and it
-// lives in the Origin Private File System.
+// lives in the Origin Private File System. The native app can ship it in its
+// bundle at BUNDLED_PATH instead; then it loads straight from the app origin.
 
 export const MODEL_FILE = "gemma3-1b-it-int4-web.task";
+export const BUNDLED_PATH = `/models/${MODEL_FILE}`;
 const WASM_BASE = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai@latest/wasm";
 const CHUNK = 8 * 1024 * 1024;
 
 export type GemmaState = "unavailable" | "absent" | "loading" | "ready" | "error";
 
+export type GemmaSource = "bundled" | "opfs" | "url";
+
 export interface GemmaStatus {
   state: GemmaState;
   progress?: number;
   reason?: string;
+  source?: GemmaSource | null;
 }
 
 interface Writable {
@@ -59,7 +64,9 @@ export interface GemmaDeps {
   genai(): Promise<GenAi>;
   objectUrl(blob: Blob): string;
   revokeUrl(url: string): void;
-  fetch(url: string): Promise<Response>;
+  fetch(url: string, init?: RequestInit): Promise<Response>;
+  /** Absolute URL of the bundled model, or null when the origin is not http(s). */
+  bundledUrl(): string | null;
 }
 
 export const browserDeps: GemmaDeps = {
@@ -70,7 +77,11 @@ export const browserDeps: GemmaDeps = {
   genai: () => import("@mediapipe/tasks-genai") as unknown as Promise<GenAi>,
   objectUrl: (blob) => URL.createObjectURL(blob),
   revokeUrl: (url) => URL.revokeObjectURL(url),
-  fetch: (url) => fetch(url),
+  fetch: (url, init) => fetch(url, init),
+  bundledUrl: () =>
+    typeof location !== "undefined" && /^https?:$/.test(location.protocol)
+      ? new URL(BUNDLED_PATH, location.origin).href
+      : null,
 };
 
 function message(e: unknown): string {
@@ -86,6 +97,28 @@ export function createGemma(deps: GemmaDeps) {
   let engine: Engine | null = null;
   let loading: Promise<void> | null = null;
   let queue: Promise<unknown> = Promise.resolve();
+  let probe: Promise<string | null> | null = null;
+  let bundled: string | null = null;
+  let stored: GemmaSource = "opfs";
+
+  // HEAD once per session: the native app serves the model from its bundle, the web deployment answers 404.
+  function probeBundled(): Promise<string | null> {
+    probe ??= (async () => {
+      const url = deps.hasGpu() ? deps.bundledUrl() : null;
+      if (!url) return null;
+      try {
+        const res = await deps.fetch(url, { method: "HEAD" });
+        return res && (res.status === 200 || res.status === 206) ? url : null;
+      } catch {
+        return null;
+      }
+    })().then((url) => {
+      bundled = url;
+      if (url && !engine && !loading) set({ state: "absent", source: "bundled" });
+      return url;
+    });
+    return probe;
+  }
 
   function set(next: GemmaStatus) {
     snapshot = next;
@@ -152,6 +185,7 @@ export function createGemma(deps: GemmaDeps) {
 
   const gemma = {
     status(): GemmaStatus {
+      void probeBundled();
       return snapshot;
     },
 
@@ -164,15 +198,21 @@ export function createGemma(deps: GemmaDeps) {
 
     /** Checks OPFS for a stored model and starts loading it if present. */
     async refresh(): Promise<void> {
+      if (await probeBundled()) {
+        if (snapshot.state === "absent") await gemma.ensureLoaded().catch(() => undefined);
+        return;
+      }
       if (!supported || snapshot.state !== "absent") return;
       if (await storedFile()) await gemma.ensureLoaded().catch(() => undefined);
     },
 
     importFile(file: File): Promise<void> {
+      stored = "opfs";
       return afterWrite(() => write(file, file.size));
     },
 
     importUrl(url: string): Promise<void> {
+      stored = "url";
       return afterWrite(async () => {
         const res = await deps.fetch(url);
         if (!res.ok || !res.body) throw new Error(`download failed ${res.status}`);
@@ -181,7 +221,7 @@ export function createGemma(deps: GemmaDeps) {
     },
 
     async remove(): Promise<void> {
-      if (!supported) return;
+      if (!supported || bundled) return;
       engine?.close?.();
       engine = null;
       loading = null;
@@ -197,14 +237,23 @@ export function createGemma(deps: GemmaDeps) {
       if (engine) return Promise.resolve();
       if (loading) return loading;
       loading = (async () => {
-        if (!supported) throw new Error(snapshot.reason ?? "offline tutor not supported");
-        const file = await storedFile();
-        if (!file) {
-          set({ state: "absent" });
-          throw new Error("model not installed");
+        const fromBundle = await probeBundled();
+        let url: string;
+        let source: GemmaSource;
+        if (fromBundle) {
+          url = fromBundle;
+          source = "bundled";
+        } else {
+          if (!supported) throw new Error(snapshot.reason ?? "offline tutor not supported");
+          const file = await storedFile();
+          if (!file) {
+            set({ state: "absent" });
+            throw new Error("model not installed");
+          }
+          url = deps.objectUrl(file);
+          source = stored;
         }
-        set({ state: "loading" });
-        const url = deps.objectUrl(file);
+        set({ state: "loading", source });
         try {
           const { FilesetResolver, LlmInference } = await deps.genai();
           const fileset = await FilesetResolver.forGenAiTasks(WASM_BASE);
@@ -215,12 +264,12 @@ export function createGemma(deps: GemmaDeps) {
             temperature: 0.6,
             randomSeed: 1,
           });
-          set({ state: "ready" });
+          set({ state: "ready", source });
         } catch (e) {
-          set({ state: "error", reason: message(e) });
+          set(fromBundle ? { state: "error", reason: message(e), source: "bundled" } : { state: "error", reason: message(e) });
           throw e;
         } finally {
-          deps.revokeUrl(url);
+          if (!fromBundle) deps.revokeUrl(url);
         }
       })().finally(() => {
         loading = null;

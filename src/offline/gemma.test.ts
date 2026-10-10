@@ -1,4 +1,4 @@
-import { createGemma, MODEL_FILE, type GemmaDeps, type StorageDir } from "./gemma";
+import { BUNDLED_PATH, createGemma, MODEL_FILE, type GemmaDeps, type StorageDir } from "./gemma";
 
 function fakeDir() {
   const files = new Map<string, Blob>();
@@ -42,6 +42,7 @@ function deps(over: Partial<GemmaDeps> = {}) {
     objectUrl: () => "blob:model",
     revokeUrl: () => undefined,
     fetch: vi.fn(),
+    bundledUrl: () => null,
     ...over,
   };
   return { d, files, createFromOptions, generateResponse };
@@ -120,5 +121,61 @@ describe("gemma", () => {
     const g = createGemma(d);
     await expect(g.importFile(new File(["w"], MODEL_FILE))).rejects.toThrow("no adapter");
     expect(g.status()).toEqual({ state: "error", reason: "no adapter" });
+  });
+
+  describe("bundled source", () => {
+    const url = `https://localhost${BUNDLED_PATH}`;
+
+    it("HEAD 200: ready from the bundle without touching OPFS", async () => {
+      const root = vi.fn(async () => {
+        throw new Error("opfs touched");
+      });
+      const fetch = vi.fn(async () => new Response(null, { status: 200 }));
+      const { d, createFromOptions } = deps({ root, fetch, bundledUrl: () => url });
+      const g = createGemma(d);
+      await g.ensureLoaded();
+      expect(g.status()).toEqual({ state: "ready", source: "bundled" });
+      expect(fetch).toHaveBeenCalledWith(url, { method: "HEAD" });
+      expect(createFromOptions.mock.calls[0][1]).toMatchObject({ baseOptions: { modelAssetPath: url } });
+      expect(root).not.toHaveBeenCalled();
+      await g.ensureLoaded();
+      g.status();
+      expect(fetch).toHaveBeenCalledTimes(1);
+    });
+
+    it("HEAD 200 works without OPFS and refresh loads it", async () => {
+      const fetch = vi.fn(async () => new Response(null, { status: 200 }));
+      const g = createGemma(deps({ hasStorage: () => false, fetch, bundledUrl: () => url }).d);
+      await g.refresh();
+      expect(g.status()).toEqual({ state: "ready", source: "bundled" });
+    });
+
+    it("HEAD 404: existing OPFS behaviour", async () => {
+      const fetch = vi.fn(async () => new Response(null, { status: 404 }));
+      const { d, files } = deps({ fetch, bundledUrl: () => url });
+      const g = createGemma(d);
+      await expect(g.ensureLoaded()).rejects.toThrow("model not installed");
+      expect(g.status().state).toBe("absent");
+      files.set(MODEL_FILE, new Blob(["w"]));
+      await g.ensureLoaded();
+      expect(g.status()).toEqual({ state: "ready", source: "opfs" });
+    });
+
+    it("HEAD rejects: existing OPFS behaviour", async () => {
+      const fetch = vi.fn(async () => Promise.reject(new TypeError("offline")));
+      const { d, createFromOptions } = deps({ fetch, bundledUrl: () => url });
+      const g = createGemma(d);
+      await expect(g.ensureLoaded()).rejects.toThrow("model not installed");
+      await g.importFile(new File(["w"], MODEL_FILE));
+      expect(g.status()).toEqual({ state: "ready", source: "opfs" });
+      expect(createFromOptions.mock.calls[0][1]).toMatchObject({ baseOptions: { modelAssetPath: "blob:model" } });
+    });
+
+    it("non-http origin: no probe", async () => {
+      const fetch = vi.fn();
+      const g = createGemma(deps({ fetch }).d);
+      await expect(g.ensureLoaded()).rejects.toThrow("model not installed");
+      expect(fetch).not.toHaveBeenCalled();
+    });
   });
 });

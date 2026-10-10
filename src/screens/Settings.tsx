@@ -26,7 +26,7 @@ function statusText(s: GemmaStatus): string {
     case "loading":
       return s.progress === undefined ? "loading" : `loading ${s.progress} %`;
     case "ready":
-      return "ready";
+      return s.source === "bundled" ? "ready, built into the app" : "ready";
     case "error":
       return s.reason ? `error: ${s.reason}` : "error";
   }
@@ -178,7 +178,9 @@ function OfflineTutor() {
   }
 
   const busy = status.state === "loading";
-  const usable = status.state !== "unavailable";
+  const builtIn = status.source === "bundled";
+  const usable = status.state !== "unavailable" && !builtIn;
+  const installed = builtIn || status.state === "ready";
 
   return (
     <div className={row}>
@@ -217,18 +219,37 @@ function OfflineTutor() {
         </button>
       )}
       {failed && <p className="text-[length:var(--text-small)] text-muted">{failed}</p>}
-      <p className="text-[length:var(--text-small)] text-muted">
-        when the network is gone, noé runs on gemma 3 1b in this browser. get {MODEL_FILE} (about 700 mb) from{" "}
-        <a
-          href="https://huggingface.co/litert-community/Gemma3-1B-IT"
-          target="_blank"
-          rel="noreferrer"
-          className="underline"
-        >
-          hugging face
-        </a>
-        . you accept the gemma licence there first. the file stays in this browser.
-      </p>
+      {installed && (
+        <p className="text-[length:var(--text-small)] text-muted">
+          on-device model: Gemma 3 1B,{" "}
+          <a href="https://ai.google.dev/gemma/terms" target="_blank" rel="noreferrer" className="underline">
+            Gemma Terms of Use
+          </a>
+          ,{" "}
+          <a
+            href="https://ai.google.dev/gemma/prohibited_use_policy"
+            target="_blank"
+            rel="noreferrer"
+            className="underline"
+          >
+            prohibited use policy
+          </a>
+        </p>
+      )}
+      {!builtIn && (
+        <p className="text-[length:var(--text-small)] text-muted">
+          when the network is gone, noé runs on gemma 3 1b in this browser. get {MODEL_FILE} (about 700 mb) from{" "}
+          <a
+            href="https://huggingface.co/litert-community/Gemma3-1B-IT"
+            target="_blank"
+            rel="noreferrer"
+            className="underline"
+          >
+            hugging face
+          </a>
+          . you accept the gemma licence there first. the file stays in this browser.
+        </p>
+      )}
     </div>
   );
 }

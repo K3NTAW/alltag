@@ -19,3 +19,7 @@ ios/App/DerivedData/
 ios/App/App/public/
 ios/App/Pods/
 ios/App/App.xcworkspace/xcuserdata/
+
+# Gemma model for the native app bundle (pnpm model:fetch), ~700 MB
+public/models/*.task
+public/models/*.litertlm

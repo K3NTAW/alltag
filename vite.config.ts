@@ -18,6 +18,8 @@ export default defineConfig({
       includeAssets: ["manifest.webmanifest", "icon-192.svg", "icon-512.svg"],
       workbox: {
         globPatterns: ["**/*.{js,css,html,svg,woff2}"],
+        // The bundled Gemma model (public/models, native app only) is ~700 MB; never precache it.
+        globIgnores: ["**/*.task", "**/*.litertlm"],
         navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/api\//],
         // Workbox tests a RegExp against the full href, so match /api on the pathname instead.

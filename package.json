@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "lint": "eslint .",
-    "ios:build": "vite build && cap sync ios",
+    "ios:build": "node -e \"const fs=require('fs');let ok=false;try{ok=fs.readdirSync('public/models').some(f=>f.endsWith('.task'))}catch{}if(!ok)console.warn('warning: no .task file in public/models, the app ships without the offline model (pnpm model:fetch)')\" && vite build && cap sync ios",
+    "model:fetch": "sh scripts/fetch-model.sh",
     "ios:open": "cap open ios",
     "db:push": "supabase db push",
     "db:types": "supabase gen types typescript --linked > src/sync/database.types.ts"

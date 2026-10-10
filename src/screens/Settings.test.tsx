@@ -151,4 +151,29 @@ describe("Settings offline tutor", () => {
       "https://huggingface.co/litert-community/Gemma3-1B-IT",
     );
   });
+
+  it("bundled: built-in text, no file input, no remove", () => {
+    fake.set({ state: "ready", source: "bundled" });
+    render(<Settings />);
+    expect(screen.getByTestId("offline-status")).toHaveTextContent("ready, built into the app");
+    expect(screen.queryByLabelText("choose gemma3-1b-it-int4-web.task")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "remove" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "hugging face" })).not.toBeInTheDocument();
+  });
+
+  it("licence line when bundled or installed, not when absent", () => {
+    const { unmount } = render(<Settings />);
+    expect(screen.queryByRole("link", { name: "Gemma Terms of Use" })).not.toBeInTheDocument();
+    unmount();
+    for (const s of [{ state: "ready", source: "bundled" }, { state: "ready", source: "opfs" }] as GemmaStatus[]) {
+      fake.set(s);
+      const view = render(<Settings />);
+      expect(screen.getByText(/on-device model: Gemma 3 1B/)).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Gemma Terms of Use" })).toHaveAttribute(
+        "href",
+        "https://ai.google.dev/gemma/terms",
+      );
+      view.unmount();
+    }
+  });
 });

@@ -148,6 +148,21 @@ Setup, once per browser:
 
 Requirements and caveats: needs WebGPU (current Chrome or Edge on desktop or Android) and OPFS; elsewhere Settings says "not supported". The MediaPipe LLM Inference web API is in maintenance mode upstream; fine for a hackathon demo, not a long-term bet. A 1B model is much weaker than the cloud models: prompts are short and French, and its JSON is parsed leniently with safe defaults.
 
+#### Bundled in the iOS app
+
+The native app ships the model in its bundle, so a TestFlight or App Store install has the offline tutor ready with no file picking.
+
+```sh
+pnpm model:fetch      # scripts/fetch-model.sh: hf CLI, or curl with HF_TOKEN; into public/models/
+pnpm ios:build        # warns (does not fail) when public/models has no .task file
+```
+
+- `public/models/gemma3-1b-it-int4-web.task` lands in `dist/` and is served at `https://localhost/models/...` inside the app. On start `src/offline/gemma.ts` sends a HEAD there; a 200 loads the model straight from that URL and Settings shows "ready, built into the app".
+- The file ships inside the IPA (about 700 MB), so the App Store marks the app as a large download.
+- It is not in git, not deployed to Vercel and never precached by the service worker; the web app keeps the file picker.
+- Licence: Gemma is distributed under the [Gemma Terms of Use](https://ai.google.dev/gemma/terms). The app must show that notice and link the [prohibited use policy](https://ai.google.dev/gemma/prohibited_use_policy); Settings shows "on-device model: Gemma 3 1B, Gemma Terms of Use" whenever a model is bundled or installed.
+- Later: Apple Background Assets essential downloads fetch the model from our own host during App Store installation, so the IPA stays small and the model is still there on first launch.
+
 #### Install on your phone
 
 The app ships a service worker, so once installed it opens with no network and the offline tutor is reachable.
