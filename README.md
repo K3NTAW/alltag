@@ -52,6 +52,11 @@ vercel deploy
 | `GEMINI_MODEL` | Optional last-resort alias read by the routes when their own var is unset |
 | `ALLOWED_ORIGINS` | Extra origins allowed to call `/api`, comma-separated, exact match. Set to `https://localhost` for the iOS app; leave empty for the web only |
 | `VITE_API_BASE` | Client build only, native app only: `https://<your-vercel-host>`. Empty on the web (same origin) |
+| `VITE_SUPABASE_URL` | Supabase project URL, client-side |
+| `VITE_SUPABASE_ANON_KEY` | Supabase anon key, client-side; RLS keeps it safe |
+| `VITE_CLERK_PUBLISHABLE_KEY` | Clerk publishable key, client-side |
+
+For the account and sync setup (Supabase project, Clerk, these three `VITE_` vars), see [docs/SUPABASE.md](docs/SUPABASE.md).
 
 On Vercel, add the same vars under Project Settings, Environment Variables (or `vercel env add GEMINI_API_KEY`) for Production and Preview. `vercel.json` sets the Vite framework and a 30 s `maxDuration` for `api/**/*.ts`.
 

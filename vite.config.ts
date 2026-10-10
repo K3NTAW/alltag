@@ -43,7 +43,7 @@ export default defineConfig({
         test: {
           name: "node",
           environment: "node",
-          include: ["api/**/*.test.ts", "docs/**/*.test.ts"],
+          include: ["api/**/*.test.ts", "docs/**/*.test.ts", "supabase/**/*.test.ts"],
         },
       },
     ],
