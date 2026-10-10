@@ -62,11 +62,7 @@ describe("Scene", () => {
     const { container } = renderScene();
     const root = container.querySelector("section")!;
     expect(root).toHaveClass("h-dvh", "overflow-hidden");
-    expect(screen.getByAltText("café")).toHaveClass(
-      "h-full",
-      "w-full",
-      "object-cover",
-    );
+    expect(screen.getByAltText("café")).toHaveClass("h-full", "w-full", "object-cover");
   });
 
   it("shows the sheet with the task", () => {
