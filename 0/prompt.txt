@@ -1,0 +1,58 @@
+Implement this single task in the current worktree. Commit the completed changes on the current branch with a message that starts with the task id before testing. Never leave uncommitted changes and never touch files outside scope.
+The packet above is the task contract: implement the ## objective, satisfy every line of ## acceptance, and edit only paths listed in ## write_scope.
+Run only the acceptance-named tests in the foreground; never background a command. Each command must finish in under 10 minutes. The daemon runs the full gate externally.
+No new dependencies without stating why. Finish with: summary, files changed, failures-only test output.
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read.
+
+packet v061ac9f38072 base 5ef24be4726f sources pool.toml@19c37ec8af44 gotchas@374d2195ba90 memory@notes,bus routed=shadow
+## objective
+V: vitest timeouts 30 s and maxWorkers 4 in vite.config.ts so gates survive a loaded machine
+- discovery: Run `pnpm install --frozen-lockfile` FIRST (the previous attempt skipped it and its gate could not run). Work from goal/T-0001.
+
+Why: machine load average 50 to 80 on 10 cores made the full `npm test` fail on random tests with "Test timed out in 5000ms" or "[vitest-pool-runner]: Timeout waiting for worker to respond"; each file passes alone.
+
+1. vite.config.ts, in the top-level `test` block only (the one with globals and setupFiles), add: `testTimeout: 30000, hookTimeout: 30000, teardownTimeout: 30000, maxWorkers: 4,` (if tsc rejects a key, check node_modules/vitest/dist/*.d.ts for the right name). Do not change projects, includes or anything else. Touch no other file.
+2. Run `npm test -- --watch=false`, `npx tsc --noEmit`, `npm run lint`.
+3. Commit as "vitest: longer timeouts and four workers so the gate survives a loaded machine".
+## acceptance
+- vite.config.ts test block has testTimeout 30000, hookTimeout 30000 and a 4-worker cap; git diff --name-only HEAD~1 lists only vite.config.ts
+- Gate green: npm test -- --watch=false, npx tsc --noEmit, npm run lint
+## base
+- branch: main
+- merge-base goal/T-0001: 5ef24be4726f745612785cfba5e120dfd068ed32
+- goal: T-0001
+## write_scope
+- vite.config.ts
+## read_scope
+- .
+- tests/
+## constraints
+- allowed_dependencies: "none new"
+- budget_turns: 10
+- interface_contract: "Test config only."
+- read_only: false
+- read_scope: ["vite.config.ts", "package.json", "node_modules/vitest/dist/*.d.ts"]
+- route: "straightforward"
+- task_class: "mechanical"
+- timeout_s: 900
+## relevant_tests
+- (none found)
+## symbols
+- (none)
+## gotchas
+- mem:gotchas.md:3 Gradium WebSocket shapes verified 2026-10-10
+## decisions
+- 2026-10-10 Alltag build order A..H as 8 execute tasks with shared contracts owned by the scaffold
+- 2026-10-10 T-0001 closable: pushed goal/T-0001 19e9771..a0b9ef8 (T-0029 merge was local only), updated PR 1 body with O and S, posted PR url as goal result
+- 2026-10-10 T-0041 gate_red was load noise: external gate green, hold released for re-gate instead of respec or split
+## verify
+- .claude/hooks/tests-green.sh .
+- On failure, report only scripts/failures_only.sh output.
+## evidence
+- (none)
+
+## conditional instructions
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read; run the test script at most twice.
+
+You are a Claude fallback executor (Codex is unavailable); a human reviews merges. Commit on the task branch when green.
+If you need a tool outside your allowlist, post bus_post_result with status held and result reason needs_tool:<tool id>.
