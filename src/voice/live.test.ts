@@ -322,7 +322,7 @@ describe("LiveSession listen mode", () => {
     expect(config.systemInstruction).toBe(buildListenPrompt({ from: "fr", to: "en" }));
   });
 
-  it("emits modelTurn text parts as tutorText, final on turnComplete, and never plays audio", async () => {
+  it("emits no tutorText for modelTurn text, closes the French on turnComplete, and never plays audio", async () => {
     const { deps, ai, ctx } = makeDeps();
     const createAudioContext = vi.fn(deps.createAudioContext);
     const s = new LiveSession({ ...deps, createAudioContext });
@@ -340,11 +340,7 @@ describe("LiveSession listen mode", () => {
       { text: "On se voit demain", final: false },
       { text: "On se voit demain", final: true },
     ]);
-    expect(tutor).toEqual([
-      { text: "See you", final: false },
-      { text: "See you tomorrow", final: false },
-      { text: "See you tomorrow", final: true },
-    ]);
+    expect(tutor).toEqual([]);
     expect(createAudioContext).not.toHaveBeenCalled();
     expect(ctx.sources).toHaveLength(0);
     expect(s.queued).toBe(0);

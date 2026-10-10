@@ -305,12 +305,9 @@ export class LiveSession {
       }
       for (const part of content.modelTurn?.parts ?? []) {
         if (this.listen) {
-          // The translation of the utterance just heard.
-          if (part.text && !part.thought) {
-            this.flushUser();
-            this.tutorBuf += part.text;
-            this.emit("tutorText", { text: this.tutorBuf, final: false });
-          }
+          // Listen only uses input transcription; the model answers instead of translating,
+          // so its text is dropped. It replying still means the utterance is over.
+          if (part.text && !part.thought) this.flushUser();
           continue;
         }
         const data = part.inlineData;
