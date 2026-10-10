@@ -11,7 +11,9 @@
     "test": "vitest run",
     "lint": "eslint .",
     "ios:build": "vite build && cap sync ios",
-    "ios:open": "cap open ios"
+    "ios:open": "cap open ios",
+    "db:push": "supabase db push",
+    "db:types": "supabase gen types typescript --linked > src/sync/database.types.ts"
   },
   "dependencies": {
     "@capacitor/core": "^8.5.3",
