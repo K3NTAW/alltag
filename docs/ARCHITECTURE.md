@@ -43,7 +43,7 @@ Where each state lives in code:
 
 ## Service worker
 
-`vite-plugin-pwa` (workbox `generateSW`) builds `dist/sw.js` and `src/main.tsx` registers it with `registerType: "autoUpdate"`. It precaches the app shell (`**/*.{js,css,html,svg,woff2}`, files up to 5 MB) and answers navigations with `/index.html`, so the installed app loads with no network. `/api/*` is excluded from the navigate fallback and routed `NetworkOnly`: API responses are never cached, and offline the client falls back to the on-device model instead. The manifest stays `public/manifest.webmanifest` (`manifest: false` in the plugin).
+`vite-plugin-pwa` (workbox `generateSW`) builds `dist/sw.js` with `registerType: "autoUpdate"` (the worker skips waiting and claims clients); `src/main.tsx` registers `/sw.js` itself in production builds, since the plugin's `virtual:pwa-register` would pull in `workbox-window`. It precaches the app shell (`**/*.{js,css,html,svg,woff2}`, files up to 5 MB) and answers navigations with `/index.html`, so the installed app loads with no network. `/api/*` is excluded from the navigate fallback and routed `NetworkOnly`: API responses are never cached, and offline the client falls back to the on-device model instead. The manifest stays `public/manifest.webmanifest` (`manifest: false` in the plugin).
 
 ## Data in localStorage
 

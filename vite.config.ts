@@ -13,6 +13,7 @@ export default defineConfig({
     // The app shell is precached; /api is never cached.
     VitePWA({
       registerType: "autoUpdate",
+      injectRegister: false,
       manifest: false,
       includeAssets: ["manifest.webmanifest", "icon-192.svg", "icon-512.svg"],
       workbox: {
