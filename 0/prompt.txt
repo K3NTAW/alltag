@@ -1,0 +1,113 @@
+Implement this single task in the current worktree. Commit the completed changes on the current branch with a message that starts with the task id before testing. Never leave uncommitted changes and never touch files outside scope.
+The packet above is the task contract: implement the ## objective, satisfy every line of ## acceptance, and edit only paths listed in ## write_scope.
+Run only the acceptance-named tests in the foreground; never background a command. Each command must finish in under 10 minutes. The daemon runs the full gate externally.
+No new dependencies without stating why. Finish with: summary, files changed, failures-only test output.
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read.
+
+packet v91855e7e4cfd base 5ef24be4726f sources pool.toml@19c37ec8af44 gotchas@374d2195ba90 memory@notes specialist: execute+implement-spec over cap by 5502 chars: acceptance kept whole routed=shadow
+## skills
+### executor/implement-spec (v6ba2f814dd6f)
+## Trigger
+Any execute task from the orchestrator.
+
+## Objective
+Implement one atomic task within its Scope and leave tests green.
+
+## Procedure
+Read Spec, Acceptance, Scope. Run `scripts/tests_green.sh` first. Make the smallest accepted change. Run it again; iterate on failure. Commit on the task branch.
+
+## Tools
+Read, Edit, Bash; `scripts/failures_only.sh`.
+
+## Evidence requirements
+Acceptance checks and tests-green result.
+
+## Output contract
+Finish with: 3-line summary, `git diff --stat`, failures-only output (empty when green).
+
+## Stop conditions
+Stop when Acceptance passes or budget ends.
+
+## Failure/recovery
+Report only `scripts/failures_only.sh` output. Edit only paths in Scope. No new dependencies unless the spec names them.
+## objective
+U3 v7: add-only card backup and restore for signed-in users (no deletes, no tombstones, no sent-map; re-scoped after three spec reviews)
+- discovery: U3 v7: add-only card backup. Replaces T-0073/T-0075/T-0077 (superseded). Three spec reviews rejected every design that propagated deletes (resurrection, tombstone scoping, races, per-user lists, growth). This version propagates NO deletes: the client never writes deleted_at, keeps no removal lists, no skip list, no sent-map, no hash. It needs NO migration and NO timestamp comparison. Known limits are documented, not solved.
+
+Context (goal/T-0001 at 7654838): src/sync/supabase.ts exports getSupabase(), isSupabaseConfigured(), withSession(fn(client, userId)) (returns null when signed out or unconfigured; refreshes an expiring session). src/auth/auth.tsx exports AuthProvider, useAuth() {status: "disabled"|"loading"|"signed_out"|"signed_in", userId, address, ...}. Cards live in src/srs/store.ts (localStorage key alltag.cards, memory fallback, save() is the single write path; exports keep/all/get/due/byNoun/grade/remove/clear). Card type in src/lib/types.ts (id, phrase_fr, phrase_en, noun_fr?, objectId?, crop?, place?, errorType?, ease, interval, reps, due ms, learnedAt ms). Table public.items (supabase/migrations/20261010120000_init.sql, ALREADY APPLIED, do not edit): id uuid pk, user_id text default current_user_id(), noun_fr, phrase_fr not null, phrase_en, error_type, srs jsonb, kept_at timestamptz, updated_at (trigger), deleted_at. RLS: user_id = auth.jwt() sub. Row type ItemRow in src/sync/schema.ts. Run `pnpm install` first in the worktree; leave no untracked files.
+
+Behaviour:
+A1 Mapping (src/sync/backup.ts, pure, tested). cardToRow(card, userId) builds the row from an explicit allow-list only: {id, user_id, noun_fr: noun_fr ?? null, phrase_fr, phrase_en: phrase_en ?? null, error_type: errorType ?? null, srs: {interval, ease, reps, due: ISO(card.due), learnedAt: ISO(card.learnedAt), objectId?, place?}, kept_at: ISO(card.learnedAt)}. It never includes deleted_at or updated_at, and never crop (a test serialises the row and asserts the string contains no "crop"). rowToCard(row) is the inverse: ISO -> epoch ms; null -> undefined for noun_fr, phrase_en, error_type, objectId, place; a missing or invalid srs number falls back to ease 2.5, interval 0, reps 0, due now. Extend SrsState in schema.ts with optional learnedAt, objectId, place (jsonb, no SQL change). Only cards whose id matches the UUID regex are backed up; others are skipped.
+A2 Store hooks (src/srs/store.ts, additions only, existing exports and behaviour unchanged): subscribe(fn) -> unsubscribe, fn called after every save(); addRestored(cards: Card[]) appends cards whose id is not already local (dedupe by id only, also within the batch, first wins), returns the number added, saves once (one notify) and saves nothing when zero.
+A3 Backup (backup.ts runBackup()): if navigator.onLine === false, set status "offline" and return. Inside withSession: upsert ALL local UUID cards via cardToRow in chunks of 200 with onConflict "id". Every run resends everything (no change tracking; card counts are small). A returned {error} or a thrown error ends the run with status "error" and never throws out of runBackup. Success sets status "ok" with lastOkAt = Date.now().
+A4 Restore (backup.ts runRestore()): inside withSession: select id,noun_fr,phrase_fr,phrase_en,error_type,srs,kept_at from items where deleted_at is null, .order("id"), paged with .range(from, from+999) until a page returns fewer than 1000 rows. store.addRestored(rows.map(rowToCard)). Add-only: never overwrites or removes a local card. Returns true on success, false on any error (status "error", no throw).
+A5 Single flight: restore and backup share ONE lock in backup.ts. A run requested while one is running sets a dirty flag and reruns once after. Stale runs: backup.ts exports setActiveUser(userId | null); every run captures the active user at start and skips all status writes when it differs at the end.
+A6 Runner (src/sync/BackupRunner.tsx, renders null, mounted inside AuthProvider above App in src/main.tsx): when useAuth() reports signed_in with userId U: setActiveUser(U); run restore then backup; while signed in: store.subscribe -> debounce 3000 ms -> runBackup(); window "online" -> runRestore() then runBackup(); after an "error", retry every 60 s (restore first if the last restore failed, else backup). On signed_out, disabled, loading or unmount: clear all timers and listeners, setActiveUser(null), status "off". No network while not signed in.
+A7 Status (backup.ts): tiny observable {state: "off"|"working"|"ok"|"error"|"offline", lastOkAt: number | null} with useBackupStatus(). "off" when disabled, loading, signed out, or when withSession returns null. Settings signed-in section: the existing sync row keeps data-testid="sync-state" and shows "backed up HH:MM" (24 h, Europe/Zurich via toLocaleTimeString) when ok, "backing up…" when working, "backup failed, will retry" on error, "offline, will back up later" when offline, "ready" when off. Update the existing "signed in: address, sync ready" test to the new text. Nothing else in Settings changes; Settings.clearAll stays local only.
+A8 Docs (docs/SUPABASE.md, one section "Card backup"): signed-in cards are backed up to your account and restored on a new device; photos and conversations stay on the device. Limits, stated plainly: deleting a card or resetting a device removes it only on that device, the backup keeps it and it comes back on the next restore (sign-in or reconnect); a word kept on two devices before they both backed up appears twice; the last device to back up wins review progress for a card; a row with unreadable review state restores with fresh review state. Rollback: git revert the commit; no schema or live change.
+
+Tests (vitest; mock the "./supabase" seam with vi.mock, spread vi.importActual where needed; fake client records from("items").upsert/select chains):
+- src/sync/backup.test.ts: round trip with crop dropped and the "crop" string test; null/undefined mapping; defaults on bad srs; non-UUID ids skipped; upsert chunks of 200 with onConflict id and no deleted_at key; returned error and thrown error set "error" without throwing; offline skip; single flight with one rerun across restore and backup; restore fetches two pages when the first has 1000 rows; restore adds only missing ids and never overwrites a local card; stale run after setActiveUser(null) writes no status.
+- src/srs/store.test.ts additions: subscribe fires after keep/grade/remove/clear and unsubscribe stops it; addRestored dedupe (local id, in-batch) and count; existing tests unchanged and passing.
+- src/sync/BackupRunner.test.tsx: signed_in runs restore then backup once; a store change triggers backup after 3000 ms (fake timers); "online" runs restore then backup; error retries after 60 s; signed_out does no network; unmount cleans up and sets status off.
+- src/screens/Settings.test.tsx: the five sync-state texts in the signed-in section; existing tests pass (the "ready" expectation updated).
+## acceptance
+- src/sync/backup.test.ts passes: allow-list mapping round trip with no crop, null mapping, srs defaults, UUID filter, chunked upsert onConflict id without deleted_at, errors set status error without throwing, offline skip, shared single flight with one rerun, paged restore (two pages at 1000), add-only restore, stale run writes nothing
+- src/srs/store.test.ts covers subscribe/unsubscribe and addRestored dedupe and count; existing store tests unchanged and passing
+- src/sync/BackupRunner.test.tsx passes: restore then backup on signed_in, debounced backup after 3000 ms, restore then backup on online, retry after 60 s on error, no network when signed out, cleanup on unmount
+- src/screens/Settings.test.tsx passes with the five sync-state texts; all other Settings tests unchanged
+- docs/SUPABASE.md has a Card backup section listing the four limits (device-only deletes, twins, last backup wins, unreadable srs)
+- No new migration, supabase/migrations/** unchanged; no new dependency; no untracked files left in the worktree
+- Gate green: npm test -- --watch=false, npx tsc --noEmit, npm run lint
+## base
+- branch: main
+- merge-base goal/T-0001: 5ef24be4726f745612785cfba5e120dfd068ed32
+- goal: T-0001
+## write_scope
+- src/sync/backup.ts
+- src/sync/backup.test.ts
+- src/sync/BackupRunner.tsx
+- src/sync/BackupRunner.test.tsx
+- src/sync/schema.ts
+- src/srs/store.ts
+- src/srs/store.test.ts
+- src/main.tsx
+- src/screens/Settings.tsx
+- src/screens/Settings.test.tsx
+- docs/SUPABASE.md
+## read_scope
+- docs/
+- src/
+- src/screens/
+- src/srs/
+- src/sync/
+- tests/
+## constraints
+- allowed_dependencies: "none new"
+- budget_turns: 80
+- dedupe: "card-backup-v2-addonly"
+- interface_contract: "Uses supabase.ts withSession and auth.tsx useAuth unchanged; store.ts adds subscribe and addRestored only; backup.ts exports cardToRow, rowToCard, runBackup, runRestore, setActiveUser, useBackupStatus."
+- read_only: false
+- read_scope: ["**"]
+- respec_of: "T-0077"
+- route: "standard"
+- timeout_s: 2400
+## relevant_tests
+
+## symbols
+
+## gotchas
+
+## decisions
+
+## verify
+- .claude/hooks/tests-green.sh .
+- On failure, report only scripts/failures_only.sh output.
+## evidence
+
+
+## conditional instructions
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read; run the test script at most twice.
+
+You are a Claude fallback executor (Codex is unavailable); a human reviews merges. Commit on the task branch when green.
+If you need a tool outside your allowlist, post bus_post_result with status held and result reason needs_tool:<tool id>.
