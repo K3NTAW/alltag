@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ChangeEvent } from "react";
 import { postScene } from "../lib/api";
 import { go } from "../lib/screen";
 import { session } from "../lib/session";
@@ -8,12 +8,22 @@ import * as store from "../srs/store";
 
 type Phase = "idle" | "scanning";
 
+function subscribeOnline(cb: () => void): () => void {
+  window.addEventListener("online", cb);
+  window.addEventListener("offline", cb);
+  return () => {
+    window.removeEventListener("online", cb);
+    window.removeEventListener("offline", cb);
+  };
+}
+
 export default function Look() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [camera, setCamera] = useState<"pending" | "on" | "off">("pending");
   const [phase, setPhase] = useState<Phase>("idle");
   const [frame, setFrame] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const offline = useSyncExternalStore(subscribeOnline, () => !navigator.onLine);
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -122,7 +132,22 @@ export default function Look() {
             look
           </button>
         )}
-        {!scanning && <p className="text-[length:var(--text-xs)] opacity-70">point at anything</p>}
+        {!scanning && offline ? (
+          <>
+            <p className="text-[length:var(--text-xs)] opacity-70">
+              camera needs the network. your kept phrases and saved scenes work offline.
+            </p>
+            <button
+              type="button"
+              onClick={() => go("diary")}
+              className="rounded-[var(--radius-pill)] border border-card px-4 py-1 text-[length:var(--text-s)]"
+            >
+              open a saved scene
+            </button>
+          </>
+        ) : (
+          !scanning && <p className="text-[length:var(--text-xs)] opacity-70">point at anything</p>
+        )}
         {error && (
           <p role="alert" className="text-[length:var(--text-s)] text-due">
             {error}

@@ -111,8 +111,29 @@ Partner split: Noé live = Gemini Live, native speaker playback and review = Gra
 | Live roleplay (Noé) | api/live-token.ts, src/voice/live.ts | `GEMINI_MODEL_LIVE` | gemini-3.8-live | Native audio and barge-in, lowest turn latency |
 | Review check | api/check.ts | `GEMINI_MODEL_CHECK` | gemini-3.5-flash-lite | Trivial transcript vs target comparison, must feel instant |
 | CEFR level estimate | not wired yet (reserved) | `GEMINI_MODEL_LEVEL` | gemini-3.8-flash | JSON classification at moderate volume |
+| Offline: Gemma 3 1B on device | src/offline/gemma.ts | none (file in OPFS) | gemma3-1b-it-int4-web.task | Text roleplay and corrections when the network is gone; runs in the browser on WebGPU |
 
 More detail in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+### Offline mode (Gemma 3 1B on device)
+
+The cloud path stays the default. When the browser is offline, or a POST to `/api/turn` or `/api/correct` fails with a network error (fetch rejects, not a 4xx/5xx), the client answers with Gemma 3 1B instruct running in the browser through the MediaPipe LLM Inference API (`@mediapipe/tasks-genai`). Replies from the device carry `source: "local"` and Roleplay shows "offline, noé runs on this device".
+
+What works offline:
+
+| Works | Does not |
+|---|---|
+| Text roleplay with Noé (typed, no Live voice, no Gradium) | Scene parsing from the camera; Look says "camera needs the network" and offers saved scenes |
+| Corrections after the exchange | Gemini Live voice |
+| Review and recall, the diary, kept phrases (localStorage) | |
+
+Setup, once per browser:
+
+1. On Hugging Face, open `litert-community/Gemma3-1B-IT`, accept the Gemma licence (the repo is gated) and download `gemma3-1b-it-int4-web.task` (about 700 MB).
+2. In alltag, open Settings, section "offline tutor", and choose that file. It is copied into the Origin Private File System and loaded from there; the app never downloads it on its own.
+3. Optional: set `VITE_GEMMA_MODEL_URL` to a URL you host the file at; Settings then shows a "download" button instead of the file picker.
+
+Requirements and caveats: needs WebGPU (current Chrome or Edge on desktop or Android) and OPFS; elsewhere Settings says "not supported". The MediaPipe LLM Inference web API is in maintenance mode upstream; fine for a hackathon demo, not a long-term bet. A 1B model is much weaker than the cloud models: prompts are short and French, and its JSON is parsed leniently with safe defaults.
 
 ## 5. API
 

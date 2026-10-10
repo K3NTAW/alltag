@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { postCorrect, postTurn } from "../lib/api";
 import { go } from "../lib/screen";
 import { session } from "../lib/session";
@@ -11,6 +11,20 @@ const MAX_LEARNER_TURNS = 4;
 
 interface Bubble extends TurnMessage {
   en?: string;
+  local?: boolean;
+}
+
+function subscribeOnline(cb: () => void): () => void {
+  window.addEventListener("online", cb);
+  window.addEventListener("offline", cb);
+  return () => {
+    window.removeEventListener("online", cb);
+    window.removeEventListener("offline", cb);
+  };
+}
+
+function useOffline(): boolean {
+  return useSyncExternalStore(subscribeOnline, () => !navigator.onLine);
 }
 
 function openingLine(scene: SceneResult, card: Card | undefined): string {
@@ -47,7 +61,9 @@ export default function Roleplay() {
   const live = useLive();
   const { start, stop } = live;
   const [startFailed, setStartFailed] = useState(false);
-  const fallback = startFailed || live.state === "error";
+  const offline = useOffline();
+  // Live needs the network; offline the typed path runs on the on-device model.
+  const fallback = startFailed || live.state === "error" || offline;
   const [messages, setMessages] = useState<Bubble[]>(() =>
     scene ? [{ role: "tutor", text: openingLine(scene, card) }] : [],
   );
@@ -59,13 +75,14 @@ export default function Roleplay() {
   useEffect(() => {
     if (!scene) return;
     session.recallCardId = null;
+    if (offline) return;
     start({
       scene,
       level,
       knownWords: store.all().map((c) => c.noun_fr ?? c.phrase_fr),
       recallPhrase: card?.phrase_fr,
     }).catch(() => setStartFailed(true));
-  }, [scene, level, card, start]);
+  }, [scene, level, card, start, offline]);
 
   const finish = useCallback(
     async (transcript: TurnMessage[]) => {
@@ -129,7 +146,7 @@ export default function Roleplay() {
     setFailed(false);
     try {
       const reply = await postTurn({ scene, history, userText: text, level });
-      const next: Bubble[] = [...withLearner, { role: "tutor", text: reply.reply_fr, en: reply.reply_en }];
+      const next: Bubble[] = [...withLearner, { role: "tutor", text: reply.reply_fr, en: reply.reply_en, local: reply.source === "local" }];
       setMessages(next);
       if (reply.task_done || learnerCount(next) >= MAX_LEARNER_TURNS) {
         await finish(next.map(({ role, text }) => ({ role, text })));
@@ -171,6 +188,15 @@ export default function Roleplay() {
       </header>
 
       <Transcript messages={fallback ? messages : live.transcript} />
+
+      {fallback && messages.some((m) => m.local) && (
+        <p
+          data-testid="offline-pill"
+          className="self-center rounded-[var(--radius-pill)] bg-card px-4 py-1 text-[length:var(--text-s)] text-muted shadow"
+        >
+          offline, noé runs on this device
+        </p>
+      )}
 
       {fallback ? (
         <form

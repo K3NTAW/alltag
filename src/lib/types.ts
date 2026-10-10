@@ -49,6 +49,8 @@ export interface TurnResponse {
   reply_fr: string;
   reply_en: string;
   task_done: boolean;
+  /** "local" when answered by the on-device model */
+  source?: "cloud" | "local";
 }
 
 export type CorrectionType =
@@ -76,6 +78,8 @@ export interface CorrectRequest {
 export interface CorrectResponse {
   corrections: Correction[];
   kept_phrase_fr: string;
+  /** "local" when answered by the on-device model */
+  source?: "cloud" | "local";
 }
 
 export interface Card {

@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { postCorrect, postTurn } from "../lib/api";
 import { go, useScreen } from "../lib/screen";
 import { session, resetSession } from "../lib/session";
@@ -80,6 +81,8 @@ describe("Roleplay", () => {
     session.scene = scene;
     go("roleplay");
   });
+
+  afterEach(() => vi.restoreAllMocks());
 
   it("shows the empty state without a scene", () => {
     session.scene = null;
@@ -183,5 +186,36 @@ describe("Roleplay", () => {
     await waitFor(() => expect(screen.getByTestId("screen")).toHaveTextContent("corrections"));
     expect(postCorrect).toHaveBeenCalledWith({ scene, userText: "je veux le café", level: "A1" });
     expect(session.lastExchange?.corrections).toHaveLength(1);
+  });
+
+  it("offline: skips live, Enter sends the typed reply, shows the on-device pill", async () => {
+    vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
+    vi.mocked(postTurn).mockResolvedValue({
+      reply_fr: "d'accord",
+      reply_en: "ok",
+      task_done: false,
+      source: "local",
+    });
+    render(<Roleplay />);
+    expect(live.start).not.toHaveBeenCalled();
+    expect(screen.queryByTestId("offline-pill")).not.toBeInTheDocument();
+    await userEvent.type(screen.getByLabelText("your reply"), "je veux le café{Enter}");
+    expect(await screen.findByText("d'accord")).toBeInTheDocument();
+    expect(postTurn).toHaveBeenCalledWith({
+      scene,
+      history: [tutor("commande un café")],
+      userText: "je veux le café",
+      level: "A1",
+    });
+    expect(screen.getByTestId("offline-pill")).toHaveTextContent("offline, noé runs on this device");
+  });
+
+  it("no offline pill for cloud replies", async () => {
+    vi.mocked(postTurn).mockResolvedValue({ reply_fr: "voilà", reply_en: "here", task_done: false });
+    render(<Roleplay />);
+    act(() => live.set({ state: "error" }));
+    await userEvent.type(screen.getByLabelText("your reply"), "un café{Enter}");
+    expect(await screen.findByText("voilà")).toBeInTheDocument();
+    expect(screen.queryByTestId("offline-pill")).not.toBeInTheDocument();
   });
 });

@@ -8,6 +8,7 @@ import type {
   TurnRequest,
   TurnResponse,
 } from "./types";
+import { localCorrect, localTurn } from "../offline/local-api";
 
 async function call<T>(name: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`/api/${name}`, init);
@@ -27,12 +28,28 @@ export function postScene(req: SceneRequest): Promise<SceneResult> {
   return post("scene", req);
 }
 
+function offline(): boolean {
+  return typeof navigator !== "undefined" && navigator.onLine === false;
+}
+
+// Offline or a network error (fetch rejects with TypeError) -> on-device Gemma.
+// HTTP errors keep throwing: the server answered, so the network is fine.
+async function withLocal<T extends object>(cloud: () => Promise<T>, local: () => Promise<T>): Promise<T> {
+  if (offline()) return { ...(await local()), source: "local" };
+  try {
+    return await cloud();
+  } catch (e) {
+    if (!(e instanceof TypeError)) throw e;
+    return { ...(await local()), source: "local" };
+  }
+}
+
 export function postTurn(req: TurnRequest): Promise<TurnResponse> {
-  return post("turn", req);
+  return withLocal(() => post<TurnResponse>("turn", req), () => localTurn(req));
 }
 
 export function postCorrect(req: CorrectRequest): Promise<CorrectResponse> {
-  return post("correct", req);
+  return withLocal(() => post<CorrectResponse>("correct", req), () => localCorrect(req));
 }
 
 export function getGradiumToken(): Promise<GradiumToken> {

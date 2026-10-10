@@ -72,6 +72,8 @@ Response 200:
 
 Errors: 400 `missing scene, history, userText or level`, 405, 500 `missing_key`, 502 `generation_failed`, 502 `bad_output`.
 
+Client-side fallback: `postTurn` and `postCorrect` in src/lib/api.ts skip this route when `navigator.onLine` is false, and retry locally when `fetch` rejects with a network error (TypeError). The local answer comes from Gemma 3 1B on device (src/offline/local-api.ts) with the same response shape plus `source: "local"`. HTTP errors (4xx/5xx) never fall back. If the on-device model is not installed the call rejects with `GemmaUnavailable`.
+
 ## POST /api/correct
 
 Grader, one call per learner line after the exchange. Model: `GEMINI_MODEL_GRADER`, then `GEMINI_MODEL`, default `gemini-3.1-pro-preview`. If the primary call takes over 8 s or throws, it is aborted and retried once on `gemini-3.8-flash`; `model_used` says which answered. Corrections with an unknown `type` are dropped.
@@ -95,6 +97,8 @@ Response 200 (`type` is one of `article, gender, case, tense, word_order, vocab,
 ```
 
 Errors: 400 `missing scene, userText or level`, 405, 500 `missing_key`, 502 `generation_failed` (fallback also failed), 502 `bad_output`.
+
+Client-side fallback: same as `/api/turn`; the local response has no `model_used` and carries `source: "local"`.
 
 ## POST /api/check
 
