@@ -69,7 +69,7 @@ describe("Look", () => {
     const input = container.querySelector('input[type="file"]')!;
     expect(input.getAttribute("accept")).toBe("image/*");
     expect(input.getAttribute("capture")).toBe("environment");
-    expect(screen.getByText("point at anything")).toBeInTheDocument();
+    expect(screen.getByText("Point at anything.")).toBeInTheDocument();
   });
 });
 
