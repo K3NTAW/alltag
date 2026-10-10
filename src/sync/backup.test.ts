@@ -174,7 +174,7 @@ describe("mapping", () => {
   it("falls back to fresh review state on a bad srs", () => {
     vi.spyOn(Date, "now").mockReturnValue(5_000);
     for (const srs of [{}, { ease: "x", interval: 1, reps: 1, due: "2026-10-10T00:00:00Z" }, { ease: 2, interval: 1, reps: 1, due: "nope" }]) {
-      const c = rowToCard(remoteRow(3, { srs, kept_at: "2026-10-02T00:00:00.000Z" }));
+      const c = rowToCard(remoteRow(3, { srs: srs as never, kept_at: "2026-10-02T00:00:00.000Z" }));
       expect(c).toMatchObject({ ease: 2.5, interval: 0, reps: 0, due: 5_000, learnedAt: Date.UTC(2026, 9, 2) });
     }
     expect(rowToCard(remoteRow(3, { srs: null as never, kept_at: null })).learnedAt).toBe(5_000);
