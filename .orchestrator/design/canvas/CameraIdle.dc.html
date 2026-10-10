@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Camera idle</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+body{margin:0;font-family:'Instrument Sans',system-ui,sans-serif;color:#15181C}
+a{color:#0F6E56}a:hover{color:#0A4F3E}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; position: relative; overflow: hidden; background: #0D0F12; color: #FFFFFF">
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 844px; background: linear-gradient(160deg,#3A3F47 0%,#1C1F24 60%,#0D0F12 100%)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="position: absolute; left: 95px; top: 322px; width: 200px; height: 200px; opacity: 0.3; color: #FFFFFF">
+      <rect x="4" y="2.5" width="16" height="9" rx="2"></rect>
+      <path d="M7 5.5h4"></path>
+      <path d="M12 11.5v2.5"></path>
+      <path d="M10 14h4"></path>
+      <path d="M8 16.5h7v3.5a1.5 1.5 0 0 1-1.5 1.5h-4A1.5 1.5 0 0 1 8 20z"></path>
+      <path d="M15 17.5h1.5a1.25 1.25 0 0 1 0 2.5H15"></path>
+      <path d="M1 22.5h22"></path>
+    </svg>
+    <div style="position: absolute; left: 20px; bottom: 168px; font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; color: rgba(255,255,255,0.5)">[PHOTO: café counter]</div>
+  </div>
+
+  <div style="position: absolute; left: 20px; right: 20px; top: 54px; display: flex; flex-direction: row; align-items: center; justify-content: space-between">
+    <div style="width: 96px; display: flex; flex-direction: row; justify-content: flex-start">
+      <button aria-label="Settings" style="width: 44px; height: 44px; padding: 0; box-sizing: border-box; border-radius: 999px; background: rgba(20,22,26,0.62); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.14); color: #FFFFFF; font: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width: 20px; height: 20px"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg>
+      </button>
+    </div>
+    <div style="flex: 1; display: flex; flex-direction: row; justify-content: center">
+      <div style="padding: 6px 12px; border-radius: 999px; background: rgba(20,22,26,0.62); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.14); font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; color: #FFFFFF; white-space: nowrap">Français · A1</div>
+    </div>
+    <div style="width: 96px; display: flex; flex-direction: row; justify-content: flex-end; gap: 8px">
+      <button aria-label="Flash" style="width: 44px; height: 44px; padding: 0; box-sizing: border-box; border-radius: 999px; background: rgba(20,22,26,0.62); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.14); color: #FFFFFF; font: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width: 20px; height: 20px"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"></path></svg>
+      </button>
+      <button aria-label="Flip camera" style="width: 44px; height: 44px; padding: 0; box-sizing: border-box; border-radius: 999px; background: rgba(20,22,26,0.62); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.14); color: #FFFFFF; font: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width: 20px; height: 20px"><path d="M21 12a9 9 0 0 1-15.5 6.2M3 12a9 9 0 0 1 15.5-6.2"></path><path d="M21 3v5h-5M3 21v-5h5"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 45px; top: 240px; width: 300px; height: 300px">
+    <div style="position: absolute; left: 0; top: 0; width: 28px; height: 28px; box-sizing: border-box; border-top: 3px solid #FFFFFF; border-left: 3px solid #FFFFFF; border-top-left-radius: 6px"></div>
+    <div style="position: absolute; right: 0; top: 0; width: 28px; height: 28px; box-sizing: border-box; border-top: 3px solid #FFFFFF; border-right: 3px solid #FFFFFF; border-top-right-radius: 6px"></div>
+    <div style="position: absolute; left: 0; bottom: 0; width: 28px; height: 28px; box-sizing: border-box; border-bottom: 3px solid #FFFFFF; border-left: 3px solid #FFFFFF; border-bottom-left-radius: 6px"></div>
+    <div style="position: absolute; right: 0; bottom: 0; width: 28px; height: 28px; box-sizing: border-box; border-bottom: 3px solid #FFFFFF; border-right: 3px solid #FFFFFF; border-bottom-right-radius: 6px"></div>
+  </div>
+
+  <div style="position: absolute; left: 20px; right: 20px; top: 560px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center">
+    <div style="font-size: 15px; line-height: 22px; font-weight: 500; color: #FFFFFF">Point at anything.</div>
+    <div style="font-size: 14px; line-height: 20px; font-weight: 500; color: rgba(255,255,255,0.72)">Noé will tell you what it is called.</div>
+  </div>
+
+  <div style="position: absolute; left: 0; right: 0; bottom: 48px; display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: end; justify-items: center">
+    <button style="border: 0; background: transparent; font: inherit; cursor: pointer; padding: 0; color: #FFFFFF; display: flex; flex-direction: column; align-items: center; gap: 8px">
+      <span style="width: 56px; height: 56px; box-sizing: border-box; border-radius: 999px; background: rgba(20,22,26,0.62); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.14); display: flex; align-items: center; justify-content: center">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width: 24px; height: 24px"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+      </span>
+      <span style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; color: #FFFFFF">Review</span>
+    </button>
+    <button aria-label="Take a look" style="width: 76px; height: 76px; box-sizing: border-box; padding: 0; border-radius: 999px; border: 4px solid #FFFFFF; background: transparent; font: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-bottom: 24px">
+      <span style="width: 58px; height: 58px; border-radius: 999px; background: #FFFFFF; display: block"></span>
+    </button>
+    <button style="border: 0; background: transparent; font: inherit; cursor: pointer; padding: 0; color: #FFFFFF; display: flex; flex-direction: column; align-items: center; gap: 8px">
+      <span style="width: 56px; height: 56px; box-sizing: border-box; border-radius: 999px; background: rgba(20,22,26,0.62); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.14); display: flex; align-items: center; justify-content: center">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width: 24px; height: 24px"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+      </span>
+      <span style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; color: #FFFFFF">Diary</span>
+    </button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

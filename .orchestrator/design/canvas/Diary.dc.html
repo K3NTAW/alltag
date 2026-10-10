@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Diary</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+body{margin:0;font-family:'Instrument Sans',system-ui,sans-serif;color:#15181C}
+a{color:#0F6E56}a:hover{color:#0A4F3E}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; position: relative; overflow: hidden; background: #F6F5F2; display: flex; flex-direction: column">
+  <div style="box-sizing: border-box; padding: 54px 20px 0 20px; display: flex; flex-direction: column; gap: 20px">
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <h1 style="margin: 0; font-family: 'Bricolage Grotesque'; font-size: 32px; line-height: 38px; font-weight: 700; color: #15181C">Diary</h1>
+      <div style="font-size: 14px; line-height: 20px; font-weight: 500; color: #5B6069">23 phrases · 6 places</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+      <a href="#entry-machine" style="position: relative; display: block; height: 169px; border-radius: 16px; overflow: hidden; background: linear-gradient(160deg,#E9E7E1,#D6D3CB); text-decoration: none; color: #FFFFFF">
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center">
+          <svg viewBox="0 0 64 64" fill="none" stroke="#5B6069" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width: 64px; height: 64px; opacity: 0.3; margin-top: -16px"><rect x="12" y="6" width="40" height="14" rx="3"></rect><circle cx="44" cy="13" r="2"></circle><path d="M18 11h10"></path><path d="M12 20v30a2 2 0 0 0 2 2h36a2 2 0 0 0 2-2V20"></path><path d="M24 20h16v6H24z"></path><path d="M32 26v6"></path><path d="M25 38h14v8a4 4 0 0 1-4 4h-6a4 4 0 0 1-4-4z"></path><path d="M39 40h2a3 3 0 0 1 0 6h-2"></path><path d="M10 58h44"></path></svg>
+        </div>
+        <div style="position: absolute; top: 10px; left: 12px; font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; color: #5B6069">[PHOTO: coffee machine]</div>
+        <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 60%; background: linear-gradient(180deg, rgba(13,15,18,0) 0%, rgba(13,15,18,0.7) 100%)"></div>
+        <div style="position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; flex-direction: column; gap: 2px">
+          <div lang="fr" style="font-family: 'Bricolage Grotesque'; font-size: 15px; line-height: 20px; font-weight: 500; color: #FFFFFF">la machine à café</div>
+          <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: rgba(255,255,255,0.72)">Today · café</div>
+        </div>
+      </a>
+
+      <a href="#entry-billet" style="position: relative; display: block; height: 169px; border-radius: 16px; overflow: hidden; background: linear-gradient(160deg,#E9E7E1,#D6D3CB); text-decoration: none; color: #FFFFFF">
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center">
+          <svg viewBox="0 0 64 64" fill="none" stroke="#5B6069" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width: 64px; height: 64px; opacity: 0.3; margin-top: -16px"><path d="M8 22a4 4 0 0 1 4-4h40a4 4 0 0 1 4 4v5a5 5 0 0 0 0 10v5a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4v-5a5 5 0 0 0 0-10z"></path><path d="M16 27h16"></path><path d="M16 33h10"></path><path d="M40 24v16" stroke-dasharray="3 3"></path></svg>
+        </div>
+        <div style="position: absolute; top: 10px; left: 12px; font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; color: #5B6069">[PHOTO: train ticket]</div>
+        <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 60%; background: linear-gradient(180deg, rgba(13,15,18,0) 0%, rgba(13,15,18,0.7) 100%)"></div>
+        <div style="position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; flex-direction: column; gap: 2px">
+          <div lang="fr" style="font-family: 'Bricolage Grotesque'; font-size: 15px; line-height: 20px; font-weight: 500; color: #FFFFFF">un billet, s'il vous plaît</div>
+          <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: rgba(255,255,255,0.72)">Yesterday · Hauptbahnhof</div>
+        </div>
+      </a>
+
+      <a href="#entry-lait" style="position: relative; display: block; height: 169px; border-radius: 16px; overflow: hidden; background: linear-gradient(160deg,#E9E7E1,#D6D3CB); text-decoration: none; color: #FFFFFF">
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center">
+          <svg viewBox="0 0 64 64" fill="none" stroke="#5B6069" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width: 64px; height: 64px; opacity: 0.3; margin-top: -16px"><path d="M18 24h28v28a2 2 0 0 1-2 2H20a2 2 0 0 1-2-2z"></path><path d="M18 24l6-12h16l6 12"></path><path d="M32 12v12"></path><path d="M24 36h16"></path><path d="M24 42h10"></path></svg>
+        </div>
+        <div style="position: absolute; top: 10px; left: 12px; font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; color: #5B6069">[PHOTO: milk carton]</div>
+        <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 60%; background: linear-gradient(180deg, rgba(13,15,18,0) 0%, rgba(13,15,18,0.7) 100%)"></div>
+        <div style="position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; flex-direction: column; gap: 2px">
+          <div lang="fr" style="font-family: 'Bricolage Grotesque'; font-size: 15px; line-height: 20px; font-weight: 500; color: #FFFFFF">où est le lait ?</div>
+          <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: rgba(255,255,255,0.72)">3 days ago · kitchen</div>
+        </div>
+      </a>
+
+      <a href="#entry-table" style="position: relative; display: block; height: 169px; border-radius: 16px; overflow: hidden; background: linear-gradient(160deg,#E9E7E1,#D6D3CB); text-decoration: none; color: #FFFFFF">
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center">
+          <svg viewBox="0 0 64 64" fill="none" stroke="#5B6069" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width: 64px; height: 64px; opacity: 0.3; margin-top: -16px"><path d="M8 24h48v4H8z"></path><path d="M14 28v24"></path><path d="M50 28v24"></path><path d="M14 40h36"></path><circle cx="24" cy="17" r="4"></circle><circle cx="40" cy="17" r="4"></circle></svg>
+        </div>
+        <div style="position: absolute; top: 10px; left: 12px; font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; color: #5B6069">[PHOTO: table for two]</div>
+        <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 60%; background: linear-gradient(180deg, rgba(13,15,18,0) 0%, rgba(13,15,18,0.7) 100%)"></div>
+        <div style="position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; flex-direction: column; gap: 2px">
+          <div lang="fr" style="font-family: 'Bricolage Grotesque'; font-size: 15px; line-height: 20px; font-weight: 500; color: #FFFFFF">une table pour deux</div>
+          <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: rgba(255,255,255,0.72)">Last week · restaurant</div>
+        </div>
+      </a>
+
+      <a href="#entry-caisse" style="position: relative; display: block; height: 169px; border-radius: 16px; overflow: hidden; background: linear-gradient(160deg,#E9E7E1,#D6D3CB); text-decoration: none; color: #FFFFFF">
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center">
+          <svg viewBox="0 0 64 64" fill="none" stroke="#5B6069" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width: 64px; height: 64px; opacity: 0.3; margin-top: -16px"><path d="M20 12h24l-2 12H22z"></path><path d="M14 30h36l4 14H10z"></path><path d="M10 44h44v8H10z"></path><path d="M18 37h4"></path><path d="M26 37h4"></path><path d="M34 37h4"></path><path d="M42 37h4"></path></svg>
+        </div>
+        <div style="position: absolute; top: 10px; left: 12px; font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; color: #5B6069">[PHOTO: till]</div>
+        <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 60%; background: linear-gradient(180deg, rgba(13,15,18,0) 0%, rgba(13,15,18,0.7) 100%)"></div>
+        <div style="position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; flex-direction: column; gap: 2px">
+          <div lang="fr" style="font-family: 'Bricolage Grotesque'; font-size: 15px; line-height: 20px; font-weight: 500; color: #FFFFFF">la caisse</div>
+          <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: rgba(255,255,255,0.72)">Last week · café</div>
+        </div>
+      </a>
+
+      <a href="#entry-croissant" style="position: relative; display: block; height: 169px; border-radius: 16px; overflow: hidden; background: linear-gradient(160deg,#E9E7E1,#D6D3CB); text-decoration: none; color: #FFFFFF">
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center">
+          <svg viewBox="0 0 64 64" fill="none" stroke="#5B6069" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width: 64px; height: 64px; opacity: 0.3; margin-top: -16px"><path d="M14 42c-6-12 6-24 18-24s24 12 18 24"></path><path d="M14 42c4 6 32 6 36 0"></path><path d="M22 22c-2 6-2 12 0 18"></path><path d="M32 18v22"></path><path d="M42 22c2 6 2 12 0 18"></path></svg>
+        </div>
+        <div style="position: absolute; top: 10px; left: 12px; font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; color: #5B6069">[PHOTO: croissant]</div>
+        <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 60%; background: linear-gradient(180deg, rgba(13,15,18,0) 0%, rgba(13,15,18,0.7) 100%)"></div>
+        <div style="position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; flex-direction: column; gap: 2px">
+          <div lang="fr" style="font-family: 'Bricolage Grotesque'; font-size: 15px; line-height: 20px; font-weight: 500; color: #FFFFFF">un croissant</div>
+          <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: rgba(255,255,255,0.72)">Last week · café</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <nav aria-label="Main" style="position: absolute; left: 0; right: 0; bottom: 0; box-sizing: border-box; padding: 6px 20px 34px 20px; background: #F6F5F2; border-top: 1px solid #E3E1DB; display: flex; flex-direction: row; justify-content: space-around">
+    <a href="#look" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 72px; min-height: 44px; text-decoration: none; color: #5B6069">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width: 24px; height: 24px"><path d="M4 8a2 2 0 0 1 2-2h2l2-2h4l2 2h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"></path><circle cx="12" cy="12.5" r="3.5"></circle></svg>
+      <span style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase">Look</span>
+    </a>
+    <a href="#review" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 72px; min-height: 44px; text-decoration: none; color: #5B6069">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width: 24px; height: 24px"><path d="M17 2l4 4-4 4"></path><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="M7 22l-4-4 4-4"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+      <span style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase">Review</span>
+    </a>
+    <a href="#diary" aria-current="page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 72px; min-height: 44px; text-decoration: none; color: #0F6E56">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width: 24px; height: 24px"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+      <span style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase">Diary</span>
+    </a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

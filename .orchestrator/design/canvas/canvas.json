@@ -1,0 +1,57 @@
+{
+  "v": 3,
+  "createdOnFiles": {"v": 1, "at": "2026-10-10T11:20:00+02:00"},
+  "title": "Alltag design",
+  "launch": {"view": "canvas"},
+  "pages": [],
+  "boards": {
+    "Main.dc.html":            {"x": 0,    "y": 0,    "w": 1200, "h": 820,  "title": "Cover and loop"},
+    "Foundations.dc.html":     {"x": 1280, "y": 0,    "w": 1200, "h": 1320, "title": "Foundations"},
+    "Research.dc.html":        {"x": 2560, "y": 0,    "w": 1200, "h": 1320, "title": "Research (Mobbin)"},
+    "Components.dc.html":      {"x": 3840, "y": 0,    "w": 1200, "h": 1320, "title": "Components"},
+
+    "Onb1Welcome.dc.html":     {"x": 0,    "y": 1700, "w": 390, "h": 844, "title": "Onboarding 1 Welcome"},
+    "Onb2Language.dc.html":    {"x": 470,  "y": 1700, "w": 390, "h": 844, "title": "Onboarding 2 Language"},
+    "Onb3Level.dc.html":       {"x": 940,  "y": 1700, "w": 390, "h": 844, "title": "Onboarding 3 Level"},
+    "Onb4Camera.dc.html":      {"x": 1410, "y": 1700, "w": 390, "h": 844, "title": "Onboarding 4 Camera and mic"},
+
+    "CameraIdle.dc.html":      {"x": 0,    "y": 2900, "w": 390, "h": 844, "title": "Look 1 Viewfinder"},
+    "CameraScanning.dc.html":  {"x": 470,  "y": 2900, "w": 390, "h": 844, "title": "Look 2 Scanning"},
+    "SceneLabels.dc.html":     {"x": 940,  "y": 2900, "w": 390, "h": 844, "title": "Look 3 Scene labels"},
+    "ObjectSheet.dc.html":     {"x": 1410, "y": 2900, "w": 390, "h": 844, "title": "Look 4 Object sheet"},
+    "VoiceIntro.dc.html":      {"x": 1880, "y": 2900, "w": 390, "h": 844, "title": "Listen Tutor intro"},
+    "RoleplayStart.dc.html":   {"x": 2350, "y": 2900, "w": 390, "h": 844, "title": "Do 1 Task"},
+    "RoleplayListening.dc.html": {"x": 2820, "y": 2900, "w": 390, "h": 844, "title": "Do 2 Listening"},
+    "RoleplayReply.dc.html":   {"x": 3290, "y": 2900, "w": 390, "h": 844, "title": "Do 3 Tutor reply"},
+    "Corrections.dc.html":     {"x": 3760, "y": 2900, "w": 390, "h": 844, "title": "Fix Corrections"},
+    "ExchangeDone.dc.html":    {"x": 4230, "y": 2900, "w": 390, "h": 844, "title": "Fix Exchange done"},
+
+    "ReviewQueue.dc.html":     {"x": 0,    "y": 4100, "w": 390, "h": 844, "title": "Keep 1 Review queue"},
+    "ReviewCard.dc.html":      {"x": 470,  "y": 4100, "w": 390, "h": 844, "title": "Keep 2 Review card"},
+    "ReviewResult.dc.html":    {"x": 940,  "y": 4100, "w": 390, "h": 844, "title": "Keep 3 Result"},
+    "RecallTrigger.dc.html":   {"x": 1410, "y": 4100, "w": 390, "h": 844, "title": "Keep 4 Camera recall"},
+    "Diary.dc.html":           {"x": 1880, "y": 4100, "w": 390, "h": 844, "title": "Keep 5 Diary"},
+
+    "Settings.dc.html":        {"x": 0,    "y": 5300, "w": 390, "h": 844, "title": "Settings"},
+    "StateNoMic.dc.html":      {"x": 470,  "y": 5300, "w": 390, "h": 844, "title": "State Mic denied"},
+    "StateSlow.dc.html":       {"x": 940,  "y": 5300, "w": 390, "h": 844, "title": "State Slow network"},
+    "StateEmptyReview.dc.html": {"x": 1410, "y": 5300, "w": 390, "h": 844, "title": "State Nothing due"}
+  },
+  "order": [
+    "Main.dc.html", "Foundations.dc.html", "Research.dc.html", "Components.dc.html",
+    "Onb1Welcome.dc.html", "Onb2Language.dc.html", "Onb3Level.dc.html", "Onb4Camera.dc.html",
+    "CameraIdle.dc.html", "CameraScanning.dc.html", "SceneLabels.dc.html", "ObjectSheet.dc.html",
+    "VoiceIntro.dc.html", "RoleplayStart.dc.html", "RoleplayListening.dc.html", "RoleplayReply.dc.html",
+    "Corrections.dc.html", "ExchangeDone.dc.html",
+    "ReviewQueue.dc.html", "ReviewCard.dc.html", "ReviewResult.dc.html", "RecallTrigger.dc.html", "Diary.dc.html",
+    "Settings.dc.html", "StateNoMic.dc.html", "StateSlow.dc.html", "StateEmptyReview.dc.html"
+  ],
+  "notes": {
+    "t0": {"x": 0, "y": -260, "text": "Alltag · foundations", "kind": "title1", "maxW": 5000},
+    "t1": {"x": 0, "y": 1440, "text": "Onboarding · 60 seconds, no account", "kind": "title1", "maxW": 1800},
+    "t2": {"x": 0, "y": 2640, "text": "The loop · look, listen, do, fix", "kind": "title1", "maxW": 4600},
+    "t3": {"x": 0, "y": 3840, "text": "Keep · review by speaking, recall by camera, the diary", "kind": "title1", "maxW": 2300},
+    "t4": {"x": 0, "y": 5040, "text": "Settings and states", "kind": "title1", "maxW": 1800}
+  },
+  "designSystems": []
+}

@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Foundations</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+body{margin:0;font-family:'Instrument Sans',system-ui,sans-serif;color:#15181C}
+a{color:#0F6E56}a:hover{color:#0A4F3E}
+</style>
+</helmet>
+<div style="width: 1200px; height: 1320px; box-sizing: border-box; position: relative; overflow: hidden; background: #F6F5F2; display: flex; flex-direction: column; gap: 28px; padding: 48px 56px">
+
+  <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end; gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: #5B6069">Alltag · design v1 · 2026-10-10</div>
+      <div style="font-family: 'Bricolage Grotesque'; font-size: 32px; line-height: 38px; font-weight: 700">Foundations</div>
+    </div>
+    <div style="font-size: 14px; line-height: 20px; font-weight: 500; color: #5B6069; max-width: 440px; text-align: right">Tokens for both surfaces. Every board writes these values inline, so this sheet is the one place they are named.</div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; flex-direction: row; align-items: baseline; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid #E3E1DB">
+      <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: #15181C">01 · Color</div>
+      <div style="font-size: 14px; line-height: 20px; font-weight: 500; color: #5B6069">One accent. Success is moss, attention is clay, memory is sun. Never red and green together.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="width: 96px; height: 72px; border-radius: 10px; background: #F6F5F2; border: 1px solid #E3E1DB; box-sizing: border-box"></div>
+        <div style="font-size: 14px; line-height: 20px; font-weight: 600">paper <span style="font-weight: 500; color: #5B6069">#F6F5F2</span></div>
+        <div style="font-size: 13px; line-height: 18px; color: #5B6069">Light ground</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="width: 96px; height: 72px; border-radius: 10px; background: #FFFFFF; border: 1px solid #E3E1DB; box-sizing: border-box"></div>
+        <div style="font-size: 14px; line-height: 20px; font-weight: 600">card <span style="font-weight: 500; color: #5B6069">#FFFFFF</span></div>
+        <div style="font-size: 13px; line-height: 18px; color: #5B6069">Cards on paper</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="width: 96px; height: 72px; border-radius: 10px; background: #E3E1DB"></div>
+        <div style="font-size: 14px; line-height: 20px; font-weight: 600">line <span style="font-weight: 500; color: #5B6069">#E3E1DB</span></div>
+        <div style="font-size: 13px; line-height: 18px; color: #5B6069">Hairlines on paper</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="width: 96px; height: 72px; border-radius: 10px; background: #15181C"></div>
+        <div style="font-size: 14px; line-height: 20px; font-weight: 600">ink <span style="font-weight: 500; color: #5B6069">#15181C</span></div>
+        <div style="font-size: 13px; line-height: 18px; color: #5B6069">Primary text on paper</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="width: 96px; height: 72px; border-radius: 10px; background: #5B6069"></div>
+        <div style="font-size: 14px; line-height: 20px; font-weight: 600">ink2 <span style="font-weight: 500; color: #5B6069">#5B6069</span></div>
+        <div style="font-size: 13px; line-height: 18px; color: #5B6069">Secondary text, 4.5:1 on paper</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="width: 96px; height: 72px; border-radius: 10px; background: #0D0F12"></div>
+        <div style="font-size: 14px; line-height: 20px; font-weight: 600">night <span style="font-weight: 500; color: #5B6069">#0D0F12</span></div>
+        <div style="font-size: 13px; line-height: 18px; color: #5B6069">Camera ground</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="width: 96px; height: 72px; border-radius: 10px; background: linear-gradient(160deg,#3A3F47,#1C1F24); display: flex; align-items: center; justify-content: center">
+          <div style="width: 64px; height: 36px; border-radius: 999px; background: rgba(20,22,26,0.62); border: 1px solid rgba(255,255,255,0.14); box-sizing: border-box"></div>
+        </div>
+        <div style="font-size: 14px; line-height: 20px; font-weight: 600">glass <span style="font-weight: 500; color: #5B6069">20,22,26 · 62%</span></div>
+        <div style="font-size: 13px; line-height: 18px; color: #5B6069">Pills over camera, blur 18, 1px white 14%</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="width: 96px; height: 72px; border-radius: 10px; background: #0F6E56"></div>
+        <div style="font-size: 14px; line-height: 20px; font-weight: 600">moss <span style="font-weight: 500; color: #5B6069">#0F6E56</span></div>
+        <div style="font-size: 13px; line-height: 18px; color: #5B6069">The accent. Buttons, active, "better"</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="width: 96px; height: 72px; border-radius: 10px; background: #DDEFE7"></div>
+        <div style="font-size: 14px; line-height: 20px; font-weight: 600">mossSoft <span style="font-weight: 500; color: #5B6069">#DDEFE7</span></div>
+        <div style="font-size: 13px; line-height: 18px; color: #5B6069">Tint for chips, selected rows</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="width: 96px; height: 72px; border-radius: 10px; background: #B84A1C"></div>
+        <div style="font-size: 14px; line-height: 20px; font-weight: 600">clay <span style="font-weight: 500; color: #5B6069">#B84A1C</span></div>
+        <div style="font-size: 13px; line-height: 18px; color: #5B6069">"What you said", errors. 20px+ or bold</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="width: 96px; height: 72px; border-radius: 10px; background: #F7E3DA"></div>
+        <div style="font-size: 14px; line-height: 20px; font-weight: 600">claySoft <span style="font-weight: 500; color: #5B6069">#F7E3DA</span></div>
+        <div style="font-size: 13px; line-height: 18px; color: #5B6069">Tint behind clay text</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="width: 96px; height: 72px; border-radius: 10px; background: #F2C94C"></div>
+        <div style="font-size: 14px; line-height: 20px; font-weight: 600">sun <span style="font-weight: 500; color: #5B6069">#F2C94C</span></div>
+        <div style="font-size: 13px; line-height: 18px; color: #5B6069">Recall, "we saw this before". Camera only</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 7fr 5fr; gap: 32px">
+
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; flex-direction: row; align-items: baseline; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid #E3E1DB">
+        <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: #15181C">02 · Type</div>
+        <div style="font-size: 14px; line-height: 20px; font-weight: 500; color: #5B6069">French is always Bricolage Grotesque. The English gloss is Instrument Sans in ink2.</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 0">
+        <div style="display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid #E3E1DB">
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase">hero</div>
+            <div style="font-size: 12px; line-height: 16px; font-weight: 500; color: #5B6069">44 / 48 · display 700</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <div lang="fr" style="font-family: 'Bricolage Grotesque'; font-size: 44px; line-height: 48px; font-weight: 700; letter-spacing: -0.01em">la machine à café</div>
+            <div style="font-size: 16px; line-height: 24px; color: #5B6069">the coffee machine</div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid #E3E1DB">
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase">h1</div>
+            <div style="font-size: 12px; line-height: 16px; font-weight: 500; color: #5B6069">32 / 38 · display 700</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <div lang="fr" style="font-family: 'Bricolage Grotesque'; font-size: 32px; line-height: 38px; font-weight: 700">la machine à café</div>
+            <div style="font-size: 16px; line-height: 24px; color: #5B6069">the coffee machine</div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid #E3E1DB">
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase">h2</div>
+            <div style="font-size: 12px; line-height: 16px; font-weight: 500; color: #5B6069">24 / 30 · display 500</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <div lang="fr" style="font-family: 'Bricolage Grotesque'; font-size: 24px; line-height: 30px; font-weight: 500">la machine à café</div>
+            <div style="font-size: 16px; line-height: 24px; color: #5B6069">the coffee machine</div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid #E3E1DB">
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase">title</div>
+            <div style="font-size: 12px; line-height: 16px; font-weight: 500; color: #5B6069">18 / 24 · body 600</div>
+          </div>
+          <div style="display: flex; flex-direction: row; gap: 16px; align-items: baseline">
+            <div lang="fr" style="font-family: 'Bricolage Grotesque'; font-size: 18px; line-height: 24px; font-weight: 500">la machine à café</div>
+            <div style="font-size: 18px; line-height: 24px; font-weight: 600; color: #5B6069">the coffee machine</div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid #E3E1DB">
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase">body</div>
+            <div style="font-size: 12px; line-height: 16px; font-weight: 500; color: #5B6069">16 / 24 · body 400</div>
+          </div>
+          <div style="display: flex; flex-direction: row; gap: 16px; align-items: baseline">
+            <div lang="fr" style="font-family: 'Bricolage Grotesque'; font-size: 16px; line-height: 24px; font-weight: 500">la machine à café</div>
+            <div style="font-size: 16px; line-height: 24px; font-weight: 400; color: #5B6069">the coffee machine</div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid #E3E1DB">
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase">small</div>
+            <div style="font-size: 12px; line-height: 16px; font-weight: 500; color: #5B6069">14 / 20 · body 500</div>
+          </div>
+          <div style="display: flex; flex-direction: row; gap: 16px; align-items: baseline">
+            <div lang="fr" style="font-family: 'Bricolage Grotesque'; font-size: 14px; line-height: 20px; font-weight: 500">la machine à café</div>
+            <div style="font-size: 14px; line-height: 20px; font-weight: 500; color: #5B6069">the coffee machine</div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: baseline; padding: 10px 0">
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase">micro</div>
+            <div style="font-size: 12px; line-height: 16px; font-weight: 500; color: #5B6069">12 / 16 · body 500 · 0.04em · eyebrows uppercase</div>
+          </div>
+          <div style="display: flex; flex-direction: row; gap: 16px; align-items: baseline">
+            <div lang="fr" style="font-family: 'Bricolage Grotesque'; font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase">la machine à café</div>
+            <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: #5B6069">the coffee machine</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; flex-direction: row; align-items: baseline; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid #E3E1DB">
+        <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: #15181C">03 · Spacing and shape</div>
+        <div style="font-size: 14px; line-height: 20px; font-weight: 500; color: #5B6069">8px grid. No shadows on paper.</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: #5B6069">Grid steps</div>
+        <div style="display: flex; flex-direction: row; gap: 16px; align-items: flex-end">
+          <div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><div style="width: 4px; height: 4px; background: #0F6E56; border-radius: 1px"></div><div style="font-size: 12px; line-height: 16px; font-weight: 500; color: #5B6069">4</div></div>
+          <div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><div style="width: 8px; height: 8px; background: #0F6E56; border-radius: 2px"></div><div style="font-size: 12px; line-height: 16px; font-weight: 500; color: #5B6069">8</div></div>
+          <div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><div style="width: 12px; height: 12px; background: #0F6E56; border-radius: 2px"></div><div style="font-size: 12px; line-height: 16px; font-weight: 500; color: #5B6069">12</div></div>
+          <div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><div style="width: 16px; height: 16px; background: #0F6E56; border-radius: 3px"></div><div style="font-size: 12px; line-height: 16px; font-weight: 500; color: #5B6069">16</div></div>
+          <div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><div style="width: 20px; height: 20px; background: #0F6E56; border-radius: 3px"></div><div style="font-size: 12px; line-height: 16px; font-weight: 500; color: #5B6069">20</div></div>
+          <div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><div style="width: 24px; height: 24px; background: #0F6E56; border-radius: 4px"></div><div style="font-size: 12px; line-height: 16px; font-weight: 500; color: #5B6069">24</div></div>
+          <div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><div style="width: 32px; height: 32px; background: #0F6E56; border-radius: 4px"></div><div style="font-size: 12px; line-height: 16px; font-weight: 500; color: #5B6069">32</div></div>
+          <div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><div style="width: 48px; height: 48px; background: #0F6E56; border-radius: 6px"></div><div style="font-size: 12px; line-height: 16px; font-weight: 500; color: #5B6069">48</div></div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px">
+        <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: #5B6069">Radii</div>
+        <div style="display: flex; flex-direction: row; gap: 12px">
+          <div style="display: flex; flex-direction: column; gap: 6px"><div style="width: 72px; height: 56px; background: #FFFFFF; border: 1px solid #E3E1DB; border-radius: 10px; box-sizing: border-box"></div><div style="font-size: 12px; line-height: 16px; font-weight: 500; color: #5B6069">chip 10</div></div>
+          <div style="display: flex; flex-direction: column; gap: 6px"><div style="width: 72px; height: 56px; background: #FFFFFF; border: 1px solid #E3E1DB; border-radius: 16px; box-sizing: border-box"></div><div style="font-size: 12px; line-height: 16px; font-weight: 500; color: #5B6069">button 16</div></div>
+          <div style="display: flex; flex-direction: column; gap: 6px"><div style="width: 72px; height: 56px; background: #FFFFFF; border: 1px solid #E3E1DB; border-radius: 20px; box-sizing: border-box"></div><div style="font-size: 12px; line-height: 16px; font-weight: 500; color: #5B6069">card 20</div></div>
+          <div style="display: flex; flex-direction: column; gap: 6px"><div style="width: 72px; height: 56px; background: #FFFFFF; border: 1px solid #E3E1DB; border-radius: 28px 28px 0 0; box-sizing: border-box"></div><div style="font-size: 12px; line-height: 16px; font-weight: 500; color: #5B6069">sheet 28 top</div></div>
+          <div style="display: flex; flex-direction: column; gap: 6px"><div style="width: 72px; height: 56px; background: #FFFFFF; border: 1px solid #E3E1DB; border-radius: 999px; box-sizing: border-box"></div><div style="font-size: 12px; line-height: 16px; font-weight: 500; color: #5B6069">pill 999</div></div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 8px; padding-top: 12px; border-top: 1px solid #E3E1DB">
+        <div style="font-size: 14px; line-height: 20px; color: #5B6069"><span style="font-weight: 600; color: #15181C">Gutter</span> 20 · <span style="font-weight: 600; color: #15181C">section gap</span> 24 · <span style="font-weight: 600; color: #15181C">card padding</span> 16</div>
+        <div style="font-size: 14px; line-height: 20px; color: #5B6069"><span style="font-weight: 600; color: #15181C">Buttons</span> 56 tall, body 600 17 · <span style="font-weight: 600; color: #15181C">touch targets</span> 44 or more</div>
+        <div style="font-size: 14px; line-height: 20px; color: #5B6069"><span style="font-weight: 600; color: #15181C">Phone</span> 390 × 844 · top inset 54 · bottom inset 34 · no status bar</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; flex-direction: row; align-items: baseline; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid #E3E1DB">
+      <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: #15181C">04 · Surfaces</div>
+      <div style="font-size: 14px; line-height: 20px; font-weight: 500; color: #5B6069">Two grounds. The camera is the user's world, the chrome stays out of the way. Learning happens on paper.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px">
+      <div style="background: #0D0F12; border-radius: 20px; padding: 20px; display: flex; flex-direction: row; gap: 20px; align-items: center; color: #FFFFFF">
+        <div style="width: 180px; height: 120px; border-radius: 12px; background: linear-gradient(160deg,#3A3F47,#1C1F24); position: relative; overflow: hidden; flex-shrink: 0">
+          <div style="position: absolute; top: 12px; left: 12px; width: 18px; height: 18px; border-top: 3px solid #FFFFFF; border-left: 3px solid #FFFFFF; border-top-left-radius: 6px"></div>
+          <div style="position: absolute; top: 12px; right: 12px; width: 18px; height: 18px; border-top: 3px solid #FFFFFF; border-right: 3px solid #FFFFFF; border-top-right-radius: 6px"></div>
+          <div style="position: absolute; bottom: 12px; left: 12px; width: 18px; height: 18px; border-bottom: 3px solid #FFFFFF; border-left: 3px solid #FFFFFF; border-bottom-left-radius: 6px"></div>
+          <div style="position: absolute; bottom: 12px; right: 12px; width: 18px; height: 18px; border-bottom: 3px solid #FFFFFF; border-right: 3px solid #FFFFFF; border-bottom-right-radius: 6px"></div>
+          <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; background: rgba(20,22,26,0.62); border: 1px solid rgba(255,255,255,0.14); white-space: nowrap">
+            <span style="width: 6px; height: 6px; border-radius: 999px; background: #F2C94C"></span>
+            <span lang="fr" style="font-family: 'Bricolage Grotesque'; font-size: 14px; line-height: 18px; font-weight: 500; color: #FFFFFF">la machine</span>
+            <span style="font-size: 12px; line-height: 16px; color: rgba(255,255,255,0.72)">machine</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <div style="font-family: 'Bricolage Grotesque'; font-size: 18px; line-height: 24px; font-weight: 700">Camera surfaces</div>
+          <div style="font-size: 14px; line-height: 20px; color: rgba(255,255,255,0.72)">Night ground, glass pills, snow text. Sun marks memory: a card is due, we saw this before. No bottom nav, one control row.</div>
+        </div>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #E3E1DB; border-radius: 20px; padding: 20px; display: flex; flex-direction: row; gap: 20px; align-items: center">
+        <div style="width: 180px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px">
+          <div style="display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1px solid #E3E1DB; border-radius: 12px; background: #F6F5F2">
+            <div style="font-size: 11px; line-height: 14px; font-weight: 500; color: #5B6069">You said</div>
+            <div lang="fr" style="font-family: 'Bricolage Grotesque'; font-size: 14px; line-height: 18px; font-weight: 700; color: #B84A1C">le machine</div>
+            <div style="font-size: 11px; line-height: 14px; font-weight: 500; color: #5B6069">Better</div>
+            <div lang="fr" style="font-family: 'Bricolage Grotesque'; font-size: 14px; line-height: 18px; font-weight: 700; color: #0F6E56">la machine</div>
+          </div>
+          <button type="button" style="border: 0; background: #0F6E56; color: #FFFFFF; font: inherit; cursor: pointer; height: 40px; border-radius: 12px; font-size: 14px; font-weight: 600">Keep</button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <div style="font-family: 'Bricolage Grotesque'; font-size: 18px; line-height: 24px; font-weight: 700">Learning surfaces</div>
+          <div style="font-size: 14px; line-height: 20px; color: #5B6069">Paper ground, white cards, moss for the one action and for "better". Clay for what you said. Bottom nav with Look, Review, Diary.</div>
+        </div>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: row; gap: 10px; flex-wrap: wrap">
+      <span style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px; border: 1px solid #E3E1DB; background: #FFFFFF; font-size: 14px; line-height: 20px; font-weight: 500; color: #15181C"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12"></path><path d="M18 6L6 18"></path></svg>no streaks</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px; border: 1px solid #E3E1DB; background: #FFFFFF; font-size: 14px; line-height: 20px; font-weight: 500; color: #15181C"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12"></path><path d="M18 6L6 18"></path></svg>no XP, gems, flames</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px; border: 1px solid #E3E1DB; background: #FFFFFF; font-size: 14px; line-height: 20px; font-weight: 500; color: #15181C"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12"></path><path d="M18 6L6 18"></path></svg>no mascots</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px; border: 1px solid #E3E1DB; background: #FFFFFF; font-size: 14px; line-height: 20px; font-weight: 500; color: #15181C"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12"></path><path d="M18 6L6 18"></path></svg>no emoji</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px; border: 1px solid #E3E1DB; background: #FFFFFF; font-size: 14px; line-height: 20px; font-weight: 500; color: #15181C"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12"></path><path d="M18 6L6 18"></path></svg>no fake status bar</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px; background: #DDEFE7; font-size: 14px; line-height: 20px; font-weight: 500; color: #0F6E56"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>correction after the turn, not during</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px; background: #DDEFE7; font-size: 14px; line-height: 20px; font-weight: 500; color: #0F6E56"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>lowercase-calm copy, no exclamation marks</span>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1200,"height":1320}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

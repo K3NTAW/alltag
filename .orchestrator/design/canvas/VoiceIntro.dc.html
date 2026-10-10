@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Voice intro</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+body{margin:0;font-family:'Instrument Sans',system-ui,sans-serif;color:#15181C}
+a{color:#0F6E56}a:hover{color:#0A4F3E}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; position: relative; overflow: hidden; background: #0D0F12; color: #FFFFFF">
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 844px; background: linear-gradient(160deg,#3A3F47 0%,#1C1F24 60%,#0D0F12 100%)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="position: absolute; left: 95px; top: 322px; width: 200px; height: 200px; opacity: 0.3; color: #FFFFFF">
+      <rect x="4" y="2.5" width="16" height="9" rx="2"></rect>
+      <path d="M7 5.5h4"></path>
+      <path d="M12 11.5v2.5"></path>
+      <path d="M10 14h4"></path>
+      <path d="M8 16.5h7v3.5a1.5 1.5 0 0 1-1.5 1.5h-4A1.5 1.5 0 0 1 8 20z"></path>
+      <path d="M15 17.5h1.5a1.25 1.25 0 0 1 0 2.5H15"></path>
+      <path d="M1 22.5h22"></path>
+    </svg>
+    <div style="position: absolute; left: 20px; bottom: 44px; font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; color: rgba(255,255,255,0.5)">[PHOTO: café counter]</div>
+  </div>
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 844px; background: rgba(13,15,18,0.5)"></div>
+
+  <div style="position: absolute; left: 0; right: 0; top: 54px; display: flex; flex-direction: row; justify-content: center">
+    <div style="padding: 6px 12px; border-radius: 999px; background: rgba(20,22,26,0.62); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.14); font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; color: #FFFFFF; white-space: nowrap">Listen · 1 of 3</div>
+  </div>
+
+  <button aria-label="Tap to interrupt" style="position: absolute; left: 135px; top: 290px; width: 120px; height: 120px; padding: 0; box-sizing: border-box; border-radius: 999px; background: rgba(20,22,26,0.62); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 3px solid #0F6E56; color: #FFFFFF; font: inherit; cursor: pointer; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 6px">
+    <span style="width: 5px; height: 18px; border-radius: 3px; background: #FFFFFF"></span>
+    <span style="width: 5px; height: 34px; border-radius: 3px; background: #FFFFFF"></span>
+    <span style="width: 5px; height: 48px; border-radius: 3px; background: #FFFFFF"></span>
+    <span style="width: 5px; height: 30px; border-radius: 3px; background: #FFFFFF"></span>
+    <span style="width: 5px; height: 20px; border-radius: 3px; background: #FFFFFF"></span>
+  </button>
+
+  <div style="position: absolute; right: 20px; top: 290px; display: flex; flex-direction: column; gap: 8px">
+    <button aria-label="Slower" style="width: 56px; height: 56px; padding: 0; box-sizing: border-box; border-radius: 16px; background: rgba(20,22,26,0.62); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.14); color: #FFFFFF; font: inherit; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width: 18px; height: 18px"><path d="M4 16a8 8 0 0 1 16 0"></path><path d="M12 16l-3-4"></path><path d="M4 16h16"></path></svg>
+      <span style="font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: 0.04em">Slower</span>
+    </button>
+    <button aria-label="Again" style="width: 56px; height: 56px; padding: 0; box-sizing: border-box; border-radius: 16px; background: rgba(20,22,26,0.62); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.14); color: #FFFFFF; font: inherit; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width: 18px; height: 18px"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v5h5"></path></svg>
+      <span style="font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: 0.04em">Again</span>
+    </button>
+  </div>
+
+  <div style="position: absolute; left: 45px; top: 442px; width: 300px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center">
+    <div lang="fr" style="font-family: 'Bricolage Grotesque'; font-size: 20px; line-height: 26px; font-weight: 500; color: #FFFFFF">Une tasse, le lait, un croissant.</div>
+    <div style="font-size: 14px; line-height: 20px; color: rgba(255,255,255,0.72)">A cup, milk, a croissant.</div>
+    <div style="font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.04em; color: rgba(255,255,255,0.72); margin-top: 10px">Noé is speaking · tap to interrupt</div>
+  </div>
+
+  <div style="position: absolute; left: 0; right: 0; bottom: 48px; display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 8px">
+    <span style="width: 8px; height: 8px; border-radius: 999px; background: #0F6E56"></span>
+    <span style="width: 8px; height: 8px; border-radius: 999px; background: #0F6E56"></span>
+    <span style="width: 8px; height: 8px; border-radius: 999px; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.5); background: transparent"></span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
