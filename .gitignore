@@ -8,3 +8,8 @@ wt/
 .orchestrator/daemon.lock
 graphify-out/
 .mcp.json
+node_modules
+dist
+.env
+.env.*.local
+.vercel

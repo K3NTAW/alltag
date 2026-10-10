@@ -1,0 +1,30 @@
+/* Placeholder values with stable names. The human pastes the canvas values here later. */
+:root {
+  --bg: #F6F4EF;
+  --card: #FFFFFF;
+  --ink: #1B1B1A;
+  --muted: #6B6965;
+  --line: #E4E1DA;
+  --accent: #2F6F5E;
+  --accent-soft: #DCEBE4;
+  --warn: #B8542F;
+  --due: #D9A441;
+
+  --radius-s: 12px;
+  --radius-m: 20px;
+  --radius-pill: 999px;
+
+  --font: system-ui, -apple-system, "Inter", sans-serif;
+  --text-xs: 13px;
+  --text-s: 15px;
+  --text-m: 17px;
+  --text-l: 22px;
+  --text-xl: 28px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+}

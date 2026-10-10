@@ -1,0 +1,39 @@
+import type {
+  CorrectRequest,
+  CorrectResponse,
+  GradiumToken,
+  SceneRequest,
+  SceneResult,
+  TurnRequest,
+  TurnResponse,
+} from "./types";
+
+async function call<T>(name: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`/api/${name}`, init);
+  if (!res.ok) throw new Error(`${name} ${res.status}`);
+  return (await res.json()) as T;
+}
+
+function post<T>(name: string, body: unknown): Promise<T> {
+  return call<T>(name, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export function postScene(req: SceneRequest): Promise<SceneResult> {
+  return post("scene", req);
+}
+
+export function postTurn(req: TurnRequest): Promise<TurnResponse> {
+  return post("turn", req);
+}
+
+export function postCorrect(req: CorrectRequest): Promise<CorrectResponse> {
+  return post("correct", req);
+}
+
+export function getGradiumToken(): Promise<GradiumToken> {
+  return call("gradium-token");
+}
