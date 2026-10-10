@@ -1,0 +1,87 @@
+Implement this single task in the current worktree. Commit the completed changes on the current branch with a message that starts with the task id before testing. Never leave uncommitted changes and never touch files outside scope.
+The packet above is the task contract: implement the ## objective, satisfy every line of ## acceptance, and edit only paths listed in ## write_scope.
+Run only the acceptance-named tests in the foreground; never background a command. Each command must finish in under 10 minutes. The daemon runs the full gate externally.
+No new dependencies without stating why. Finish with: summary, files changed, failures-only test output.
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read.
+
+packet v97ef6963c042 base 5ef24be4726f sources pool.toml@19c37ec8af44 gotchas@4cea4f31e183 memory@notes specialist: execute+implement-spec routed=shadow
+## skills
+### executor/implement-spec (v6ba2f814dd6f)
+## Trigger
+Any execute task from the orchestrator.
+
+## Objective
+Implement one atomic task within its Scope and leave tests green.
+
+## Procedure
+Read Spec, Acceptance, Scope. Run `scripts/tests_green.sh` first. Make the smallest accepted change. Run it again; iterate on failure. Commit on the task branch.
+
+## Tools
+Read, Edit, Bash; `scripts/failures_only.sh`.
+
+## Evidence requirements
+Acceptance checks and tests-green result.
+
+## Output contract
+Finish with: 3-line summary, `git diff --stat`, failures-only output (empty when green).
+
+## Stop conditions
+Stop when Acceptance passes or budget ends.
+
+## Failure/recovery
+Report only `scripts/failures_only.sh` output. Edit only paths in Scope. No new dependencies unless the spec names them.
+## objective
+follow-up for T-0088: restyle the App offline status line to the StateOffline v3 glass pill
+- discovery: Design v3 phase 2 remainder. T-0088 restyled Settings and Account but could not touch the offline banner because it lives in src/App.tsx, outside its write scope. This task finishes the "system states" part of T-0088.
+Read first: /Users/k3ntaw/code/alltag/.orchestrator/design/v3/STYLE-V3.md, /Users/k3ntaw/code/alltag/.orchestrator/design/v3/SNIPPETS.md, the StateOffline section of /Users/k3ntaw/code/alltag/.orchestrator/design/v3/BOARDS-V3.md, and the board /Users/k3ntaw/code/alltag/.orchestrator/design/v3/project/StateOffline.dc.html. For the pill style, reuse the classes T-0085 put on the Roleplay offline pill (src/screens/Roleplay.tsx, data-testid offline-pill: glass-dark glass-specular fade-in, h-9, rounded-[18px], 13px/18px text).
+Change: in src/App.tsx the offline `<p role="status">` (shown when offline and screen is not roleplay) becomes the StateOffline top glass pill: centred under the safe-area top inset, cloud-off icon (inline SVG, aria-hidden) plus the text "Offline · Noé on your phone". Keep role="status", keep the same render condition and the same hook logic. No toast, no tutor card, no text input (those belong to Roleplay and already exist there). Use motion.css classes and tokens, no raw hex, no new dependency.
+StateSlow: the app has no slow-connection state, so there is nothing to restyle; do not add behaviour. Note that in the result.
+Rules: behaviour, state logic, props, aria roles and data-testid values stay as they are; existing tests pass unchanged. Before starting run `pnpm install --frozen-lockfile` in the worktree (the T-0088 gate went red only because node_modules was missing). Leave no untracked files. Rollback: git revert the commit.
+## acceptance
+- src/App.tsx offline status line matches the StateOffline board top pill: glass-dark pill, cloud-off icon, text 'Offline · Noé on your phone', centred under the safe-area inset, fade-in motion class
+- role="status" and the render condition (offline and screen !== roleplay) unchanged; Roleplay.tsx untouched
+- No raw hex colours; no new dependency; no untracked files
+- Gate green: npm test -- --watch=false, npx tsc --noEmit, npm run lint
+## base
+- branch: main
+- merge-base goal/T-0001: 5ef24be4726f745612785cfba5e120dfd068ed32
+- goal: T-0001
+## write_scope
+- src/App.tsx
+## read_scope
+- src/
+- tests/
+## constraints
+- allowed_dependencies: "none new"
+- budget_turns: 25
+- dedupe: "design-v3-system-offline"
+- follow_up_for: "T-0088"
+- interface_contract: "App keeps its offline status element role and render condition; styling only."
+- read_only: false
+- read_scope: ["**", "/Users/k3ntaw/code/alltag/.orchestrator/design/v3/**"]
+- route: "independent"
+- task_class: "styling"
+- timeout_s: 900
+## relevant_tests
+- (none found)
+## symbols
+- (none)
+## gotchas
+- mem:gotchas.md:3 Gradium WebSocket shapes verified 2026-10-10
+- mem:gotchas.md:10 Vercel functions need .js on relative imports (type=module)
+- mem:gotchas.md:17 Worktree prune during a running executor left a stale index.lock
+## decisions
+- 2026-10-10 Alltag build order A..H as 8 execute tasks with shared contracts owned by the scaffold
+- 2026-10-10 T-0001 closable: pushed goal/T-0001 19e9771..a0b9ef8 (T-0029 merge was local only), updated PR 1 body with O and S, posted PR url as goal result
+- 2026-10-10 T-0041 gate_red was load noise: external gate green, hold released for re-gate instead of respec or split
+## verify
+- .claude/hooks/tests-green.sh .
+- On failure, report only scripts/failures_only.sh output.
+## evidence
+- T-0088: Planner 17:47: gate_red was environment only (no node_modules in wt/T-0088: vitest, tsc, eslint all 'command not found'; bus failure_kind=environment). Planner ran pnpm install --frozen-lockfile in wt
+
+## conditional instructions
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read; run the test script at most twice.
+
+You are a Claude fallback executor (Codex is unavailable); a human reviews merges. Commit on the task branch when green.
+If you need a tool outside your allowlist, post bus_post_result with status held and result reason needs_tool:<tool id>.
