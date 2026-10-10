@@ -11,7 +11,18 @@
   --color-accent-soft: var(--accent-soft);
   --color-warn: var(--warn);
   --color-due: var(--due);
+  --color-paper: var(--paper);
+  --color-ink2: var(--ink2);
+  --color-night: var(--night);
+  --color-snow: var(--snow);
+  --color-moss: var(--moss);
+  --color-moss-soft: var(--moss-soft);
+  --color-clay: var(--clay);
+  --color-clay-soft: var(--clay-soft);
+  --color-sun: var(--sun);
   --font-sans: var(--font);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
 }
 
 html,
@@ -22,9 +33,19 @@ body,
 
 body {
   margin: 0;
-  background: var(--bg);
+  background: var(--paper);
   color: var(--ink);
-  font-family: var(--font);
+  font-family: var(--font-body);
   font-size: var(--text-m);
   -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.display {
+  font-family: var(--font-display);
 }

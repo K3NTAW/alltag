@@ -1,20 +1,61 @@
-/* Placeholder values with stable names. The human pastes the canvas values here later. */
+/* Alltag design language, from .orchestrator/design/STYLE.md (v1, 2026-10-10). */
 :root {
-  --bg: #F6F4EF;
+  /* Ground */
+  --paper: #F6F5F2;
   --card: #FFFFFF;
-  --ink: #1B1B1A;
-  --muted: #6B6965;
-  --line: #E4E1DA;
-  --accent: #2F6F5E;
-  --accent-soft: #DCEBE4;
-  --warn: #B8542F;
-  --due: #D9A441;
+  --line: #E3E1DB;
+  --ink: #15181C;
+  --ink2: #5B6069;
+  --night: #0D0F12;
+  --glass: rgba(20, 22, 26, 0.62);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --snow: #FFFFFF;
 
-  --radius-s: 12px;
-  --radius-m: 20px;
+  /* Accent */
+  --moss: #0F6E56;
+  --moss-soft: #DDEFE7;
+  --clay: #B84A1C;
+  --clay-soft: #F7E3DA;
+  --sun: #F2C94C;
+
+  /* Type */
+  --font-display: "Bricolage Grotesque", sans-serif;
+  --font-body: "Instrument Sans", sans-serif;
+  --text-hero: 44px;
+  --lh-hero: 48px;
+  --text-h1: 32px;
+  --lh-h1: 38px;
+  --text-h2: 24px;
+  --lh-h2: 30px;
+  --text-title: 18px;
+  --lh-title: 24px;
+  --text-body: 16px;
+  --lh-body: 24px;
+  --text-small: 14px;
+  --lh-small: 20px;
+  --text-micro: 12px;
+  --lh-micro: 16px;
+
+  /* Shape and layout */
+  --radius-chip: 10px;
+  --radius-button: 16px;
+  --radius-card: 20px;
+  --radius-sheet: 28px;
   --radius-pill: 999px;
+  --gutter: 20px;
+  --safe-top: 54px;
+  --safe-bottom: 34px;
 
-  --font: system-ui, -apple-system, "Inter", sans-serif;
+  /* Aliases for T-0002 token names */
+  --bg: var(--paper);
+  --muted: var(--ink2);
+  --accent: var(--moss);
+  --accent-soft: var(--moss-soft);
+  --warn: var(--clay);
+  --due: var(--sun);
+  --radius-s: var(--radius-chip);
+  --radius-m: var(--radius-card);
+  --font: var(--font-body);
   --text-xs: 13px;
   --text-s: 15px;
   --text-m: 17px;
