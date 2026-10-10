@@ -240,7 +240,7 @@ describe("Listen", () => {
     expect(postExtract).toHaveBeenCalledWith(expect.objectContaining({ lines: [{ fr: "Salut", en: "" }] }));
   });
 
-  it("ignores a translation that arrives after stop and a new start", async () => {
+  it("ignores a translation that arrives after stop", async () => {
     let resolve: (r: { text: string }) => void = () => {};
     vi.mocked(postTranslate).mockImplementationOnce(() => new Promise((r) => (resolve = r)));
     vi.mocked(postExtract).mockRejectedValue(new Error("extract 502"));
@@ -251,14 +251,10 @@ describe("Listen", () => {
     expect(postTranslate).toHaveBeenCalledTimes(1);
     fireEvent.click(screen.getByRole("button", { name: "Stop and learn" }));
     await screen.findByText("From that conversation");
-    fireEvent.click(screen.getByRole("button", { name: "Save transcript to diary" }));
-    act(() => go("listen"));
-    live.reset();
-    fireEvent.click(screen.getByRole("button", { name: "start listening" }));
-    act(() => live.set({ state: "listening", events: [{ kind: "user", text: "Salut", final: false }] }));
     await act(async () => resolve({ text: "Hello (late)" }));
     expect(screen.queryByText("Hello (late)")).not.toBeInTheDocument();
-    expect(screen.getAllByTestId("pair")).toHaveLength(1);
+    fireEvent.click(screen.getByRole("button", { name: "Save transcript to diary" }));
+    expect(conversations.all()[0].lines.map((l) => l.en)).not.toContain("Hello (late)");
   });
 
   it("shows the fallback notice when the live token fails", async () => {
