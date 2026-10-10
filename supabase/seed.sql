@@ -1,0 +1,1 @@
+-- No seed data. Every row belongs to a signed-in Supabase Auth user and is written by the app's sync.

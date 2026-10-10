@@ -8,3 +8,18 @@ wt/
 .orchestrator/daemon.lock
 graphify-out/
 .mcp.json
+node_modules
+dist
+.env
+.env.*.local
+.vercel
+# iOS (Capacitor) build products; ios/App/App/public is the synced web build
+ios/App/build/
+ios/App/DerivedData/
+ios/App/App/public/
+ios/App/Pods/
+ios/App/App.xcworkspace/xcuserdata/
+
+# Gemma model for the native app bundle (pnpm model:fetch), ~700 MB
+public/models/*.task
+public/models/*.litertlm

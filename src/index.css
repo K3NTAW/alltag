@@ -1,0 +1,64 @@
+@import "tailwindcss";
+@import "./styles/tokens.css";
+@import "./styles/motion.css";
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-warn: var(--warn);
+  --color-due: var(--due);
+  --color-paper: var(--paper);
+  --color-ink2: var(--ink2);
+  --color-night: var(--night);
+  --color-snow: var(--snow);
+  --color-moss: var(--moss);
+  --color-moss-soft: var(--moss-soft);
+  --color-clay: var(--clay);
+  --color-clay-soft: var(--clay-soft);
+  --color-sun: var(--sun);
+  --font-sans: var(--font);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+}
+
+/* Scroll room under the floating tab bar (64 + 16 + 16) and the home indicator. */
+@utility pb-tabbar {
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
+}
+
+/* Content starts below the status bar now that the viewport covers it. */
+@utility pt-safe {
+  padding-top: calc(env(safe-area-inset-top) + 16px);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(70% 45% at 85% -5%, rgba(47, 163, 127, 0.1), rgba(47, 163, 127, 0) 70%) no-repeat, var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--text-m);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+}

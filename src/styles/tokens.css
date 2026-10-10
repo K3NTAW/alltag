@@ -1,0 +1,228 @@
+/* Alltag design language v3 "Quiet glass, living orb", from docs/design/STYLE-V3.md (2026-10-10). */
+:root {
+  /* Ground */
+  --paper: #F4F2EE;
+  --sunken: #ECE9E3;
+  --card: #FFFFFF;
+  --line: rgba(18, 19, 22, 0.08);
+  --ink: #121316;
+  --ink2: #5E616A;
+  --ink3: #8A8D94;
+  --night: #0A0B0D;
+  --raised: #16181C;
+  --night-text: #F5F4F0;
+  --night-text2: rgba(245, 244, 240, 0.7);
+  --glass: rgba(22, 24, 28, 0.52);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --snow: #FFFFFF;
+
+  /* Accent */
+  --moss: #127A5E;
+  --moss-soft: #DCEFE6;
+  --clay: #B4472A;
+  --clay-soft: #F7E3DB;
+  --sun: #E7A92E;
+  --sun-soft: #FBF0D6;
+  --sun-on-dark: #F3CF7A;
+  --sun-ink: #7A5208;
+
+  /* Noé orb, only inside the orb and its glow */
+  --orb-1: #0E5C47;
+  --orb-2: #2FA37F;
+  --orb-3: #BFE8D6;
+  --orb-4: #F0C766;
+
+  /* Type */
+  --font-display: "Instrument Serif", Georgia, serif;
+  --font-body: "Geist", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+  --text-hero: 44px;
+  --lh-hero: 48px;
+  /* iOS scale from STYLE-GLASS.md: large title, title, headline, body, footnote, caption. */
+  --text-h1: 34px;
+  --lh-h1: 41px;
+  --text-h2: 28px;
+  --lh-h2: 34px;
+  --text-title: 17px;
+  --lh-title: 22px;
+  --text-body: 17px;
+  --lh-body: 22px;
+  --text-callout: 16px;
+  --lh-callout: 21px;
+  --text-small: 13px;
+  --lh-small: 18px;
+  --text-micro: 12px;
+  --lh-micro: 16px;
+
+  /* Shape and layout */
+  --radius-chip: 10px;
+  --radius-thumb: 14px;
+  --radius-inner: 16px;
+  --radius-button: 14px;
+  --radius-card: 24px;
+  --radius-sheet: 32px;
+  --radius-pill: 999px;
+  --gutter: 20px;
+  --safe-top: 54px;
+  --safe-bottom: 34px;
+
+  /* Aliases for T-0002 token names */
+  --bg: var(--paper);
+  --muted: var(--ink2);
+  --accent: var(--moss);
+  --accent-soft: var(--moss-soft);
+  --warn: var(--clay);
+  --due: var(--sun);
+  --radius-s: var(--radius-chip);
+  --radius-m: var(--radius-card);
+  --font: var(--font-body);
+  --text-xs: 13px;
+  --text-s: 15px;
+  --text-m: 17px;
+  --text-l: 22px;
+  --text-xl: 28px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* Elevation (light). Cards have no border. */
+  --e1: 0 1px 2px rgba(18, 19, 22, 0.04), 0 8px 24px rgba(18, 19, 22, 0.06);
+  --e2: 0 2px 6px rgba(18, 19, 22, 0.06), 0 18px 48px rgba(18, 19, 22, 0.14);
+
+  /* Motion: instant, quick, base, slow, ambient. */
+  --dur-1: 120ms;
+  --dur-2: 220ms;
+  --dur-3: 360ms;
+  --dur-4: 600ms;
+  --dur-loop: 4800ms;
+  --stagger: 50ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-loop: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Glass, floating controls only (STYLE-V3 section 4). */
+  --glass-blur: 24px;
+  --glass-light-bg: rgba(255, 255, 255, 0.62);
+  --glass-light-border: rgba(255, 255, 255, 0.8);
+  --glass-light-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 10px 30px rgba(18, 19, 22, 0.12),
+    0 0 0 0.5px rgba(18, 19, 22, 0.08);
+  --glass-dark-bg: rgba(22, 24, 28, 0.52);
+  --glass-dark-border: rgba(255, 255, 255, 0.14);
+  --glass-dark-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 12px 36px rgba(0, 0, 0, 0.45);
+  --glass-clear-bg: rgba(255, 255, 255, 0.14);
+  --glass-clear-border: rgba(255, 255, 255, 0.32);
+  --glass-clear-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
+  --glass-clear-blur: 16px;
+  --glass-specular: linear-gradient(180deg, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0) 45%);
+  --glass-specular-dark: linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 45%);
+  --glass-tint-moss: rgba(18, 122, 94, 0.14);
+  --glass-tint-moss-dark: rgba(143, 220, 192, 0.2);
+  --moss-on-dark: #8FDCC0;
+  --camera-dim: rgba(0, 0, 0, 0.35);
+  --radius-capsule: 32px;
+  --radius-full: 999px;
+  --tabbar-h: 64px;
+  --tabbar-gap: 16px;
+}
+
+/* Glass is for controls and navigation only, never cards, lists or text.
+   Components layer, so Tailwind utilities (position, size) still win. */
+@layer components {
+  .glass-light,
+  .glass-dark,
+  .glass-clear {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .glass-light {
+    background: var(--glass-light-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(170%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(170%);
+    border: 1px solid var(--glass-light-border);
+    box-shadow: var(--glass-light-shadow);
+    color: var(--ink);
+  }
+
+  .glass-dark {
+    background: var(--glass-dark-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(170%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(170%);
+    border: 1px solid var(--glass-dark-border);
+    box-shadow: var(--glass-dark-shadow);
+    color: var(--night-text);
+  }
+
+  .glass-clear {
+    background: var(--glass-clear-bg);
+    backdrop-filter: blur(var(--glass-clear-blur)) saturate(150%);
+    -webkit-backdrop-filter: blur(var(--glass-clear-blur)) saturate(150%);
+    border: 1px solid var(--glass-clear-border);
+    box-shadow: var(--glass-clear-shadow);
+    color: var(--snow);
+  }
+
+  /* Top highlight, painted under the content of the element. */
+  .glass-specular {
+    isolation: isolate;
+  }
+
+  .glass-specular::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--glass-specular);
+    pointer-events: none;
+  }
+
+  .glass-dark.glass-specular::before {
+    background: var(--glass-specular-dark);
+  }
+
+  .tint-moss {
+    background: var(--glass-tint-moss);
+    color: var(--moss);
+  }
+
+  .glass-dark .tint-moss {
+    background: var(--glass-tint-moss-dark);
+    color: var(--moss-on-dark);
+  }
+
+  /* Soft glows so the glass has something to refract. */
+  .bg-paper {
+    background: radial-gradient(70% 45% at 85% -5%, rgba(47, 163, 127, 0.1), rgba(47, 163, 127, 0) 70%), var(--paper);
+  }
+
+  .bg-night {
+    background: var(--night);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-light {
+    background: #FFFFFF;
+    border-color: var(--line);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .glass-dark {
+    background: #1C1E22;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .glass-clear {
+    background: rgba(22, 24, 28, 0.78);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}

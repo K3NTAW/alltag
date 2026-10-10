@@ -1,0 +1,21 @@
+# Supabase CLI config for the hosted project "alltag" (eu-central-2).
+# No keys here.
+project_id = "alltag"
+
+[api]
+enabled = true
+schemas = ["public", "storage"]
+
+[db]
+major_version = 17
+
+[storage]
+enabled = true
+file_size_limit = "10MiB"
+
+[auth]
+enabled = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false
