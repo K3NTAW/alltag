@@ -1,0 +1,96 @@
+Implement this single task in the current worktree. Commit the completed changes on the current branch with a message that starts with the task id before testing. Never leave uncommitted changes and never touch files outside scope.
+The packet above is the task contract: implement the ## objective, satisfy every line of ## acceptance, and edit only paths listed in ## write_scope.
+Run only the acceptance-named tests in the foreground; never background a command. Each command must finish in under 10 minutes. The daemon runs the full gate externally.
+No new dependencies without stating why. Finish with: summary, files changed, failures-only test output.
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read.
+
+packet vd93342a661c0 base 5ef24be4726f sources pool.toml@19c37ec8af44 gotchas@4389a0c0f548 memory@notes specialist: execute+implement-spec routed=shadow
+## skills
+### executor/implement-spec (v6ba2f814dd6f)
+## Trigger
+Any execute task from the orchestrator.
+
+## Objective
+Implement one atomic task within its Scope and leave tests green.
+
+## Procedure
+Read Spec, Acceptance, Scope. Run `scripts/tests_green.sh` first. Make the smallest accepted change. Run it again; iterate on failure. Commit on the task branch.
+
+## Tools
+Read, Edit, Bash; `scripts/failures_only.sh`.
+
+## Evidence requirements
+Acceptance checks and tests-green result.
+
+## Output contract
+Finish with: 3-line summary, `git diff --stat`, failures-only output (empty when green).
+
+## Stop conditions
+Stop when Acceptance passes or budget ends.
+
+## Failure/recovery
+Report only `scripts/failures_only.sh` output. Edit only paths in Scope. No new dependencies unless the spec names them.
+## objective
+design v3 phase 2: restyle Settings, Account and system states to the v3 boards
+- discovery: Design v3 PHASE 2, screen restyle on top of phase 1 (T-0083: v3 tokens, fonts, radii, motion.css keyframes + utility classes + reduce-motion, Orb component, restyled GlassButton and TabBar; reference copies in docs/design/).
+Read first: /Users/k3ntaw/code/alltag/.orchestrator/design/v3/STYLE-V3.md, /Users/k3ntaw/code/alltag/.orchestrator/design/v3/SNIPPETS.md, /Users/k3ntaw/code/alltag/.orchestrator/design/v3/BOARDS-V3.md (the sections named below) and the board files /Users/k3ntaw/code/alltag/.orchestrator/design/v3/project/<Board>.dc.html (inline-styled HTML of each phone screen; the visual target). Match layout, hierarchy, type (Instrument Serif for French text and titles, Geist for UI), spacing, radii, glass only on floating controls, and the named motions (use the motion.css classes; respect reduce-motion).
+Rules: behaviour, state logic, data flow, API calls, props, aria labels, roles and data-testid values stay exactly as they are; existing tests must pass unchanged except assertions that pin old copy or old class names, which you may update with the same intent. Use the CSS variables / Tailwind theme colours, not raw hex, except the orb gradient. No new dependencies. Copy changes only where the board shows different wording for the same element.
+Rollback: git revert the commit.
+
+This task: Settings, Account and system states. Boards: SYSTEM: Settings, SignIn (Account screen: own address/password form with the Sign in / Create account segmented control), StateOffline, StateSlow (offline/slow banners). Only the files in scope.
+## acceptance
+- Settings, Account and system states match the named v3 boards in layout, type, colour tokens, radii and motion classes
+- Behaviour, props, aria labels and data-testid values unchanged; existing tests pass (only old-style assertions updated)
+- No raw hex colours except the orb gradient; no new dependency
+- Gate green: npm test -- --watch=false, npx tsc --noEmit, npm run lint
+## base
+- branch: main
+- merge-base goal/T-0001: 5ef24be4726f745612785cfba5e120dfd068ed32
+- goal: T-0001
+## write_scope
+- src/screens/Settings.tsx
+- src/screens/Settings.test.tsx
+- src/screens/Account.tsx
+- src/screens/Account.test.tsx
+- src/offline/**
+## read_scope
+- src/offline/
+- src/screens/
+- tests/
+## constraints
+- allowed_dependencies: "none new"
+- budget_turns: 60
+- dedupe: "design-v3-system"
+- interface_contract: "Screen components keep props, behaviour, aria labels and test ids; styling only."
+- read_only: false
+- read_scope: ["**", "/Users/k3ntaw/code/alltag/.orchestrator/design/v3/**"]
+- route: "independent"
+- task_class: "styling"
+- timeout_s: 1800
+## relevant_tests
+- (none found)
+## symbols
+- (none)
+## gotchas
+- mem:gotchas.md:17 Worktree prune during a running executor left a stale index.lock
+- mem:gotchas.md:3 Gradium WebSocket shapes verified 2026-10-10
+- mem:gotchas.md:10 Vercel functions need .js on relative imports (type=module)
+## decisions
+- 2026-10-10 Alltag build order A..H as 8 execute tasks with shared contracts owned by the scaffold
+- 2026-10-10 T-0001 closable: pushed goal/T-0001 19e9771..a0b9ef8 (T-0029 merge was local only), updated PR 1 body with O and S, posted PR url as goal result
+- 2026-10-10 T-0041 gate_red was load noise: external gate green, hold released for re-gate instead of respec or split
+## verify
+- .claude/hooks/tests-green.sh .
+- On failure, report only scripts/failures_only.sh output.
+## evidence
+- T-0083: Design v3 phase 1 is done and committed on `task/T-0083` (3e0c2f8, plus fix bab780c). The full gate passes: 308 tests, tsc and lint all OK, and `pnpm build` exits 0.
+
+**Summary**
+- **Tokens:** `tokens
+- 00851d98701a task:T-0017:gotcha:1: - mem:gotchas.md:3 Gradium WebSocket shapes verified 2026-10-10
+
+## conditional instructions
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read; run the test script at most twice.
+
+You are a Claude fallback executor (Codex is unavailable); a human reviews merges. Commit on the task branch when green.
+If you need a tool outside your allowlist, post bus_post_result with status held and result reason needs_tool:<tool id>.
