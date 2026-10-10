@@ -1,0 +1,56 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4K5N117MT4XQNYT7E5EX0N0",
+  "session_id": "6de845f8-54bb-44ce-8792-e38aaf71de09",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T15:07:11.251272Z",
+  "branch": "task/T-0083",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/design/SNIPPETS.md",
+    "docs/design/STYLE-V3.md",
+    "docs/design/keyframes.css",
+    "index.html",
+    "src/components/GlassButton.tsx",
+    "src/components/Orb.test.tsx",
+    "src/components/Orb.tsx",
+    "src/components/TabBar.tsx",
+    "src/index.css",
+    "src/screens/Roleplay.tsx",
+    "src/styles/motion.css",
+    "src/styles/tokens.css",
+    "src/styles/tokens.test.ts"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "2157e33c02f2",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 20,
+    "cache_creation_tokens": 40440,
+    "cache_read_tokens": 417979,
+    "output_tokens": 12589,
+    "api_call_count": 10
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-10T15:07:11.232762Z",
+    "agent_lines": 756,
+    "agent_removed": 62,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 756,
+    "total_lines_changed": 818,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}

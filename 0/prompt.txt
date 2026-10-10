@@ -1,0 +1,113 @@
+Implement this single task in the current worktree. Commit the completed changes on the current branch with a message that starts with the task id before testing. Never leave uncommitted changes and never touch files outside scope.
+The packet above is the task contract: implement the ## objective, satisfy every line of ## acceptance, and edit only paths listed in ## write_scope.
+Run only the acceptance-named tests in the foreground; never background a command. Each command must finish in under 10 minutes. The daemon runs the full gate externally.
+No new dependencies without stating why. Finish with: summary, files changed, failures-only test output.
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read.
+
+packet vf4cafaf64599 base 5ef24be4726f sources pool.toml@19c37ec8af44 gotchas@6bdad2cdf8f9 memory@notes specialist: execute+implement-spec over cap by 1652 chars: acceptance kept whole routed=shadow
+## skills
+### executor/implement-spec (v6ba2f814dd6f)
+## Trigger
+Any execute task from the orchestrator.
+
+## Objective
+Implement one atomic task within its Scope and leave tests green.
+
+## Procedure
+Read Spec, Acceptance, Scope. Run `scripts/tests_green.sh` first. Make the smallest accepted change. Run it again; iterate on failure. Commit on the task branch.
+
+## Tools
+Read, Edit, Bash; `scripts/failures_only.sh`.
+
+## Evidence requirements
+Acceptance checks and tests-green result.
+
+## Output contract
+Finish with: 3-line summary, `git diff --stat`, failures-only output (empty when green).
+
+## Stop conditions
+Stop when Acceptance passes or budget ends.
+
+## Failure/recovery
+Report only `scripts/failures_only.sh` output. Edit only paths in Scope. No new dependencies unless the spec names them.
+## objective
+design v3 phase 1: tokens (palette, Instrument Serif + Geist, radii, motion), keyframes + reduce-motion, Noé orb, glass button and tab bar restyle
+- discovery: Design v3 "Quiet glass, living orb", PHASE 1 FOUNDATION. Hard deadline: this must be done, gate green and committed within 25 minutes. Keep it to the foundation; screen layouts are phase 2.
+
+Source of truth (read first, untracked, absolute paths): /Users/k3ntaw/code/alltag/.orchestrator/design/v3/STYLE-V3.md (tokens, type, motion, reduce-motion, haptics), /Users/k3ntaw/code/alltag/.orchestrator/design/v3/SNIPPETS.md (sections B keyframes, C Noé orb, D floating circle button, E tab bar, F buttons), /Users/k3ntaw/code/alltag/.orchestrator/design/v3/keyframes.css. Copy STYLE-V3.md, SNIPPETS.md and keyframes.css into docs/design/ in the repo so the code has its reference.
+
+The app styles through CSS variables: src/styles/tokens.css (imported by src/index.css, mapped into Tailwind v4 via @theme inline). Changing the tokens restyles every screen. Keep EVERY existing variable name (screens and tests use them); change values and add new ones.
+
+Do:
+1. tokens.css: v3 palette. --paper #F4F2EE (linen), --ink #121316, --ink2 #5E616A, --night #0A0B0D, --moss #127A5E (green), --sun #E7A92E, --clay #B4472A; derive --moss-soft, --clay-soft, --line, --card per STYLE-V3. Radii per STYLE-V3: 10/14/16/24/32/capsule (map --radius-chip 10, --radius-button 14 or as STYLE-V3 says, --radius-card 24, --radius-sheet 32, keep --radius-pill and --radius-capsule). Fonts: --font-display "Instrument Serif" (French text and titles), --font-body "Geist", add --font-mono "Geist Mono". Add motion tokens --dur-1 120ms, --dur-2 220ms, --dur-3 360ms, --dur-4 600ms, --dur-loop 4800ms and easing curves --ease-out, --ease-sheet, --ease-pop, --ease-loop exactly as STYLE-V3 defines. Glass only on floating controls: keep the existing glass classes and variables (tokens.test.ts checks them) and set their values per STYLE-V3.
+2. index.html: replace the Google Fonts link with Instrument Serif (regular + italic), Geist (400/500/600) and Geist Mono (400/500), display=swap.
+3. src/styles/motion.css (imported from src/index.css): the KEYFRAMES_BLOCK from SNIPPETS B / keyframes.css, plus small utility classes for the named motions STYLE-V3 lists that apply to whole elements (at least: screen enter, sheet up, pop in, press scale on .press:active, orb breathe). A @media (prefers-reduced-motion: reduce) block that disables loops and transforms and keeps opacity fades, per STYLE-V3.
+4. src/components/Orb.tsx (+ Orb.test.tsx): Noé orb from SNIPPETS C with props size (28|44|96|168) and state ("idle"|"listening"|"thinking"|"speaking"), gradient #0E5C47, #2FA37F, #BFE8D6, #F0C766, state drives the animation class; role="img" with aria-label "Noé, <state>". Replace the existing tutor avatar/orb usage ONLY where it is a single small swap (search src for the current tutor indicator); otherwise just export the component.
+5. src/components/GlassButton.tsx and src/components/TabBar.tsx restyled per SNIPPETS D/E/F (light and dark variants as described), with press motion. Keep their props, aria labels, test ids and tab set unchanged so TabBar.test.tsx and GlassButton.test.tsx pass; update tests only where they assert old style values.
+6. Update src/styles/tokens.test.ts expectations that pin old values; add assertions for the new palette, fonts, motion tokens and the reduce-motion block.
+Out of scope: screen layouts (phase 2), new dependencies, haptics plumbing.
+Rollback: git revert the commit.
+## acceptance
+- tokens.css carries the v3 palette, fonts, radii and motion tokens with all old variable names still defined; tokens.test.ts asserts them and passes
+- src/styles/motion.css has the v3 keyframes, motion utility classes and a prefers-reduced-motion block; imported from src/index.css
+- src/components/Orb.tsx renders four states with the v3 gradient and an accessible label; Orb.test.tsx passes
+- GlassButton and TabBar restyled per SNIPPETS with props, labels and tabs unchanged; their tests pass
+- index.html loads Instrument Serif, Geist and Geist Mono; docs/design/ holds STYLE-V3.md, SNIPPETS.md, keyframes.css
+- No new dependency; gate green: npm test -- --watch=false, npx tsc --noEmit, npm run lint; pnpm build exits 0
+## base
+- branch: main
+- merge-base goal/T-0001: 5ef24be4726f745612785cfba5e120dfd068ed32
+- goal: T-0001
+## write_scope
+- src/styles/tokens.css
+- src/styles/tokens.test.ts
+- src/styles/motion.css
+- src/index.css
+- index.html
+- src/components/Orb.tsx
+- src/components/Orb.test.tsx
+- src/components/GlassButton.tsx
+- src/components/GlassButton.test.tsx
+- src/components/TabBar.tsx
+- src/components/TabBar.test.tsx
+- docs/design/**
+- src/screens/Roleplay.tsx
+- src/screens/Roleplay.test.tsx
+## read_scope
+- .
+- docs/design/
+- src/
+- src/components/
+- src/screens/
+- src/styles/
+- tests/
+## constraints
+- allowed_dependencies: "none new"
+- budget_turns: 60
+- dedupe: "design-v3-foundation"
+- interface_contract: "All existing CSS variable names, component props, aria labels and test ids unchanged."
+- priority: "high"
+- read_only: false
+- read_scope: ["**", "/Users/k3ntaw/code/alltag/.orchestrator/design/v3/**"]
+- route: "straightforward"
+- task_class: "styling"
+- timeout_s: 1500
+## relevant_tests
+
+## symbols
+
+## gotchas
+
+## decisions
+
+## verify
+- .claude/hooks/tests-green.sh .
+- On failure, report only scripts/failures_only.sh output.
+## evidence
+
+
+## conditional instructions
+Tool-call budget: read only files inside Scope first, then edit; do not re-read a file you already read; run the test script at most twice.
+
+You are a Claude fallback executor (Codex is unavailable); a human reviews merges. Commit on the task branch when green.
+If you need a tool outside your allowlist, post bus_post_result with status held and result reason needs_tool:<tool id>.

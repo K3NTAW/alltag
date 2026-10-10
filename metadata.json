@@ -1,0 +1,38 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4K5N117MT4XQNYT7E5EX0N0",
+  "strategy": "manual-commit",
+  "branch": "task/T-0083",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/design/SNIPPETS.md",
+    "docs/design/STYLE-V3.md",
+    "docs/design/keyframes.css",
+    "index.html",
+    "src/components/GlassButton.tsx",
+    "src/components/Orb.test.tsx",
+    "src/components/Orb.tsx",
+    "src/components/TabBar.tsx",
+    "src/index.css",
+    "src/screens/Roleplay.tsx",
+    "src/styles/motion.css",
+    "src/styles/tokens.css",
+    "src/styles/tokens.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 20,
+    "cache_creation_tokens": 40440,
+    "cache_read_tokens": 417979,
+    "output_tokens": 12589,
+    "api_call_count": 10
+  }
+}
